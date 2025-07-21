@@ -19,7 +19,7 @@
 8. Setelah command prompt terbuka, ketik "code ." maka project akan terbuka di vscode
 9. Kembali ke command prompt, lalu copas "cd FrontEnd"
 10. Setelah itu ketik "npm install"
-11. Buka codenya di vscode, masuk ke folder Android, buat file dengan nama "local.properties" lalu isi sdk.dir=C:\\Users\\YOUR_NAME\\AppData\\Local\\Android\\Sdk
+11. Buka codenya di vscode, masuk ke folder Android, buat file dengan nama "local.properties" lalu isi "sdk.dir=C:\\Users\\YOUR_NAME\\AppData\\Local\\Android\\Sdk"
 12. Setelah itu buka terminal di vscode, masukkan "mkdir android\app\src\main\assets"
 13. Setelah itu jalankan "npx react-native start --reset-cache"
 14. Setelah itu buka terminal baru, jalankan "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
