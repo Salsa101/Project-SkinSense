@@ -1,7 +1,7 @@
 # Clone Project SkinSense
 1. Buka tempat dimana folder project mau ditaruh (wajib di C:\NAMA_FOLDER_BEBAS)
 2. Buka cmd di folder tersebut
-3. Copas "git clone https://github.com/Salsa101/SkinSense-Project.git"
+3. Copas "git clone https://github.com/Salsa101/Project-SkinSense.git"
 4. Buka Sourcetree, klik "Add"
 5. Browse path project ini lalu klik Add
 6. Di panel sebelah kiri buka Remotes > Origin lalu double klik "dev" maka akan muncul popup Checkout, klik OK saja
