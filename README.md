@@ -1,3 +1,11 @@
+# Menjalankan Project (Setelah semua terinstall)
+1. Buka terminal di vscode
+2. Ketik "cd BackEnd" (ini wajib diperhatiin biar gak salah!)
+3. Setelah kamu ada di direktori BackEnd, jalankan "npm run dev"
+4. Kemudian tambah terminal baru lagi
+5. Ketik "cd FrontEnd" (ini wajib diperhatiin biar gak salah!)
+6. Setelah kamu ada di direktori FrontEnd, jalankan "npx react-native run-android"
+
 # Clone Project SkinSense
 1. Buka tempat dimana folder project mau ditaruh (wajib di C:\NAMA_FOLDER_BEBAS)
 2. Buka cmd di folder tersebut
@@ -20,14 +28,15 @@
 9. Kembali ke command prompt, lalu copas "cd FrontEnd"
 10. Setelah itu ketik "npm install"
 11. Buka codenya di vscode, masuk ke folder Android, buat file dengan nama "local.properties" lalu isi "sdk.dir=C:\\Users\\YOUR_NAME\\AppData\\Local\\Android\\Sdk" (ini \ nya double ya, gtau knp di viewnya jadi 1 \ doang padahal gw tulis double"
-12. Setelah itu buka terminal di vscode, masukkan "mkdir android\app\src\main\assets"
-13. Setelah itu jalankan "npx react-native start --reset-cache"
-14. Setelah itu buka terminal baru, jalankan "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
-15. Setelah berhasil, ketik cd Android
-16. Jalankan "./gradlew clean"
-17. Setelah itu jalankan "./grandlew installdebug"
-18. Setelah sukses, ketik "npx react-native run-android"
-19. Daaannn project siap dicoding
+12. Dibawah sdk.dir tadi tambahkan ndk.version=ISI_PAKAI_NDK_VER_KAMU
+13. Untuk cek ndk versi punyamu, kamu bisa coba akses di "C:\Users\NAMA_KAMU\AppData\Local\Android\Sdk\ndk", nanti disitu ada folder dengan judul "27.1.12297006" (contoh punya gw)
+14. Setelah itu buka terminal di vscode, masukkan "mkdir android\app\src\main\assets"
+15. Setelah itu jalankan "npx react-native start --reset-cache"
+16. Setelah itu buka terminal baru, jalankan "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
+17. Setelah berhasil, ketik cd Android
+18. Jalankan "./gradlew clean"
+19. Setelah itu jalankan "./gradlew installdebug"
+20. Setelah sukses, ketik "npx react-native run-android"
 
 # Setup Project SkinSense (BackEnd)
 1. Buka terminal baru lalu "cd BackEnd"
@@ -35,12 +44,13 @@
 3. Setelah itu jalankan "npm run dev"
 4. Kalau udah ada kalimat "Server running at http://localhost:3000" berarti udah berhasil, tinggalin aja jangan diapa-apain lagi
 
-# Cara Push Perubahan ke Sourcetree
-1. Klik "Commit"
-2. Klik "Stage All"
-3. Ketik perubahan apa yang dilakukan, misal "Add login page" lalu klik "Commit"
-4. Setelah itu klik "Push" (pastikan yang tercentang hanya dev) kemudian push
-5. Daan perubahan yang kamu lakukan sudah bisa diakses oleh rekan tim mu~
+# Cara Push/Pull Perubahan ke Sourcetree
+1. Untuk push perubahan, klik "Commit"
+2. Setelah itu klik "Stage All"
+3. Ketik perubahan apa yang dilakukan di bawah, misal "Add login page" lalu klik "Commit"
+4. Setelah itu klik "Push" dan perubahan yang kamu lakukan sudah masuk ke sourcetree
+5. Jika rekan tim lain melakukan perubahan dan push perubahan ke sourcetree, maka kamu bisa klik "pull" dan perubahan yang dilakukan rekan lain akan masuk ke projectmu
+6. Jika rekan tim lain sudah bilang "aku udah push perubahan di sourcetree" tapi di kamu belum ada notif pada opsi "pull" maka klik dulu "fetch" untuk mengambil latest commit yang dilakukan di seluruh project
 
 # Notes Untuk Pull dan Push di Sourcetree
 Setiap kali tim lain push perubahan dan kamu ingin push perubahan yang kamu lakukan di lokal, tolong !!!pull terlebih dahulu baru push perubahan lokal agar tidak bentrok!!!
