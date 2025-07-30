@@ -37,6 +37,7 @@
 18. Jalankan "./gradlew clean"
 19. Setelah itu jalankan "./gradlew installdebug"
 20. Setelah sukses, ketik "npx react-native run-android"
+21. Kemudian ketik "npm install axios" (masih di direktori FrontEnd)
 
 # Setup Project SkinSense (BackEnd)
 1. Buka terminal baru lalu "cd BackEnd"
