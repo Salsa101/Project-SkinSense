@@ -10,7 +10,7 @@ const AccountOption = () => {
       />
       <View style={styles.content}>
         <Text style={styles.title}>Hello!</Text>
-        <Text style={styles.subtitle}>Welcome to SkinSense</Text>
+        <Text style={styles.subtitle}>Welcome to</Text>
 
         <TouchableOpacity style={styles.signInBtn}>
           <Text style={styles.signInText}>Sign In</Text>
