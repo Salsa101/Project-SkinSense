@@ -1,12 +1,21 @@
-buildscript {
-    ext {
+def ndkVersionProp = null
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    def Properties localProperties = new Properties()
+    localProperties.load(new FileInputStream(localPropertiesFile))
+    ndkVersionProp = localProperties.getProperty("ndk.version")
+}
+
+ext {
         buildToolsVersion = "35.0.0"
         minSdkVersion = 24
         compileSdkVersion = 35
         targetSdkVersion = 35
-        ndkVersion = "27.0.12077973"
+        ndkVersion = ndkVersionProp ?: "27.1.12297006"
         kotlinVersion = "2.1.20"
     }
+
+buildscript {
     repositories {
         google()
         mavenCentral()
