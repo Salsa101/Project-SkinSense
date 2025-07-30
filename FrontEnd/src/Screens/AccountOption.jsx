@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const AccountOption = () => {
+const AccountOption = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Image
@@ -13,11 +13,11 @@ const AccountOption = () => {
         <Text style={styles.subtitle}>Welcome to</Text>
 
         <TouchableOpacity style={styles.signInBtn}>
-          <Text style={styles.signInText}>Sign In</Text>
+          <Text style={styles.signInText} onPress={() => navigation.navigate('SignIn')}>Sign In</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signUpBtn}>
-          <Text style={styles.signUpText}>Sign Up</Text>
+          <Text style={styles.signUpText} onPress={() => navigation.navigate('SignUp')}>Sign Up</Text>
         </TouchableOpacity>
       </View>
     </View>
