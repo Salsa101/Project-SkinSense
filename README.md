@@ -8,7 +8,7 @@
 7. Klik "Fetch" lalu "OK"
 8. Klik "Pull" lalu "OK"
 
-# Setup Project SkinSense
+# Setup Project SkinSense (FrontEnd)
 1. Cari C:\Users\YOUR_NAME\AppData\Local\Android\Sdk\emulator
 2. Ketik "emulator -list-avds" di file path
 3. Nanti keluar emulator apa aja yang udah kamu install
@@ -28,6 +28,12 @@
 17. Setelah itu jalankan "./grandlew installdebug"
 18. Setelah sukses, ketik "npx react-native run-android"
 19. Daaannn project siap dicoding
+
+# Setup Project SkinSense (BackEnd)
+1. Buka terminal baru lalu "cd BackEnd"
+2. Jalankan "npm install"
+3. Setelah itu jalankan "npm run dev"
+4. Kalau udah ada kalimat "Server running at http://localhost:3000" berarti udah berhasil, tinggalin aja jangan diapa-apain lagi
 
 # Cara Push Perubahan ke Sourcetree
 1. Klik "Commit"
