@@ -1,10 +1,12 @@
 # Menjalankan Project (Setelah semua terinstall)
 1. Buka terminal di vscode
 2. Ketik "cd BackEnd" (ini wajib diperhatiin biar gak salah!)
-3. Setelah kamu ada di direktori BackEnd, jalankan "npm run dev"
-4. Kemudian tambah terminal baru lagi
-5. Ketik "cd FrontEnd" (ini wajib diperhatiin biar gak salah!)
-6. Setelah kamu ada di direktori FrontEnd, jalankan "npx react-native run-android"
+3. Jalankan "npm install" (kalau ada dependency baru, klo gada ya gausah!)
+4. Setelah kamu ada di direktori BackEnd, jalankan "npm run dev"
+5. Kemudian tambah terminal baru lagi
+6. Ketik "cd FrontEnd" (ini wajib diperhatiin biar gak salah!)
+7. Jalankan "npm install" (kalau ada dependency baru, klo gada ya gausah!)
+8. Setelah kamu ada di direktori FrontEnd, jalankan "npx react-native run-android"
 
 # Clone Project SkinSense
 1. Buka tempat dimana folder project mau ditaruh (wajib di C:\NAMA_FOLDER_BEBAS)
