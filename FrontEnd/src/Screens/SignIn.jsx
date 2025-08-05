@@ -7,33 +7,32 @@ import {
   Button,
   Image,
   SafeAreaView,
+  Alert
 } from 'react-native';
-import axios from 'axios';
+import api from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignIn = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    axios
-      .post('http://10.0.2.2:3000/login', {
-        username: username,
-        password: password,
-      })
-      .then(response => {
-        if (response.data.success) {
-          setErrorMessage('');
-          navigation.navigate('Home');
-        } else {
-          setErrorMessage('Data yang anda masukkan salah');
-          setTimeout(() => setErrorMessage(''), 3000);
-        }
-      })
-      .catch(error => {
-        setErrorMessage('Data yang anda masukkan salah');
-        setTimeout(() => setErrorMessage(''), 3000);
+  const handleLogin = async () => {
+    try {
+      await api.post('/login', {
+        username,
+        password,
+      }, {
+        withCredentials: true, // Kirim dan simpan cookie
       });
+
+      Alert.alert('Sukses', 'Login berhasil.');
+      navigation.navigate('Home'); // ganti sesuai rute kamu
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Login gagal.';
+      Alert.alert('Error', msg);
+      console.log('Login error:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -65,18 +64,16 @@ const SignIn = ({ navigation }) => {
 
           <View style={{ marginTop: 10 }}>
             {errorMessage !== '' && (
-              <Text style={{ color: 'red', }}>
-                {errorMessage}
-              </Text>
+              <Text style={{ color: 'red' }}>{errorMessage}</Text>
             )}
             <Button style={styles.btn} title="Sign In" onPress={handleLogin} />
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
               Already have an account? {''}
               <Text
                 style={styles.text2}
-                onPress={() => navigation.navigate('SignIn')}
+                onPress={() => navigation.navigate('SignUp')}
               >
-                Sign In
+                Sign Up
               </Text>
             </Text>
           </View>

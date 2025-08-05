@@ -1,14 +1,32 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
+import api from '../api';
 
-const SplashScreen = ({navigation}) => {
+const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('AccountOption');
-    }, 2500);
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/home', {
+          withCredentials: true,
+        });
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
+        setTimeout(() => {
+          if (response.data?.user) {
+            navigation.replace('Home');
+          } else {
+            navigation.replace('SignIn');
+          }
+        }, 2500);
+      } catch (error) {
+        console.log('Auth check failed:', error.message);
+        setTimeout(() => {
+          navigation.replace('SignIn');
+        }, 2500);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <View style={styles.container}>

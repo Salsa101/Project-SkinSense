@@ -7,13 +7,39 @@ import {
   Button,
   Image,
   SafeAreaView,
+  Alert
 } from 'react-native';
+
+import api from '../api';
 
 const SignUp = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegister = async () => {
+    try {
+      const response = await api.post('/register', {
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      if (response.data.message === 'User berhasil terdaftar.') {
+        Alert.alert('Sukses', 'Berhasil daftar! Silakan login.');
+        navigation.navigate('SignIn');
+      } else {
+        Alert.alert('Gagal', response.data.message || 'Gagal mendaftar.');
+      }
+    } catch (error) {
+      const msg =
+        error.response?.data?.message || 'Terjadi kesalahan saat registrasi.';
+      Alert.alert('Error', msg);
+      console.log('Register error:', error.response?.data || error.message);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -64,7 +90,7 @@ const SignUp = ({ navigation }) => {
             <Button
               style={styles.btn}
               title="Sign Up"
-              onPress={() => navigation.navigate('Home')}
+              onPress={handleRegister}
             />
             <Text style={{ textAlign: 'center', marginTop: 10 }}>
               Already have an account? {''}
