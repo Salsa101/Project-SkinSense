@@ -46,13 +46,10 @@ const HomeScreen = ({ navigation }) => {
       await api.post(
         '/logout',
         {},
-        {
-          withCredentials: true,
-        },
       );
 
       Alert.alert('Sukses', 'Logout berhasil.');
-      navigation.navigate('SignIn');
+      navigation.navigate('AccountOption');
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'Gagal logout.');

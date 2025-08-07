@@ -6,21 +6,19 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await api.get('/home', {
-          withCredentials: true,
-        });
+        const response = await api.get('/home');
 
         setTimeout(() => {
           if (response.data?.user) {
             navigation.replace('Home');
           } else {
-            navigation.replace('SignIn');
+            navigation.replace('AccountOption');
           }
         }, 2500);
       } catch (error) {
         console.log('Auth check failed:', error.message);
         setTimeout(() => {
-          navigation.replace('SignIn');
+          navigation.replace('AccountOption');
         }, 2500);
       }
     };

@@ -1,23 +1,35 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const AccountOption = ({navigation}) => {
+const AccountOption = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/OpsiAkun.png')} // ganti dengan file kamu
+        source={require('../../assets/OpsiAkun.png')}
         style={styles.image}
       />
       <View style={styles.content}>
-        <Text style={styles.title}>Hello!</Text>
-        <Text style={styles.subtitle}>Welcome to</Text>
+        <View style={{ marginBottom:30, alignItems: 'center' }}>
+          <Text style={styles.title}>Hello!</Text>
+          <Text style={styles.subtitle}>Welcome to SkinSense</Text>
+        </View>
 
         <TouchableOpacity style={styles.signInBtn}>
-          <Text style={styles.signInText} onPress={() => navigation.navigate('SignIn')}>Sign In</Text>
+          <Text
+            style={styles.signInText}
+            onPress={() => navigation.navigate('SignIn')}
+          >
+            Sign In
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signUpBtn}>
-          <Text style={styles.signUpText} onPress={() => navigation.navigate('SignUp')}>Sign Up</Text>
+          <Text
+            style={styles.signUpText}
+            onPress={() => navigation.navigate('SignUp')}
+          >
+            Sign Up
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -37,10 +49,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 80,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 40,
     fontWeight: 'bold',
     color: '#D25E8D',
     marginBottom: 10,

@@ -1,33 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import { React, useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
+  KeyboardAvoidingView,
   TextInput,
+  StyleSheet,
+  Text,
+  Platform,
+  TouchableWithoutFeedback,
   Button,
+  Keyboard,
   Image,
-  SafeAreaView,
-  Alert
+  Alert,
 } from 'react-native';
-import api from '../api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SignIn = ({ navigation }) => {
+import api from '../api';
+
+const SignIn = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
     try {
-      await api.post('/login', {
-        username,
-        password,
-      }, {
-        withCredentials: true, // Kirim dan simpan cookie
-      });
+      await api.post(
+        '/login',
+        {
+          username,
+          password,
+        },
+      );
 
       Alert.alert('Sukses', 'Login berhasil.');
-      navigation.navigate('Home'); // ganti sesuai rute kamu
+      navigation.navigate('Home');
     } catch (error) {
       const msg = error.response?.data?.message || 'Login gagal.';
       Alert.alert('Error', msg);
@@ -36,66 +40,71 @@ const SignIn = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Image
-          source={require('../../assets/OpsiAkun.png')}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Sign In</Text>
-
-        <View style={styles.form}>
-          <Text style={styles.body}>Username</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Masukkan username"
-            value={username}
-            onChangeText={setUsername}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Image
+            source={require('../../assets/OpsiAkun.png')}
+            style={styles.image}
           />
+          <Text style={styles.title}>Sign In</Text>
 
-          <Text style={styles.body}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Masukkan password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.form}>
+            <Text style={styles.body}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Masukkan username"
+              value={username}
+              onChangeText={setUsername}
+            />
 
-          <View style={{ marginTop: 10 }}>
-            {errorMessage !== '' && (
-              <Text style={{ color: 'red' }}>{errorMessage}</Text>
-            )}
-            <Button style={styles.btn} title="Sign In" onPress={handleLogin} />
-            <Text style={{ textAlign: 'center', marginTop: 10 }}>
-              Already have an account? {''}
-              <Text
-                style={styles.text2}
-                onPress={() => navigation.navigate('SignUp')}
-              >
-                Sign Up
+            <Text style={styles.body}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Masukkan password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <View style={styles.buttonContainer}>
+              {errorMessage !== '' && (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              )}
+              <Button title="Sign In" onPress={handleLogin} />
+              <Text style={styles.signupText}>
+                Already have an account?{' '}
+                <Text
+                  style={styles.text2}
+                  onPress={() => navigation.navigate('SignUp')}
+                >
+                  Sign Up
+                </Text>
               </Text>
-            </Text>
+            </View>
           </View>
         </View>
-        <View />
-      </View>
-    </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
     flex: 1,
+  },
+  inner: {
+    padding: 24,
+    flex: 1,
+    justifyContent: 'space-around',
   },
   image: {
     width: '100%',
     height: '35%',
     resizeMode: 'cover',
-  },
-  form: {
-    margin: 30,
   },
   title: {
     fontSize: 40,
@@ -104,6 +113,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     fontWeight: 'bold',
     color: '#0077b6',
+  },
+  form: {
+    margin: 30,
   },
   body: {
     fontSize: 16,
@@ -116,8 +128,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
   },
-  btn: {
-    borderRadius: 6,
+  buttonContainer: {
+    marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
+  },
+  signupText: {
+    textAlign: 'center',
+    marginTop: 10,
   },
   text2: {
     color: '#0077b6',
