@@ -7,6 +7,7 @@ import SignIn from '../Screens/SignIn';
 import SplashScreen from '../Screens/SplashScreen';
 import AccountOption from '../Screens/AccountOption';
 import ProfilePage from '../Screens/ProfilePage';
+import Calendar from '../Screens/Calendar';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Profile"
           component={ProfilePage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Calendar"
+          component={Calendar}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

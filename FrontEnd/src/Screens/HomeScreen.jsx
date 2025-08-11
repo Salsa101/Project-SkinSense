@@ -1,21 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
-  Alert,
+  BackHandler,
   ScrollView,
   Image,
+  Alert,
   TouchableOpacity,
 } from 'react-native';
 
+import { useFocusEffect } from '@react-navigation/native';
 import api from '../api';
+import Navbar from '../Components/Navbar';
 
 const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState('');
+  const [active, setActive] = useState('Home');
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert('Keluar Aplikasi', 'Apakah kamu yakin ingin keluar?', [
+          { text: 'Batal', style: 'cancel' },
+          { text: 'Keluar', onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+
+      const handleBack = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => handleBack.remove();
+    }, []),
+  );
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -38,7 +61,11 @@ const HomeScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <ActivityIndicator style={styles.loading} size="large" color="#0000ff" />
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center' }}
+        size="large"
+        color="#DE576F"
+      />
     );
   }
 
@@ -50,145 +77,141 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/logout', {});
-
-      Alert.alert('Sukses', 'Logout berhasil.');
-      navigation.navigate('AccountOption');
-    } catch (error) {
-      console.error('Logout error:', error);
-      Alert.alert('Error', 'Gagal logout.');
-    }
-  };
-
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text>Hello, {userData?.user?.username}</Text>
-          <Text>Dry Skin & Acne Prone</Text>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text>Hello, {userData?.user?.username}</Text>
+            <Text>Dry Skin & Acne Prone</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <Image
+              source={require('../../assets/profile-picture.png')}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+
+        {/* Reminder */}
+        <View style={styles.reminderSection}>
           <Image
-            source={require('../../assets/profile-picture.png')}
-            style={styles.profileImage}
+            source={require('../../assets/face-picture.png')}
+            style={styles.faceImage}
           />
+          <View style={styles.reminderContainer}>
+            <View style={styles.reminderContent}>
+              <Text style={styles.reminderTitle}>Reminder</Text>
+              <Text style={styles.reminderTitle}>+</Text>
+            </View>
+            <Text style={styles.reminderText}>
+              - Product A is expiring in 4 days
+            </Text>
+            <Text style={styles.reminderText}>- Apply your sunscreen</Text>
+          </View>
+        </View>
+
+        {/* Compare Button */}
+        <TouchableOpacity style={styles.compareButton}>
+          <View style={styles.compareButtonContent}>
+            <Text style={styles.compareButtonText}>Compare Your SKin</Text>
+            <Text style={styles.compareButtonText}>---</Text>
+          </View>
         </TouchableOpacity>
-      </View>
 
-      {/* Reminder */}
-      <View style={styles.reminderSection}>
-        <Image
-          source={require('../../assets/face-picture.png')}
-          style={styles.faceImage}
-        />
-        <View style={styles.reminderContainer}>
-          <View style={styles.reminderContent}>
-            <Text style={styles.reminderTitle}>Reminder</Text>
-            <Text style={styles.reminderTitle}>+</Text>
+        {/* Ingredients Section */}
+        <View style={styles.ingredientsSection}>
+          <Text style={styles.ingredientsTitle}>Ingredients</Text>
+          <View style={styles.ingredientsContainer}>
+            <Text style={styles.ingredientsText}>Centella asiatica</Text>
+            <Text style={styles.ingredientsText}>Ceramide NP</Text>
+            <Text style={styles.ingredientsText}>Jojoba Oil</Text>
+            <Text style={styles.ingredientsText}>BHA</Text>
+            <Text style={styles.ingredientsText}>Hyaluronic Acid</Text>
           </View>
-          <Text style={styles.reminderText}>
-            - Product A is expiring in 4 days
-          </Text>
-          <Text style={styles.reminderText}>- Apply your sunscreen</Text>
         </View>
-      </View>
 
-      {/* Compare Button */}
-      <TouchableOpacity style={styles.compareButton}>
-        <View style={styles.compareButtonContent}>
-          <Text style={styles.compareButtonText}>Compare Your SKin</Text>
-          <Text style={styles.compareButtonText}>---</Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Ingredients Section */}
-      <View style={styles.ingredientsSection}>
-        <Text style={styles.ingredientsTitle}>Ingredients</Text>
-        <View style={styles.ingredientsContainer}>
-          <Text style={styles.ingredientsText}>Centella asiatica</Text>
-          <Text style={styles.ingredientsText}>Ceramide NP</Text>
-          <Text style={styles.ingredientsText}>Jojoba Oil</Text>
-          <Text style={styles.ingredientsText}>BHA</Text>
-          <Text style={styles.ingredientsText}>Hyaluronic Acid</Text>
-        </View>
-      </View>
-
-      {/* Product Section */}
-      <View style={styles.productSection}>
-        <View style={styles.productTitleContainer}>
-          <Text style={styles.productTitle}>Product For You</Text>
-          <Text style={styles.seeMore}>See more</Text>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {/* Product 1 */}
-          <View style={styles.productContainer}>
-            <Image
-              source={require('../../assets/product-image.png')}
-              style={styles.productImage}
-            />
-            <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-            <View style={styles.ingredientProductContainer}>
-              <Text style={styles.ingredientProductText}>BHA</Text>
-              <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+        {/* Product Section */}
+        <View style={styles.productSection}>
+          <View style={styles.productTitleContainer}>
+            <Text style={styles.productTitle}>Product For You</Text>
+            <Text style={styles.seeMore}>See more</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {/* Product 1 */}
+            <View style={styles.productContainer}>
+              <Image
+                source={require('../../assets/product-image.png')}
+                style={styles.productImage}
+              />
+              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
+              <View style={styles.ingredientProductContainer}>
+                <Text style={styles.ingredientProductText}>BHA</Text>
+                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+              </View>
             </View>
-          </View>
 
-          {/* Product 2 */}
-          <View style={styles.productContainer}>
-            <Image
-              source={require('../../assets/product-image.png')}
-              style={styles.productImage}
-            />
-            <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-            <View style={styles.ingredientProductContainer}>
-              <Text style={styles.ingredientProductText}>BHA</Text>
-              <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+            {/* Product 2 */}
+            <View style={styles.productContainer}>
+              <Image
+                source={require('../../assets/product-image.png')}
+                style={styles.productImage}
+              />
+              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
+              <View style={styles.ingredientProductContainer}>
+                <Text style={styles.ingredientProductText}>BHA</Text>
+                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+              </View>
             </View>
-          </View>
 
-          {/* Product 3 */}
-          <View style={styles.productContainer}>
-            <Image
-              source={require('../../assets/product-image.png')}
-              style={styles.productImage}
-            />
-            <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-            <View style={styles.ingredientProductContainer}>
-              <Text style={styles.ingredientProductText}>BHA</Text>
-              <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+            {/* Product 3 */}
+            <View style={styles.productContainer}>
+              <Image
+                source={require('../../assets/product-image.png')}
+                style={styles.productImage}
+              />
+              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
+              <View style={styles.ingredientProductContainer}>
+                <Text style={styles.ingredientProductText}>BHA</Text>
+                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+              </View>
             </View>
-          </View>
-        </ScrollView>
-        <View></View>
-      </View>
-
-      {/* Tips Section */}
-      <View style={styles.tipsSection}>
-        <View style={styles.tipsTitleContainer}>
-          <Text style={styles.tipsTitle}>Tips For You</Text>
-          <Text style={styles.seeMore}>See more</Text>
+          </ScrollView>
+          <View></View>
         </View>
 
-        <View style={styles.tipsContainer}>
-          <Text style={styles.tipsName}>Lorem ipsum</Text>
-          <Text style={styles.tipsText}>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Assumenda
-            debitis voluptas tempore, labore error molestias libero accusantium
-            fuga nesciunt...
-          </Text>
+        {/* Tips Section */}
+        <View style={styles.tipsSection}>
+          <View style={styles.tipsTitleContainer}>
+            <Text style={styles.tipsTitle}>Tips For You</Text>
+            <Text style={styles.seeMore}>See more</Text>
+          </View>
+
+          <View style={styles.tipsContainer}>
+            <Text style={styles.tipsName}>Lorem ipsum</Text>
+            <Text style={styles.tipsText}>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+              Assumenda debitis voluptas tempore, labore error molestias libero
+              accusantium fuga nesciunt...
+            </Text>
+          </View>
         </View>
+      </ScrollView>
+
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        <Navbar active={active} onPress={setActive} />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    margin: 30,
+    marginTop: 30,
+    marginHorizontal: 30,
+    marginBottom: 80,
   },
   header: {
     display: 'flex',
@@ -278,6 +301,7 @@ const styles = StyleSheet.create({
   },
   tipsSection: {
     marginTop: 40,
+    marginBottom: 35,
   },
   tipsTitleContainer: {
     display: 'flex',
@@ -289,10 +313,6 @@ const styles = StyleSheet.create({
     padding: 15,
     marginTop: 10,
     borderRadius: 10,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
