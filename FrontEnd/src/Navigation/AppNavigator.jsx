@@ -1,25 +1,49 @@
-import React from 'react';
+import { React, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../Screens/HomeScreen';
 import SignUp from '../Screens/SignUp';
 import SignIn from '../Screens/SignIn';
-import SplashScreen from '../Screens/SplashScreen';
 import AccountOption from '../Screens/AccountOption';
 import ProfilePage from '../Screens/ProfilePage';
 import Calendar from '../Screens/Calendar';
+import RNBootSplash from 'react-native-bootsplash';
+
+import api from '../api';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
+  const [initialRoute, setInitialRoute] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/home');
+
+        if (response.data?.user) {
+          setInitialRoute('Home');
+        } else {
+          setInitialRoute('AccountOption');
+        }
+      } catch (error) {
+        console.log('Auth check failed:', error.message);
+        setInitialRoute('AccountOption');
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  if (!initialRoute) {
+    return null;
+  }
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="SplashScreen">
-        <Stack.Screen
-          name="SplashScreen"
-          component={SplashScreen}
-          options={{ headerShown: false }}
-        />
+    <NavigationContainer
+      onReady={async () => await RNBootSplash.hide({ fade: true })}
+    >
+      <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="AccountOption"
           component={AccountOption}
