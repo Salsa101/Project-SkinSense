@@ -14,6 +14,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../api';
 import Navbar from '../Components/Navbar';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -83,8 +84,10 @@ const HomeScreen = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text>Hello, {userData?.user?.username}</Text>
-            <Text>Dry Skin & Acne Prone</Text>
+           <Text style={styles.welcometext}>
+            Hello, <Text style={styles.username}>{userData?.user?.username}</Text>
+           </Text>
+            <Text style={styles.skintypetext}>Dry Skin & Acne Prone</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             <Image
@@ -106,23 +109,23 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.reminderTitle}>+</Text>
             </View>
             <Text style={styles.reminderText}>
-              - Product A is expiring in 4 days
+              • Product A is expiring in 4 days
             </Text>
-            <Text style={styles.reminderText}>- Apply your sunscreen</Text>
+            <Text style={styles.reminderText}>• Apply your sunscreen</Text>
           </View>
         </View>
 
         {/* Compare Button */}
         <TouchableOpacity style={styles.compareButton}>
           <View style={styles.compareButtonContent}>
-            <Text style={styles.compareButtonText}>Compare Your SKin</Text>
-            <Text style={styles.compareButtonText}>---</Text>
+            <Text style={styles.compareButtonText}>Compare Your Skin</Text>
+            <Icon name="arrow-right" size={15} color="#DE576F" style={styles.compareIcon} />
           </View>
         </TouchableOpacity>
 
         {/* Ingredients Section */}
         <View style={styles.ingredientsSection}>
-          <Text style={styles.ingredientsTitle}>Ingredients</Text>
+          <Text style={styles.ingredientsTitle}>Ingredients For You</Text>
           <View style={styles.ingredientsContainer}>
             <Text style={styles.ingredientsText}>Centella asiatica</Text>
             <Text style={styles.ingredientsText}>Ceramide NP</Text>
@@ -228,27 +231,60 @@ const styles = StyleSheet.create({
     display: 'flex',
   },
   reminderContainer: {
-    backgroundColor: 'lightgray',
+    display: 'flex',
+    backgroundColor: '#FFF0F3',
+    borderRadius: 17,
+    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
   },
   reminderContent: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  reminderTitle: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 18,
+    color: '#DE576F',
+    paddingHorizontal: 15,
+  },
+  reminderText: {
+    fontFamily: 'Poppins-Light',
+    fontSize: 12,
+    color: '#DE576F',
+    marginLeft: 15,
+  },
   compareButtonContent: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 15,
+    marginVertical: 10,
   },
   compareButton: {
-    backgroundColor: 'lightgray',
+    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
+    borderRadius: 17,
+    backgroundColor: '#FFF0F3',
     marginTop: 30,
+  },
+  compareButtonText: {
+    color: '#DE576F',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 16,
+  },
+  compareIcon: {
+    display: 'flex',
+    alignItems: 'center',
+    textAlign: 'center',
   },
   ingredientsSection: {
     marginTop: 30,
   },
   ingredientsTitle: {
+    fontFamily: 'Poppins-Bold',
     marginBottom: 10,
+    color: '#DE576F',
+    fontSize: 16,
   },
   ingredientsContainer: {
     display: 'flex',
@@ -257,22 +293,36 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   ingredientsText: {
-    backgroundColor: 'magenta',
+    backgroundColor: '#FFE1E2',
+    fontFamily: 'Poppins-Light',
+    color: '#DE576F',
     marginBottom: 10,
     marginRight: 4,
     paddingHorizontal: 15,
     paddingVertical: 5,
     borderRadius: 15,
   },
+
   productTitleContainer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 30,
   },
+  productTitle: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 18,
+    color: '#DE576F',
+  },
+  seeMore: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 18,
+    color: '#EFB9C2',
+  },
   productContainer: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: '#FFF0F3',
+    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
     padding: 20,
     borderRadius: 20,
     marginTop: 15,
@@ -285,6 +335,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     resizeMode: 'cover',
   },
+  productName: {
+    fontFamily: 'Poppins-Light',
+    fontSize: 16,
+    color: '#DE576F',
+  },
   ingredientProductContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -292,7 +347,9 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   ingredientProductText: {
-    backgroundColor: 'magenta',
+    backgroundColor: '#FFE1E2',
+    fontFamily: 'Poppins-Light',
+    color: '#DE576F',
     marginBottom: 5,
     marginTop: 10,
     paddingHorizontal: 10,
@@ -309,10 +366,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   tipsContainer: {
-    backgroundColor: 'pink',
+    backgroundColor: '#FFF0F3',
+    boxShadow: '0px 4px 12px rgba(227, 209, 212, 0.75)',
     padding: 15,
     marginTop: 10,
     borderRadius: 10,
+  },
+  tipsTitle: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 18,
+    color: '#DE576F',
+  },
+  tipsName: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 16,
+    color: '#DE576F',
+  },
+  tipsText: {
+    fontFamily: 'Poppins-Light',
+    fontSize: 12,
+    color: '#DE576F',
   },
   title: {
     fontSize: 20,
@@ -321,6 +394,21 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: 16,
+  },
+  welcometext: {
+    fontSize: 28,
+    fontFamily: 'Poppins-Regular',
+    color: '#DE576F',
+  },
+  username: {
+    fontSize: 28,
+    fontFamily: 'Poppins-Bold',
+    color: '#DE576F',
+  },
+  skintypetext: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Regular',
+    color: '#DE576F',
   },
 });
 
