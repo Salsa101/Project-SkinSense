@@ -79,7 +79,7 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#FCF7F2' }}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -406,6 +406,7 @@ const styles = StyleSheet.create({
     color: '#DE576F',
   },
   skintypetext: {
+    lineHeight: 12,
     fontSize: 18,
     fontFamily: 'Poppins-Regular',
     color: '#DE576F',
