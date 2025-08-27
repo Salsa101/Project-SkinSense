@@ -1,7 +1,19 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { React } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+
+import { useExitAppHandler } from '../Hooks/CustomBackHandler';
 
 const AccountOption = ({ navigation }) => {
+
+  //Handler Exit app
+  useExitAppHandler();
+
   return (
     <View style={styles.container}>
       <Image

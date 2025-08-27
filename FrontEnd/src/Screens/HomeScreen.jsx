@@ -1,20 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
-  BackHandler,
   ScrollView,
   Image,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 
-import { useFocusEffect } from '@react-navigation/native';
 import api from '../api';
 import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import { useExitAppHandler } from '../Hooks/CustomBackHandler';
 
 const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -22,24 +21,8 @@ const HomeScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [active, setActive] = useState('Home');
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        Alert.alert('Keluar Aplikasi', 'Apakah kamu yakin ingin keluar?', [
-          { text: 'Batal', style: 'cancel' },
-          { text: 'Keluar', onPress: () => BackHandler.exitApp() },
-        ]);
-        return true;
-      };
-
-      const handleBack = BackHandler.addEventListener(
-        'hardwareBackPress',
-        onBackPress,
-      );
-
-      return () => handleBack.remove();
-    }, []),
-  );
+  //Exit Handler
+  useExitAppHandler();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -84,9 +67,10 @@ const HomeScreen = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-           <Text style={styles.welcometext}>
-            Hello, <Text style={styles.username}>{userData?.user?.username}</Text>
-           </Text>
+            <Text style={styles.welcometext}>
+              Hello,{' '}
+              <Text style={styles.username}>{userData?.user?.username}</Text>
+            </Text>
             <Text style={styles.skintypetext}>Dry Skin & Acne Prone</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
@@ -116,12 +100,17 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Compare Button */}
-        <TouchableOpacity style={styles.compareButton}>
-          <View style={styles.compareButtonContent}>
-            <Text style={styles.compareButtonText}>Compare Your Skin</Text>
-            <Icon name="arrow-right" size={15} color="#DE576F" style={styles.compareIcon} />
-          </View>
-        </TouchableOpacity>
+        {/* <TouchableOpacity style={styles.compareButton}> */}
+        <View style={styles.compareButtonContent}>
+          <Text style={styles.compareButtonText}>Compare Your Skin</Text>
+          <Icon
+            name="arrow-right"
+            size={15}
+            color="#DE576F"
+            style={styles.compareIcon}
+          />
+        </View>
+        {/* </TouchableOpacity> */}
 
         {/* Ingredients Section */}
         <View style={styles.ingredientsSection}>
@@ -213,7 +202,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     marginTop: 30,
-    marginHorizontal: 30,
+    marginHorizontal: 15,
     marginBottom: 80,
   },
   header: {
@@ -258,8 +247,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 15,
-    marginVertical: 10,
+    marginHorizontal: 5,
+    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
+    borderRadius: 20,
+    backgroundColor: '#FFF0F3',
+    marginTop: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   compareButton: {
     boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
@@ -406,7 +400,7 @@ const styles = StyleSheet.create({
     color: '#DE576F',
   },
   skintypetext: {
-    lineHeight: 12,
+    marginTop: 0,
     fontSize: 18,
     fontFamily: 'Poppins-Regular',
     color: '#DE576F',

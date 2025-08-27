@@ -11,9 +11,16 @@ import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 
+import { useCustomBackHandler } from '../Hooks/CustomBackHandler';
+
 const Calendar = ({ navigation }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
+
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Home');
+  });
 
   // Real Time Date
   const getWeekDays = () => {
@@ -262,7 +269,9 @@ const Calendar = ({ navigation }) => {
         <View
           style={{
             padding: 15,
-            margin: 18,
+            paddingLeft: 7,
+            margin: 16,
+            marginBottom: 20,
             backgroundColor: '#b4b4b4ff',
             borderRadius: 20,
           }}
@@ -303,7 +312,21 @@ const Calendar = ({ navigation }) => {
             Completed
           </Text>
 
-          {currentData.map(item => renderCard(item, activeTab))}
+          {currentData.length === 0 ? (
+            <Text
+              style={{
+                textAlign: 'center',
+                marginVertical: 30,
+                color: '#000000ff',
+              }}
+            >
+              No data available
+            </Text>
+          ) : (
+            currentData.map(item => renderCard(item, activeTab))
+          )}
+
+          {/* {currentData.map(item => renderCard(item, activeTab))} */}
         </View>
       </ScrollView>
 
@@ -382,17 +405,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#8f4141ff',
     borderRadius: 25,
   },
-  toggleText: {
-    fontSize: 14,
-    color: '#999',
-  },
   activeTab: {
     backgroundColor: '#fff',
     borderRadius: 25,
-  },
-  activeText: {
-    color: '#E06287',
-    fontWeight: 'bold',
   },
   title: {
     fontSize: 20,
@@ -444,24 +459,12 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 2,
   },
-  statusBadge: {
-    marginTop: 8,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginLeft: 'auto',
-  },
-  statusText: {
-    fontSize: 11,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   floatingBubble: {
     position: 'absolute',
-    bottom: 120,
+    bottom: 100,
     right: 20,
     backgroundColor: '#ae02c9ff',
-    borderRadius: 40,
+    borderRadius: 60,
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
