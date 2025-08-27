@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -6,15 +6,15 @@ import {
   Text,
   TouchableWithoutFeedback,
   Keyboard,
-  ScrollView,
   Image,
   Alert,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import api from '../api';
+
+const { height: windowHeight } = Dimensions.get('window');
 
 const SignIn = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -23,11 +23,7 @@ const SignIn = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      await api.post('/login', {
-        username,
-        password,
-      });
-
+      await api.post('/login', { username, password });
       Alert.alert('Sukses', 'Login berhasil.');
       navigation.navigate('Home');
     } catch (error) {
@@ -37,27 +33,29 @@ const SignIn = ({ navigation }) => {
     }
   };
 
+  const estimatedFormHeight = 500;
+  const imageHeight =
+    windowHeight > estimatedFormHeight + 200
+      ? windowHeight - estimatedFormHeight
+      : windowHeight * 0.3;
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollContainer}
       keyboardShouldPersistTaps="handled"
       enableOnAndroid={true}
-      extraScrollHeight={80}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
+        <View style={styles.innerContainer}>
           <Image
             source={require('../../assets/OpsiAkun.png')}
-            style={styles.image}
+            style={[styles.image, { height: imageHeight }]}
           />
-          <Text style={styles.title}>Sign In</Text>
 
-          <View style={styles.form}>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Sign In</Text>
+
             <Text style={styles.body}>Username</Text>
             <TextInput
               style={styles.input}
@@ -79,25 +77,25 @@ const SignIn = ({ navigation }) => {
 
             <Text style={styles.textForgot}>Forgot Password?</Text>
 
-            <View style={styles.buttonContainer}>
-              {errorMessage !== '' && (
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              )}
-              <TouchableOpacity style={styles.signInBtn} onPress={handleLogin}>
-                <Text style={styles.signInText}>Sign In</Text>
-              </TouchableOpacity>
-              <Text style={styles.signinText}>
-                Already have an account?{' '}
-                <Text
-                  style={styles.text2}
-                  onPress={() => navigation.navigate('SignUp')}
-                >
-                  Sign Up
-                </Text>
+            {errorMessage !== '' && (
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            )}
+
+            <TouchableOpacity style={styles.signInBtn} onPress={handleLogin}>
+              <Text style={styles.signInText}>Sign In</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.signinText}>
+              Already have an account?{' '}
+              <Text
+                style={styles.text2}
+                onPress={() => navigation.navigate('SignUp')}
+              >
+                Sign Up
               </Text>
-            </View>
+            </Text>
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAwareScrollView>
   );
@@ -110,35 +108,31 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'flex-start',
-    backgroundColor: '#FCF7F2',
-    paddingBottom: 10,
   },
-
-  inner: {
-    padding: 24,
+  innerContainer: {
     flex: 1,
-    justifyContent: 'space-around',
   },
   image: {
     width: '100%',
-    height: 350,
     resizeMode: 'cover',
+  },
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: 20,
+    marginBottom: 20,
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 36,
     textAlign: 'center',
-    marginTop: 70,
+    marginBottom: 20,
+    marginTop: 40,
     fontFamily: 'Poppins-Bold',
     color: '#DE576F',
   },
-  form: {
-    marginHorizontal: 30,
-    marginTop: 25,
-    justifyContent: 'space-between',
-  },
   body: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Poppins-Medium',
     marginTop: 16,
     color: '#DE576F',
@@ -149,13 +143,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 6,
     padding: 10,
+    marginTop: 5,
   },
   signInBtn: {
     backgroundColor: '#DE576F',
     paddingVertical: 5,
-    paddingHorizontal: 130,
     borderRadius: 25,
-    marginTop: 50,
+    marginTop: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    alignSelf: 'center',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 1,
@@ -165,11 +163,12 @@ const styles = StyleSheet.create({
   signInText: {
     color: 'white',
     fontFamily: 'Poppins-Bold',
-    fontSize: 22,
+    fontSize: 20,
     textAlign: 'center',
   },
   errorText: {
     color: 'red',
+    marginTop: 5,
   },
   signinText: {
     textAlign: 'center',

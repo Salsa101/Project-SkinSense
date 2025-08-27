@@ -8,13 +8,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
-  ScrollView,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import api from '../api';
+
+const { height: windowHeight } = Dimensions.get('window');
 
 const SignUp = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -22,6 +22,7 @@ const SignUp = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [formHeight, setFormHeight] = useState(0);
 
   const handleRegister = async () => {
     try {
@@ -46,27 +47,29 @@ const SignUp = ({ navigation }) => {
     }
   };
 
+  // Tinggi gambar otomatis menyesuaikan sisa layar
+  const imageHeight = windowHeight - formHeight;
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollContainer}
       keyboardShouldPersistTaps="handled"
       enableOnAndroid={true}
-      extraScrollHeight={150}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
+        <View style={styles.innerContainer}>
           <Image
             source={require('../../assets/OpsiAkun.png')}
-            style={styles.image}
+            style={[styles.image, { height: imageHeight }]}
           />
-          <Text style={styles.title}>Sign Up</Text>
 
-          <View style={styles.form}>
+          <View
+            style={styles.formContainer}
+            onLayout={(event) => setFormHeight(event.nativeEvent.layout.height)}
+          >
+            <Text style={styles.title}>Sign Up</Text>
+
             <Text style={styles.body}>Username</Text>
             <TextInput
               style={styles.input}
@@ -106,71 +109,53 @@ const SignUp = ({ navigation }) => {
               secureTextEntry
             />
 
-            <View style={styles.buttonContainer}>
-              {errorMessage !== '' && (
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              )}
-              <TouchableOpacity
-                style={styles.signUpBtn}
-                onPress={handleRegister}
+            {errorMessage !== '' && (
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            )}
+
+            <TouchableOpacity style={styles.signUpBtn} onPress={handleRegister}>
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.signupText}>
+              Already have an account?{' '}
+              <Text
+                style={styles.text2}
+                onPress={() => navigation.navigate('SignIn')}
               >
-                <Text style={styles.signUpText}>Sign Up</Text>
-              </TouchableOpacity>
-              <Text style={styles.signupText}>
-                Already have an account?{' '}
-                <Text
-                  style={styles.text2}
-                  onPress={() => navigation.navigate('SignIn')}
-                >
-                  Sign In
-                </Text>
+                Sign In
               </Text>
-            </View>
+            </Text>
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FCF7F2',
-  },
-  scrollContainer: {
-    flexGrow: 1,
+  container: { flex: 1, backgroundColor: '#FCF7F2' },
+  scrollContainer: { flexGrow: 1 },
+  innerContainer: { flex: 1 },
+  image: { width: '100%', resizeMode: 'cover' },
+  formContainer: {
+    paddingHorizontal: 30,
+    paddingTop: 20,
+    paddingBottom: 30,
     justifyContent: 'flex-start',
-    backgroundColor: '#FCF7F2',
-    paddingBottom: 10,
-  },
-
-  inner: {
-    padding: 24,
-    flex: 1,
-    justifyContent: 'space-around',
-  },
-  image: {
-    width: '100%',
-    height: 250,
-    resizeMode: 'cover',
   },
   title: {
     fontSize: 36,
     textAlign: 'center',
-    marginTop: 60,
+    marginBottom: 20,
+    marginTop: 40,
     fontFamily: 'Poppins-Bold',
     color: '#DE576F',
   },
-  form: {
-    marginHorizontal: 30,
-    marginTop: 20,
-    justifyContent: 'space-between',
-  },
   body: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Poppins-Medium',
-    marginTop: 10,
+    marginTop: 5,
     color: '#DE576F',
   },
   input: {
@@ -179,13 +164,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 6,
     padding: 10,
+    marginTop: 5,
   },
   signUpBtn: {
     backgroundColor: '#DE576F',
     paddingVertical: 5,
-    paddingHorizontal: 130,
     borderRadius: 25,
-    marginTop: 40,
+    marginTop: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    alignSelf: 'center',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 1,
@@ -195,12 +184,10 @@ const styles = StyleSheet.create({
   signUpText: {
     color: 'white',
     fontFamily: 'Poppins-Bold',
-    fontSize: 22,
+    fontSize: 20,
     textAlign: 'center',
   },
-  errorText: {
-    color: 'red',
-  },
+  errorText: { color: 'red', marginTop: 5 },
   signupText: {
     textAlign: 'center',
     marginTop: 10,
@@ -208,10 +195,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#DE576F',
   },
-  text2: {
-    color: '#DE576F',
-    fontFamily: 'Poppins-Bold',
-  },
+  text2: { color: '#DE576F', fontFamily: 'Poppins-Bold' },
 });
 
 export default SignUp;
