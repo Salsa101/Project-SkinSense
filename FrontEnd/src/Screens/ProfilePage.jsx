@@ -9,8 +9,9 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 
@@ -23,13 +24,12 @@ const ProfilePage = ({ navigation }) => {
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
   const [dob, setDob] = useState('');
+  const [dobDate, setDobDate] = useState(new Date());
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [openPicker, setOpenPicker] = useState(false);
 
-  const [showPicker, setShowPicker] = useState(false);
-
-  // GetProfile
   const fetchUserData = async () => {
     try {
       const response = await api.get('/profile', { withCredentials: true });
@@ -39,6 +39,9 @@ const ProfilePage = ({ navigation }) => {
       setFullname(data.user.full_name || '');
       setAge(data.user.age?.toString() || '');
       setDob(data.user.date_of_birth || '');
+      if (data.user.date_of_birth) {
+        setDobDate(new Date(data.user.date_of_birth));
+      }
     } catch (err) {
       console.error(err);
       setError('Gagal mengambil data user. Silakan login kembali.');
@@ -51,7 +54,6 @@ const ProfilePage = ({ navigation }) => {
     fetchUserData();
   }, []);
 
-  // UpdateProfile
   const handlePress = async () => {
     if (isEditing) {
       try {
@@ -64,7 +66,6 @@ const ProfilePage = ({ navigation }) => {
           },
           { withCredentials: true },
         );
-
         await fetchUserData();
       } catch (error) {
         console.error('Gagal update profile:', error);
@@ -73,42 +74,9 @@ const ProfilePage = ({ navigation }) => {
     setIsEditing(!isEditing);
   };
 
-  if (loading) {
-    return (
-      <ActivityIndicator
-        style={{ flex: 1, justifyContent: 'center' }}
-        size="large"
-        color="#DE576F"
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
-  }
-
-  // Date Picker
-  const handleDateChange = (event, selectedDate) => {
-    if (event.type === 'dismissed') {
-      setShowPicker(false);
-      return;
-    }
-    setShowPicker(false);
-    if (selectedDate) {
-      const formattedForDB = dayjs(selectedDate).format('YYYY-MM-DD');
-      setDob(formattedForDB);
-    }
-  };
-
-  // Logout
   const handleLogout = async () => {
     try {
       await api.post('/logout', {});
-
       Alert.alert('Sukses', 'Logout berhasil.');
       navigation.navigate('AccountOption');
     } catch (error) {
@@ -129,7 +97,6 @@ const ProfilePage = ({ navigation }) => {
           onPress: async () => {
             try {
               await api.delete('/profile', { withCredentials: true });
-
               Alert.alert('Sukses', 'Akun berhasil dihapus.');
               navigation.replace('AccountOption');
             } catch (error) {
@@ -142,43 +109,62 @@ const ProfilePage = ({ navigation }) => {
     );
   };
 
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center' }}
+        size="large"
+        color="#DE576F"
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.error}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1 }}
+      enableOnAndroid={true}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.headerContainer}>
         <Image
           source={require('../../assets/banner-profile.png')}
           style={styles.bannerImage}
         />
-
         <View style={styles.profileImageContainer}>
           <Image
             source={require('../../assets/profile-pic.png')}
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.cameraIconContainer}>
-            <Icon name="camera" size={20} color="#FFFF" />
+            <Icon name="camera" size={18} color="#FFFF" />
           </TouchableOpacity>
-
           <Text style={styles.nameText}>{username}</Text>
         </View>
       </View>
 
       <View style={styles.informationContainer}>
-        {/* Edit / Save Button */}
         <View style={styles.editProfileButtonContainer}>
           <TouchableOpacity
             style={styles.editProfileButton}
             onPress={handlePress}
           >
-            <Icon name={isEditing ? 'save' : 'edit'} size={25} color="white" />
+            <Icon name={isEditing ? 'save' : 'edit'} size={20} color="white" />
             <Text style={styles.editProfileButtonText}>
               {isEditing ? 'Save' : 'Edit Profile'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Profile Detail */}
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 20, marginBottom: 30 }}>
           <Text style={styles.profileText}>Full Name</Text>
           <TextInput
             style={[
@@ -223,52 +209,52 @@ const ProfilePage = ({ navigation }) => {
               pointerEvents="none"
             />
             {isEditing && (
-              <TouchableOpacity onPress={() => setShowPicker(true)}>
+              <TouchableOpacity onPress={() => setOpenPicker(true)}>
                 <Icon name="calendar" size={24} color="#ED97A0" />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Date Picker */}
-          {showPicker && (
-            <DateTimePicker
-              value={dob ? new Date(dob) : new Date()}
-              mode="date"
-              display="spinner"
-              onChange={handleDateChange}
-            />
-          )}
+          {/* Calendar Picker */}
+          <DatePicker
+            modal
+            open={openPicker}
+            date={dobDate}
+            mode="date"
+            locale="id"
+            onConfirm={date => {
+              setOpenPicker(false);
+              setDobDate(date);
+              setDob(dayjs(date).format('YYYY-MM-DD'));
+            }}
+            onCancel={() => setOpenPicker(false)}
+          />
         </View>
       </View>
 
-      {/* Logout and Delete Button */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttonStyle} onPress={handleLogout}>
-          <Icon name="sign-out" size={25} color="white" />
-          <Text style={styles.buttonStyleText}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonStyle} onPress={handleDeleteAccount}>
-          <Icon name="trash" size={25} color="white" />
-          <Text style={styles.buttonStyleText}>Delete Account</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      {!isEditing && (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonStyle} onPress={handleLogout}>
+            <Icon name="sign-out" size={20} color="white" />
+            <Text style={styles.buttonStyleText}>Logout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonStyle}
+            onPress={handleDeleteAccount}
+          >
+            <Icon name="trash" size={20} color="white" />
+            <Text style={styles.buttonStyleText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FCF7F2',
-  },
-  headerContainer: {
-    position: 'relative',
-    alignItems: 'center',
-  },
-  bannerImage: {
-    width: '100%',
-    height: 165,
-  },
+  container: { flex: 1, backgroundColor: '#FCF7F2' },
+  headerContainer: { position: 'relative', alignItems: 'center' },
+  bannerImage: { width: '100%', height: 165 },
   profileImageContainer: {
     position: 'absolute',
     bottom: -60,
@@ -279,11 +265,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 75,
-  },
+  profileImage: { width: '100%', height: '100%', borderRadius: 75 },
   cameraIconContainer: {
     position: 'absolute',
     bottom: -8,
@@ -296,13 +278,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
     fontFamily: 'Poppins-Bold',
-    fontSize: 24,
+    fontSize: 20,
     color: '#DF8595',
   },
-  informationContainer: {
-    marginHorizontal: 30,
-    marginTop: 120,
-  },
+  informationContainer: { marginHorizontal: 30, marginTop: 120 },
   editProfileButtonContainer: {
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
@@ -318,15 +297,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   editProfileButtonText: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: 'Poppins-Bold',
     color: 'white',
   },
-  profileText: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 20,
-    color: '#DF8595',
-  },
+  profileText: { fontFamily: 'Poppins-Bold', fontSize: 16, color: '#DF8595' },
   profileTextInput: {
     borderWidth: 2,
     borderColor: '#ED97A0',
@@ -338,21 +313,21 @@ const styles = StyleSheet.create({
   editable: {
     backgroundColor: 'white',
     fontFamily: 'Poppins-Medium',
-    fontSize: 18,
+    fontSize: 16,
     color: '#A86C6E',
   },
   readOnly: {
     backgroundColor: '#FFF8F1',
     fontFamily: 'Poppins-Medium',
-    fontSize: 18,
+    fontSize: 16,
     color: '#A86C6E',
   },
   buttonContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'flex-end',
     flexDirection: 'row',
-    gap: 15,
+    gap: 5,
     marginBottom: 70,
     marginHorizontal: 30,
   },
@@ -366,11 +341,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 25,
   },
-  buttonStyleText: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 18,
-    color: 'white',
-  },
+  buttonStyleText: { fontFamily: 'Poppins-Bold', fontSize: 16, color: 'white' },
 });
 
 export default ProfilePage;
