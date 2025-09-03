@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "preandroid": "npm install",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
@@ -21,7 +22,9 @@
     "react-native": "0.80.1",
     "react-native-bootsplash": "^6.3.10",
     "react-native-date-picker": "^5.0.13",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "^2.27.1",
+    "react-native-image-picker": "^8.2.1",
     "react-native-keyboard-avoiding-scroll-view": "^1.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-pager-view": "^6.8.1",

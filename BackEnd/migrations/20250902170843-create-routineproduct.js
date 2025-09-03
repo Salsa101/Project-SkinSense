@@ -1,4 +1,5 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -9,11 +10,26 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      category: {
+      productId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Products",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "Users", key: "id" },
+        onDelete: "CASCADE",
+      },
+      routineType: {
         type: Sequelize.ENUM("daily", "weekly", "custom"),
         allowNull: false,
       },
-      routineName: {
+      timeOfDay: {
         type: Sequelize.ENUM("morning", "night"),
         allowNull: false,
       },
@@ -33,19 +49,9 @@ module.exports = {
           "Saturday",
           "Sunday"
         ),
-        allowNull: true,
       },
       customDate: {
         type: Sequelize.DATEONLY,
-        allowNull: true,
-      },
-      productId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Products",
-          key: "id",
-        },
-        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,
@@ -57,6 +63,7 @@ module.exports = {
       },
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("RoutineProducts");
   },

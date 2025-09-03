@@ -8,6 +8,7 @@ import AccountOption from '../Screens/AccountOption';
 import ProfilePage from '../Screens/ProfilePage';
 import Calendar from '../Screens/Calendar';
 import EditRoutine from '../Screens/EditRoutine';
+import AddProduct from '../Screens/AddProduct';
 import RNBootSplash from 'react-native-bootsplash';
 
 import api from '../api';
@@ -78,6 +79,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="EditRoutine"
           component={EditRoutine}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddProduct"
+          component={AddProduct}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

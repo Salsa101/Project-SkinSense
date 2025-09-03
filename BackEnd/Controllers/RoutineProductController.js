@@ -4,39 +4,45 @@ const { Op } = require("sequelize");
 // Add product ke routine
 const addProductToRoutine = async (req, res) => {
   try {
-    const { routineName, category } = req.params;
+    const userId = req.user.id;
     const {
       productName,
-      brand,
-      type,
+      productBrand,
+      productStep,
+      productType,
       dateOpened,
       expirationDate,
+      routineType,
+      timeOfDay,
       reminderTime,
-      notificationFrequency,
-      dayOfWeek,
-      customDate,
     } = req.body;
 
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
     const product = await Product.create({
+      userId,
       productName,
-      brand,
-      type,
+      productBrand,
+      productStep,
+      productType,
       dateOpened,
       expirationDate,
+      productImage: imageUrl,
     });
 
     const routineProduct = await RoutineProduct.create({
+      userId,
       productId: product.id,
-      routineName,
-      category,
+      routineName: timeOfDay,
+      routineType,
+      timeOfDay,
+      category: routineType,
       reminderTime,
-      notificationFrequency,
-      dayOfWeek,
-      customDate,
     });
 
     res.status(201).json(routineProduct);
   } catch (err) {
+    console.error(err); 
     res.status(500).json({ error: err.message });
   }
 };
@@ -70,9 +76,10 @@ const viewRoutineByTime = async (req, res) => {
 // View spesifik per kategori & routineName
 const viewRoutineByCategory = async (req, res) => {
   try {
-    const { routineName, category } = req.params;
+    const userId = req.user.id;
+    const { routineType, timeOfDay } = req.params; // ambil dari URL
     const products = await RoutineProduct.findAll({
-      where: { routineName, category },
+      where: { userId, routineType, timeOfDay },
       include: [{ model: Product }],
     });
     res.json(products);
@@ -155,6 +162,31 @@ const deleteRoutineProduct = async (req, res) => {
   }
 };
 
+const uploadProduct = async (req, res) => {
+  try {
+    console.log("File:", req.file);
+    console.log("Body:", req.body);
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const { productName, productBrand, productType } = req.body;
+    const imageUrl = `/uploads/${req.file.filename}`;
+
+    const product = await Product.create({
+      productName,
+      productBrand,
+      productType,
+      image: imageUrl,
+    });
+
+    res.json({ success: true, imageUrl, product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   addProductToRoutine,
   viewRoutineByCategory,
@@ -162,4 +194,5 @@ module.exports = {
   getRoutineProduct,
   updateRoutineProduct,
   deleteRoutineProduct,
+  uploadProduct,
 };

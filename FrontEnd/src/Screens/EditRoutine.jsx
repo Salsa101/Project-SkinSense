@@ -11,85 +11,56 @@ import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 
+import api from '../api';
+
 const EditRoutine = ({ navigation }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
   const [activeRoutineTab, setActiveRoutineTab] = useState('Daily');
-  const [routineData, setRoutineData] = useState(allRoutineData);
+  const [routineData, setRoutineData] = useState([]);
 
-  const allRoutineData = [
-    {
-      id: 1,
-      type: 'Daily',
-      time: 'Morning',
-      step: 'Step 1: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr',
-      date: '08:00',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 2,
-      type: 'Daily',
-      time: 'Morning',
-      step: 'Step 2: Toner',
-      product: 'Some By Mi Toner',
-      exp: 'Exp in 8 mo',
-      date: '08:05',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-    {
-      id: 3,
-      type: 'Daily',
-      time: 'Night',
-      step: 'Step 1: Cleanser',
-      product: 'Wardah Facial Wash',
-      exp: 'Exp in 1 yr 1 mo',
-      date: '20:00',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-    {
-      id: 4,
-      type: 'Weekly',
-      time: 'Morning',
-      step: 'Step 1: Cleanser',
-      product: 'Weekly Cleanser',
-      exp: 'Exp in 6 mo',
-      date: '08:00',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-    {
-      id: 5,
-      type: 'Custom',
-      time: 'Morning',
-      step: 'Step 1: Exfoliation',
-      product: 'Custom Exfoliation',
-      exp: 'Exp in 3 mo',
-      date: '08:00',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-  ];
+  const fetchRoutine = async () => {
+    try {
+      const response = await api.get(
+        `/routine-products/view/${activeRoutineTab.toLowerCase()}/${activeTab.toLowerCase()}`,
+      );
+      setRoutineData(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const currentData = allRoutineData.filter(
-    item => item.type === activeRoutineTab && item.time === activeTab,
-  );
+  useEffect(() => {
+    fetchRoutine();
+  }, [activeRoutineTab, activeTab]);
+
+  const currentData = routineData;
 
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
       <View style={styles.infoBox}>
-        {item.image && (
-          <Image source={item.image} style={styles.productImage} />
-        )}
+        <Image
+          source={
+            item.Product?.productImage
+              ? { uri: `http://10.0.2.2:3000${item.Product.productImage}` }
+              : require('../../assets/product-placeholder.jpg')
+          }
+          style={styles.productImage}
+        />
         <View style={styles.info}>
-          <Text style={styles.step}>{item.step}</Text>
-          <Text style={styles.product}>{item.product}</Text>
-          <Text style={styles.exp}>{item.exp}</Text>
+          <Text style={styles.step}>Step {item.Product?.productStep}</Text>
+          <Text style={styles.product}>{item.Product?.productName}</Text>
+          <Text style={styles.exp}>Exp: {item.Product?.expirationDate}</Text>
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
-          <TouchableOpacity style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+          >
             <Icon name="pencil" size={18} color="#E07C8E" />
           </TouchableOpacity>
-          <TouchableOpacity style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+          >
             <Icon name="trash" size={18} color="#E07C8E" />
           </TouchableOpacity>
         </View>
@@ -100,13 +71,11 @@ const EditRoutine = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView style={{ marginBottom: 90 }}>
-        {/* Header */}
         <View style={styles.headerContainer}>
           <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
             My Skincare Routine
           </Text>
 
-          {/* Routine Toggle */}
           <View style={styles.routineToggleWrapper}>
             {['Daily', 'Weekly', 'Custom'].map(tab => (
               <TouchableOpacity
@@ -130,7 +99,6 @@ const EditRoutine = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Routine Panel */}
         <View
           style={{
             padding: 15,
@@ -139,7 +107,6 @@ const EditRoutine = ({ navigation }) => {
             borderRadius: 20,
           }}
         >
-          {/* Toggle */}
           <View style={styles.toggleWrapper}>
             <TouchableOpacity
               style={[
@@ -189,11 +156,6 @@ const EditRoutine = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-
-      {/* Navbar */}
-      {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-        <Navbar active={active} onPress={setActive} />
-      </View> */}
     </View>
   );
 };

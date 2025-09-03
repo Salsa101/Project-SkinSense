@@ -1,27 +1,24 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class RoutineProduct extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       RoutineProduct.belongsTo(models.Product, {
         foreignKey: "productId",
         onDelete: "CASCADE",
       });
+      RoutineProduct.belongsTo(models.User, { foreignKey: "userId" });
     }
   }
+
   RoutineProduct.init(
     {
-      category: {
+      routineType: {
         type: DataTypes.ENUM("daily", "weekly", "custom"),
         allowNull: false,
       },
-      routineName: {
-        // morning atau night
+      timeOfDay: {
         type: DataTypes.ENUM("morning", "night"),
         allowNull: false,
       },
@@ -29,10 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TIME,
       },
       notificationFrequency: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING, // contoh: "every 2 days"
       },
       dayOfWeek: {
-        // khusus weekly
         type: DataTypes.ENUM(
           "Monday",
           "Tuesday",
@@ -54,5 +50,6 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "RoutineProduct",
     }
   );
+
   return RoutineProduct;
 };
