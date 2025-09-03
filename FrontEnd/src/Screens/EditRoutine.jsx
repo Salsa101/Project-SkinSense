@@ -85,9 +85,13 @@ const EditRoutine = ({ navigation }) => {
           <Text style={styles.product}>{item.product}</Text>
           <Text style={styles.exp}>{item.exp}</Text>
         </View>
-        <View style={{ marginLeft: 'auto' }}>
-          <Text>A</Text>
-          <Text>A</Text>
+        <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
+          <TouchableOpacity style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}>
+            <Icon name="pencil" size={18} color="#E07C8E" />
+          </TouchableOpacity>
+          <TouchableOpacity style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}>
+            <Icon name="trash" size={18} color="#E07C8E" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -166,10 +170,9 @@ const EditRoutine = ({ navigation }) => {
           </View>
 
           <Text style={styles.title}>{activeTab} Routine</Text>
-          <Text style={styles.progress}>
-            {currentData.filter(task => task.done).length}/{currentData.length}{' '}
-            Completed
-          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('AddProduct')}>
+            <Text style={styles.progress}>+ Add Product</Text>
+          </TouchableOpacity>
 
           {currentData.length === 0 ? (
             <Text
@@ -188,9 +191,9 @@ const EditRoutine = ({ navigation }) => {
       </ScrollView>
 
       {/* Navbar */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+      {/* <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
         <Navbar active={active} onPress={setActive} />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -240,8 +243,9 @@ const styles = StyleSheet.create({
   productImage: {
     width: 50,
     height: 70,
-    borderBottomLeftRadius: 8,
-    borderTopLeftRadius: 8,
+    // borderBottomLeftRadius: 8,
+    // borderTopLeftRadius: 8,
+    borderRadius: 8,
     backgroundColor: '#000000ff',
     marginRight: 10,
   },
@@ -272,12 +276,14 @@ const styles = StyleSheet.create({
   },
   progress: {
     alignSelf: 'flex-end',
-    backgroundColor: '#FDE5EB',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
     color: '#E06287',
     marginBottom: 15,
+    fontWeight: 'bold',
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
   },
   card: {
     flexDirection: 'row',
