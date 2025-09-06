@@ -72,7 +72,7 @@ const EditRoutine = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView style={{ marginBottom: 90 }}>
         <View style={styles.headerContainer}>
-          <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
+          <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: '#E07C8E' }}>
             My Skincare Routine
           </Text>
 
@@ -88,8 +88,9 @@ const EditRoutine = ({ navigation }) => {
               >
                 <Text
                   style={{
-                    color: activeRoutineTab === tab ? '#fff' : '#999',
-                    fontWeight: 'bold',
+                    color: activeRoutineTab === tab ? '#fff' : '#B67F89',
+                    fontFamily: 'Poppins-Bold',
+                    fontSize: 14,
                   }}
                 >
                   {tab}
@@ -103,8 +104,16 @@ const EditRoutine = ({ navigation }) => {
           style={{
             padding: 15,
             margin: 16,
-            backgroundColor: '#b4b4b4ff',
+            backgroundColor: '#FFF9F3',
             borderRadius: 20,
+            shadowColor: '#AB8C8C',
+            shadowOffset: {
+             width: 0,
+             height: 4,
+          },
+             shadowOpacity: 0.5,
+             shadowRadius: 4,
+             elevation: 4,
           }}
         >
           <View style={styles.toggleWrapper}>
@@ -118,7 +127,7 @@ const EditRoutine = ({ navigation }) => {
               <Icon1
                 name="sun"
                 size={20}
-                color={activeTab === 'Morning' ? 'orange' : 'gray'}
+                color={activeTab === 'Morning' ? '#E07C8E' : '#DBABB3'}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -131,7 +140,7 @@ const EditRoutine = ({ navigation }) => {
               <Icon1
                 name="moon"
                 size={20}
-                color={activeTab === 'Night' ? 'blue' : 'gray'}
+                color={activeTab === 'Night' ? '#E07C8E' : '#DBABB3'}
               />
             </TouchableOpacity>
           </View>
@@ -146,7 +155,9 @@ const EditRoutine = ({ navigation }) => {
               style={{
                 textAlign: 'center',
                 marginVertical: 30,
-                color: '#000000ff',
+                color: '#B67F89',
+                fontFamily: 'Poppins-Medium',
+                fontSize: 11,
               }}
             >
               No data available
@@ -164,24 +175,26 @@ const styles = StyleSheet.create({
   routineToggleWrapper: {
     flexDirection: 'row',
     alignSelf: 'center',
-    backgroundColor: '#8f4141ff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 25,
     marginTop: 15,
     marginBottom: 10,
     overflow: 'hidden',
+    boxShadow: '0px 2px 4px rgba(170, 162, 162, 0.3)',
   },
   routineToggleButton: {
     flex: 1,
-    paddingVertical: 12,
-    backgroundColor: '#8f4141ff',
+    paddingVertical: 10,
+    backgroundColor: '#F8D3D5',
     justifyContent: 'center',
     alignItems: 'center',
   },
   activeRoutineTab: {
-    backgroundColor: '#ae02c9ff',
+    backgroundColor: '#E07C8E',
   },
   container: {
     flex: 1,
+    backgroundColor: '#FCF7F2'
   },
   headerContainer: {
     paddingHorizontal: 20,
@@ -189,7 +202,7 @@ const styles = StyleSheet.create({
   },
   cardDone: {
     opacity: 0.8,
-    backgroundColor: '#f5a7f5ff',
+    backgroundColor: '#E07C8E',
     borderRadius: 12,
   },
   date: {
@@ -214,7 +227,7 @@ const styles = StyleSheet.create({
   toggleWrapper: {
     flexDirection: 'row',
     alignSelf: 'center',
-    backgroundColor: '#8f4141ff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 25,
     marginBottom: 10,
     marginTop: 15,
@@ -222,7 +235,7 @@ const styles = StyleSheet.create({
   toggleButton: {
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: '#8f4141ff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 25,
   },
   activeTab: {
@@ -231,7 +244,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     color: '#E06287',
     marginBottom: 40,
     textAlign: 'center',
@@ -239,12 +252,12 @@ const styles = StyleSheet.create({
   progress: {
     alignSelf: 'flex-end',
     backgroundColor: '#FFFFFF',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 9,
     borderRadius: 12,
     color: '#E06287',
     marginBottom: 15,
-    fontWeight: 'bold',
+   fontFamily: 'Poppins-Bold',
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
   },
   card: {

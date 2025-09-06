@@ -132,20 +132,20 @@ const AddProduct = ({ navigation }) => {
             <Icon
               name="search"
               size={20}
-              color="#bf828dff"
+              color="#E07C8E"
               style={styles.icon}
             />
             <TextInput
               style={styles.input}
               placeholder="Search by product name"
-              placeholderTextColor="#bf828dff"
+              placeholderTextColor="#E07C8E"
             />
           </View>
-          <Text style={{ marginVertical: 20, alignSelf: 'center' }}>
+          <Text style={{ marginVertical: 20, alignSelf: 'center', fontFamily: 'Poppins-Medium', color: '#E07C8E' }}>
             or add manually
           </Text>
 
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <View style={{ alignItems: 'center', marginTop: 10 }}>
             <TouchableOpacity style={styles.box} onPress={handleUpload}>
               {imageUri ? (
                 <Image
@@ -156,7 +156,7 @@ const AddProduct = ({ navigation }) => {
                 <Icon1 name="plus" size={80} color="#FFFFFF" />
               )}
             </TouchableOpacity>
-            <Text style={{ alignSelf: 'center', marginTop: 5 }}>
+            <Text style={{ alignSelf: 'center', marginTop: 5 , fontFamily: 'Poppins-Medium', color: '#E07C8E'}}>
               Product Image
             </Text>
           </View>
@@ -169,7 +169,7 @@ const AddProduct = ({ navigation }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
-                  placeholderTextColor="#bf828dff"
+                  placeholderTextColor="#E07C8E"
                   value={productName}
                   onChangeText={setProductName}
                 />
@@ -183,7 +183,7 @@ const AddProduct = ({ navigation }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
-                  placeholderTextColor="#bf828dff"
+                  placeholderTextColor="#E07C8E"
                   value={productBrand}
                   onChangeText={setProductBrand}
                 />
@@ -197,7 +197,7 @@ const AddProduct = ({ navigation }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="Enter product step number..."
-                  placeholderTextColor="#bf828dff"
+                  placeholderTextColor="#E07C8E"
                   keyboardType="numeric"
                   value={productStep}
                   onChangeText={text => {
@@ -219,13 +219,23 @@ const AddProduct = ({ navigation }) => {
                 setValue={setProductValue}
                 setItems={setProductItems}
                 placeholder="Select product type"
+                placeholderStyle={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                textStyle={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#E07C8E',
+                  fontSize: 12,
+                }}
                 style={styles.dropdownPicker}
                 dropDownContainerStyle={styles.dropdownStyle}
                 ArrowDownIconComponent={() => (
-                  <Icon name="chevron-down" size={20} color="#bf828dff" />
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
                 )}
                 ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#bf828dff" />
+                  <Icon name="chevron-up" size={20} color="#E07C8E" />
                 )}
               />
             </View>
@@ -241,13 +251,23 @@ const AddProduct = ({ navigation }) => {
                 setValue={setRoutineValue}
                 setItems={setRoutineItems}
                 placeholder="Select routine type"
+                placeholderStyle={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                textStyle={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#E07C8E',
+                  fontSize: 12,
+                }}
                 style={styles.dropdownPicker}
                 dropDownContainerStyle={styles.dropdownStyle}
                 ArrowDownIconComponent={() => (
-                  <Icon name="chevron-down" size={20} color="#bf828dff" />
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
                 )}
                 ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#bf828dff" />
+                  <Icon name="chevron-up" size={20} color="#E07C8E" />
                 )}
               />
             </View>
@@ -263,13 +283,23 @@ const AddProduct = ({ navigation }) => {
                 setValue={setTimeDayValue}
                 setItems={setTimeDayItems}
                 placeholder="Select time of day"
+                placeholderStyle={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                textStyle={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#E07C8E',
+                  fontSize: 12,
+                }}
                 style={styles.dropdownPicker}
                 dropDownContainerStyle={styles.dropdownStyle}
                 ArrowDownIconComponent={() => (
-                  <Icon name="chevron-down" size={20} color="#bf828dff" />
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
                 )}
                 ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#bf828dff" />
+                  <Icon name="chevron-up" size={20} color="#E07C8E" />
                 )}
               />
             </View>
@@ -291,7 +321,7 @@ const AddProduct = ({ navigation }) => {
                   <Icon
                     name="calendar"
                     size={20}
-                    color="#bf828dff"
+                    color="#E07C8E"
                     style={styles.icon}
                   />
                 </TouchableOpacity>
@@ -315,7 +345,7 @@ const AddProduct = ({ navigation }) => {
                   <Icon
                     name="calendar"
                     size={20}
-                    color="#bf828dff"
+                    color="#E07C8E"
                     style={styles.icon}
                   />
                 </TouchableOpacity>
@@ -341,7 +371,7 @@ const AddProduct = ({ navigation }) => {
                   <Icon2
                     name="access-time"
                     size={20}
-                    color="#bf828dff"
+                    color="#E07C8E"
                     style={styles.icon}
                   />
                 </TouchableOpacity>
@@ -398,6 +428,7 @@ const AddProduct = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FCF7F2'
   },
   scrollContainer: {
     padding: 16,
@@ -405,20 +436,29 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 10,
+    color: '#E07C8E',
   },
   formContainer: {
     backgroundColor: '#FFF9F3',
     borderRadius: 20,
     padding: 20,
     paddingBottom: 0,
+    shadowColor: '#AB8C8C',
+            shadowOffset: {
+             width: 0,
+             height: 4,
+          },
+             shadowOpacity: 0.5,
+             shadowRadius: 4,
+             elevation: 4,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#bf828dff',
+    borderColor: '#E07C8E',
     borderRadius: 25,
     paddingHorizontal: 15,
     paddingVertical: 3,
@@ -429,6 +469,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
+    color: '#E07C8E',
   },
   box: {
     width: 150,
@@ -446,6 +489,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   formText: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
+    color: '#E07C8E',
     marginLeft: 20,
     marginVertical: 5,
   },
@@ -459,19 +505,19 @@ const styles = StyleSheet.create({
   saveBtnText: {
     color: '#fff',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
   },
   dropdownPicker: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#bf828dff',
+    borderColor: '#E07C8E',
     borderRadius: 25,
     paddingHorizontal: 22,
     backgroundColor: '#ffffff',
   },
   dropdownStyle: {
-    borderColor: '#bf828dff',
+    borderColor: '#E07C8E',
     borderRadius: 25,
     paddingHorizontal: 15,
   },
