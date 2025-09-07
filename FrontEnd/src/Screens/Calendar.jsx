@@ -69,12 +69,18 @@ const Calendar = ({ navigation }) => {
   const DateItem = ({ day, date, isToday }) => (
     <View style={[styles.date, isToday && { backgroundColor: '#ED97A0' }]}>
       <Text
-        style={{ fontFamily: isToday ? 'Poppins-Bold' : 'Poppins-Medium' , color: isToday ? 'white' : 'white'}}
+        style={{
+          fontFamily: isToday ? 'Poppins-Bold' : 'Poppins-Medium',
+          color: isToday ? 'white' : 'white',
+        }}
       >
         {day}
       </Text>
       <Text
-        style={{ fontWeight: isToday ? 'Poppins-Bold' : 'Poppins-Medium', color: isToday ? 'white' : 'white' }}
+        style={{
+          fontWeight: isToday ? 'Poppins-Bold' : 'Poppins-Medium',
+          color: isToday ? 'white' : 'white',
+        }}
       >
         {date}
       </Text>
@@ -105,10 +111,9 @@ const Calendar = ({ navigation }) => {
         routineProductId: id,
       });
 
-      // Map doneStatus ke done agar style & icon konsisten
       const updatedTasks = res.data.map(t => ({
         ...t,
-        done: t.doneStatus, // <-- ini bikin UI tetap konsisten
+        done: t.doneStatus,
       }));
 
       const setter = type === 'Morning' ? setMorningTasks : setNightTasks;
@@ -244,7 +249,13 @@ const Calendar = ({ navigation }) => {
         {/* Header */}
         <View style={styles.headerContainer}>
           <View style={styles.headerText}>
-            <Text style={{ fontSize: 20, color: '#E07C8E' , fontFamily: 'Poppins-Bold'}}>
+            <Text
+              style={{
+                fontSize: 20,
+                color: '#E07C8E',
+                fontFamily: 'Poppins-Bold',
+              }}
+            >
               Skincare Tracker
             </Text>
             <View style={styles.monthlyDate}>
@@ -272,12 +283,12 @@ const Calendar = ({ navigation }) => {
             borderRadius: 20,
             shadowColor: '#AB8C8C',
             shadowOffset: {
-             width: 0,
-             height: 4,
-          },
-             shadowOpacity: 0.5,
-             shadowRadius: 4,
-             elevation: 4,
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 4,
+            elevation: 4,
           }}
         >
           {/* Toggle */}
@@ -329,8 +340,6 @@ const Calendar = ({ navigation }) => {
           ) : (
             currentData.map(item => renderCard(item, activeTab))
           )}
-
-          {/* {currentData.map(item => renderCard(item, activeTab))} */}
         </View>
       </ScrollView>
 
@@ -351,27 +360,26 @@ const Calendar = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 ,backgroundColor: '#FCF7F2'},
+  container: { flex: 1, backgroundColor: '#FCF7F2' },
   headerContainer: {
     backgroundColor: '#FFF9F3',
     padding: 20,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
-     shadowColor: '#AB8C8C',
-            shadowOffset: {
-             width: 0,
-             height: 4,
-          },
-             shadowOpacity: 0.5,
-             shadowRadius: 4,
-             elevation: 4,
+    shadowColor: '#AB8C8C',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
   monthYearText: {
-    marginHorizontal: 8,
+    marginLeft: 8,
     color: '#E07C8E',
     fontFamily: 'Poppins-Medium',
     fontSize: 12,
-    alignItems: 'center',
   },
   headerText: {
     flexDirection: 'row',
@@ -490,10 +498,9 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 11,
     fontFamily: 'Poppins-Regular',
-  
   },
   product: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'Poppins-Bold',
     color: '#E06287',
     flexShrink: 1,

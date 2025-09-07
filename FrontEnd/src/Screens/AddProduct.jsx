@@ -90,7 +90,7 @@ const AddProduct = ({ navigation }) => {
     launchImageLibrary({ mediaType: 'photo' }, response => {
       if (response.assets && response.assets.length > 0) {
         const file = response.assets[0];
-        setImageUri(file.uri); // preview
+        setImageUri(file.uri);
         setSelectedFile({
           uri: file.uri,
           type: file.type,
@@ -104,9 +104,9 @@ const AddProduct = ({ navigation }) => {
     setRoutineValue(value);
 
     if (value === 'weekly') {
-      setCustomDate(null); // reset custom kalau pilih weekly
+      setCustomDate(null);
     } else if (value === 'custom') {
-      setRoutineValueDay([]); // reset weekly kalau pilih custom
+      setRoutineValueDay([]);
     } else {
       // daily
       setRoutineValueDay([]);
@@ -116,7 +116,6 @@ const AddProduct = ({ navigation }) => {
     if (callback) callback(value);
   };
 
-  // simpan data + kirim ke backend
   const handleSave = async () => {
     try {
       if (!routineValue || !timeDayValue) {
@@ -124,7 +123,6 @@ const AddProduct = ({ navigation }) => {
         return;
       }
 
-      // Validasi timeOfDay
       const hour = time.getHours();
       if (
         (timeDayValue === 'morning' && (hour < 5 || hour > 11)) ||
@@ -151,9 +149,6 @@ const AddProduct = ({ navigation }) => {
       formData.append('reminderTime', time.toTimeString().split(' ')[0]);
       formData.append('routineType', routineValue);
       formData.append('timeOfDay', timeDayValue);
-      // if (routineValueDay.length > 0) {
-      //   formData.append('dayOfWeek', routineValueDay.join(','));
-      // }
 
       if (routineValueDay.length > 0) {
         const dayOfWeekJson = routineValueDay.map(d => d.toLowerCase());
@@ -189,19 +184,21 @@ const AddProduct = ({ navigation }) => {
         <Text style={styles.headerText}>Add Product</Text>
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Icon
-              name="search"
-              size={20}
-              color="#E07C8E"
-              style={styles.icon}
-            />
+            <Icon name="search" size={20} color="#E07C8E" style={styles.icon} />
             <TextInput
               style={styles.input}
               placeholder="Search by product name"
               placeholderTextColor="#E07C8E"
             />
           </View>
-          <Text style={{ marginVertical: 20, alignSelf: 'center', fontFamily: 'Poppins-Medium', color: '#E07C8E' }}>
+          <Text
+            style={{
+              marginVertical: 20,
+              alignSelf: 'center',
+              fontFamily: 'Poppins-Medium',
+              color: '#E07C8E',
+            }}
+          >
             or add manually
           </Text>
 
@@ -216,7 +213,14 @@ const AddProduct = ({ navigation }) => {
                 <Icon1 name="plus" size={80} color="#FFFFFF" />
               )}
             </TouchableOpacity>
-            <Text style={{ alignSelf: 'center', marginTop: 5 , fontFamily: 'Poppins-Medium', color: '#E07C8E'}}>
+            <Text
+              style={{
+                alignSelf: 'center',
+                marginTop: 5,
+                fontFamily: 'Poppins-Medium',
+                color: '#E07C8E',
+              }}
+            >
               Product Image
             </Text>
           </View>
@@ -557,7 +561,7 @@ const AddProduct = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FCF7F2'
+    backgroundColor: '#FCF7F2',
   },
   scrollContainer: {
     padding: 16,
@@ -575,13 +579,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 0,
     shadowColor: '#AB8C8C',
-            shadowOffset: {
-             width: 0,
-             height: 4,
-          },
-             shadowOpacity: 0.5,
-             shadowRadius: 4,
-             elevation: 4,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
   inputContainer: {
     flexDirection: 'row',

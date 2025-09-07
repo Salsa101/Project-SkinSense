@@ -20,7 +20,7 @@ const SkinQuiz = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await api.get('/question'); // GET ke backend
+        const res = await api.get('/question');
         setQuestions(res.data);
       } catch (err) {
         console.log('Gagal ambil question:', err);
@@ -53,10 +53,12 @@ const SkinQuiz = () => {
 
   const handleSubmit = async () => {
     try {
-      const payload = Object.entries(answers).map(([quizQuestionId, quizOptionId]) => ({
-        quizQuestionId: Number(quizQuestionId),
-        quizOptionId,
-      }));
+      const payload = Object.entries(answers).map(
+        ([quizQuestionId, quizOptionId]) => ({
+          quizQuestionId: Number(quizQuestionId),
+          quizOptionId,
+        }),
+      );
 
       await api.post('/answer', { answers: payload });
       alert('Jawaban tersimpan!');
@@ -142,7 +144,7 @@ const SkinQuiz = () => {
           <TouchableOpacity
             style={styles.nextButton}
             onPress={handleSubmit}
-            disabled={!selected} // biar harus pilih dulu
+            disabled={!selected}
           >
             <Text style={styles.nextText}>Submit</Text>
           </TouchableOpacity>

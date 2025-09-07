@@ -93,11 +93,9 @@ const toggleDone = async (req, res) => {
     if (!routineProduct)
       return res.status(404).json({ message: "Routine not found" });
 
-    // Toggle doneStatus
     routineProduct.doneStatus = !routineProduct.doneStatus;
     await routineProduct.save();
 
-    // Ambil task valid hari ini
     const today = new Date().toISOString().split("T")[0];
     const dayName = new Date()
       .toLocaleString("en-US", { weekday: "long" })
@@ -119,7 +117,7 @@ const toggleDone = async (req, res) => {
           {
             routineType: "custom",
             customDate: { [Op.between]: [startOfDay, endOfDay] },
-          }, // <<< pakai range
+          },
         ],
       },
       include: [{ model: Product }],
@@ -143,16 +141,15 @@ const toggleDone = async (req, res) => {
 // View gabungan pagi/malam
 const viewRoutineByTime = async (req, res) => {
   try {
-    const userId = req.user.id; // Ambil dari authentication
-    const { routineName } = req.params; // 'morning' atau 'night'
+    const userId = req.user.id;
+    const { routineName } = req.params;
 
     const today = new Date();
     const dayName = today
       .toLocaleString("en-US", { weekday: "long" })
-      .toLowerCase(); // contoh: "Saturday"
-    const todayDate = today.toISOString().split("T")[0]; // contoh: "2025-09-06"
+      .toLowerCase();
+    const todayDate = today.toISOString().split("T")[0]; 
 
-    // start & end hari ini
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -164,16 +161,13 @@ const viewRoutineByTime = async (req, res) => {
         timeOfDay: routineName,
         userId,
         [Op.or]: [
-          // Daily
           { routineType: "daily" },
 
-          // Weekly
           {
             routineType: "weekly",
             dayOfWeek: { [Op.contains]: [dayName] },
           },
 
-          // Custom
           {
             routineType: "custom",
             customDate: { [Op.between]: [startOfDay, endOfDay] },
@@ -203,7 +197,7 @@ const viewRoutineByTime = async (req, res) => {
 const viewRoutineByCategory = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { routineType, timeOfDay } = req.params; // ambil dari URL
+    const { routineType, timeOfDay } = req.params;
     const products = await RoutineProduct.findAll({
       where: { userId, routineType, timeOfDay },
       include: [{ model: Product }],
