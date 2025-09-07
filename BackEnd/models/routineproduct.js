@@ -29,19 +29,24 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING, // contoh: "every 2 days"
       },
       dayOfWeek: {
-        type: DataTypes.ENUM(
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
-        ),
+        type: DataTypes.JSONB,
         allowNull: true,
       },
       customDate: {
         type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      doneDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      doneStatus: {
+        type: DataTypes.BOOLEAN,
         allowNull: true,
       },
     },

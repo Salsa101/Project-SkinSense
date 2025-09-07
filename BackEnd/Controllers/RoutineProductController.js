@@ -15,7 +15,29 @@ const addProductToRoutine = async (req, res) => {
       routineType,
       timeOfDay,
       reminderTime,
+      dayOfWeek,
+      customDate,
     } = req.body;
+
+    const existingStep = await RoutineProduct.findOne({
+      where: {
+        userId,
+        routineType,
+        timeOfDay,
+      },
+      include: [
+        {
+          model: Product,
+          where: { productStep },
+        },
+      ],
+    });
+
+    if (existingStep) {
+      return res.status(400).json({
+        message: `Step ${productStep} sudah dipakai di ${routineType} ${timeOfDay}.`,
+      });
+    }
 
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -30,6 +52,15 @@ const addProductToRoutine = async (req, res) => {
       productImage: imageUrl,
     });
 
+    let dayOfWeekArray = [];
+    if (req.body.dayOfWeek) {
+      try {
+        dayOfWeekArray = JSON.parse(req.body.dayOfWeek);
+      } catch (e) {
+        dayOfWeekArray = [];
+      }
+    }
+
     const routineProduct = await RoutineProduct.create({
       userId,
       productId: product.id,
@@ -38,11 +69,73 @@ const addProductToRoutine = async (req, res) => {
       timeOfDay,
       category: routineType,
       reminderTime,
+      dayOfWeek: dayOfWeekArray,
+      customDate,
     });
 
     res.status(201).json(routineProduct);
   } catch (err) {
-    console.error(err); 
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const toggleDone = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { routineProductId } = req.body;
+
+    const routineProduct = await RoutineProduct.findOne({
+      where: { id: routineProductId, userId },
+      include: [{ model: Product }],
+    });
+
+    if (!routineProduct)
+      return res.status(404).json({ message: "Routine not found" });
+
+    // Toggle doneStatus
+    routineProduct.doneStatus = !routineProduct.doneStatus;
+    await routineProduct.save();
+
+    // Ambil task valid hari ini
+    const today = new Date().toISOString().split("T")[0];
+    const dayName = new Date()
+      .toLocaleString("en-US", { weekday: "long" })
+      .toLowerCase();
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const tasks = await RoutineProduct.findAll({
+      where: {
+        userId,
+        timeOfDay: routineProduct.timeOfDay,
+        [Op.or]: [
+          { routineType: "daily" },
+          { routineType: "weekly", dayOfWeek: { [Op.contains]: [dayName] } },
+          {
+            routineType: "custom",
+            customDate: { [Op.between]: [startOfDay, endOfDay] },
+          }, // <<< pakai range
+        ],
+      },
+      include: [{ model: Product }],
+      order: [
+        ["reminderTime", "ASC"],
+        [Product, "productStep", "ASC"],
+      ],
+    });
+
+    res.json(
+      tasks.map((t) => ({
+        ...t.toJSON(),
+        done: t.doneStatus,
+      }))
+    );
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -50,25 +143,58 @@ const addProductToRoutine = async (req, res) => {
 // View gabungan pagi/malam
 const viewRoutineByTime = async (req, res) => {
   try {
-    const { routineName } = req.params;
+    const userId = req.user.id; // Ambil dari authentication
+    const { routineName } = req.params; // 'morning' atau 'night'
+
     const today = new Date();
-    const dayName = today.toLocaleString("en-US", { weekday: "long" });
-    const todayDate = today.toISOString().split("T")[0];
+    const dayName = today
+      .toLocaleString("en-US", { weekday: "long" })
+      .toLowerCase(); // contoh: "Saturday"
+    const todayDate = today.toISOString().split("T")[0]; // contoh: "2025-09-06"
+
+    // start & end hari ini
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
     const products = await RoutineProduct.findAll({
       where: {
-        routineName,
+        timeOfDay: routineName,
+        userId,
         [Op.or]: [
-          { category: "daily" },
-          { category: "weekly", dayOfWeek: dayName },
-          { category: "custom", customDate: todayDate },
+          // Daily
+          { routineType: "daily" },
+
+          // Weekly
+          {
+            routineType: "weekly",
+            dayOfWeek: { [Op.contains]: [dayName] },
+          },
+
+          // Custom
+          {
+            routineType: "custom",
+            customDate: { [Op.between]: [startOfDay, endOfDay] },
+          },
         ],
       },
       include: [{ model: Product }],
+      order: [
+        ["reminderTime", "ASC"],
+        [Product, "productStep", "ASC"],
+      ],
     });
 
-    res.json(products);
+    const result = products.map((p) => ({
+      ...p.toJSON(),
+      done: p.doneDate === todayDate,
+    }));
+
+    res.json(result);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -195,4 +321,5 @@ module.exports = {
   updateRoutineProduct,
   deleteRoutineProduct,
   uploadProduct,
+  toggleDone,
 };

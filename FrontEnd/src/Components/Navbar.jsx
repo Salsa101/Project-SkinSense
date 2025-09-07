@@ -10,7 +10,7 @@ const Navbar = ({ active, onPress }) => {
   const items = [
     { name: 'Home', icon: 'home' },
     { name: 'News', icon: 'lightbulb-outline' },
-    { name: 'Scan', icon: 'crop-free' },
+    { name: 'SkinQuiz', icon: 'crop-free' },
     { name: 'Calendar', icon: 'calendar-today' },
     { name: 'Journal', icon: 'menu-book' },
   ];

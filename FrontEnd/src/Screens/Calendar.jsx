@@ -11,16 +11,38 @@ import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 
-import { useCustomBackHandler } from '../Hooks/CustomBackHandler';
+import api from '../api';
+
+import { format, intervalToDuration } from 'date-fns';
+
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
 
 const Calendar = ({ navigation }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
+  const [morningTasks, setMorningTasks] = useState([]);
+  const [nightTasks, setNightTasks] = useState([]);
 
   //Handler Back to Home
   useCustomBackHandler(() => {
     navigation.navigate('Home');
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resMorning = await api.get('/routine-products/view/morning');
+        const resNight = await api.get('/routine-products/view/night');
+
+        setMorningTasks(resMorning.data);
+        setNightTasks(resNight.data);
+      } catch (error) {
+        console.error('Error fetching routines:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Real Time Date
   const getWeekDays = () => {
@@ -77,136 +99,77 @@ const Calendar = ({ navigation }) => {
   const monthYear = `${monthNames[today.getMonth()]}, ${today.getFullYear()}`;
   const weekDays = getWeekDays();
 
-  const morningData = [
-    {
-      id: 1,
-      order: 1,
-      step: 'Step 1: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:00',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 2,
-      order: 2,
-      step: 'Step 2: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:05',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 3,
-      order: 3,
-      step: 'Step 3: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:10',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 4,
-      order: 4,
-      step: 'Step 4: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:15',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 5,
-      order: 5,
-      step: 'Step 5: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:20',
-      image: require('../../assets/product-image.png'),
-    },
-    {
-      id: 6,
-      order: 6,
-      step: 'Step 6: Cleanser',
-      product: 'Azarine Sunscreen Gel',
-      exp: 'Exp in 1 yr 2 mo 3 days',
-      done: false,
-      date: '08:25',
-      image: require('../../assets/product-image.png'),
-    },
-  ];
+  const toggleDone = async (id, type) => {
+    try {
+      const res = await api.patch(`/routine-products/toggle-done`, {
+        routineProductId: id,
+      });
 
-  const nightData = [
-    {
-      id: 1,
-      order: 1,
-      step: 'Step 1: Cleanser',
-      product: 'Wardah Facial Wash',
-      exp: 'Exp in 1 yr 1 mo 10 days',
-      done: false,
-      date: '20:00',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-    {
-      id: 2,
-      order: 2,
-      step: 'Step 2: Toner',
-      product: 'Some By Mi Toner',
-      exp: 'Exp in 8 mo 12 days',
-      done: false,
-      date: '20:05',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-    {
-      id: 3,
-      order: 3,
-      step: 'Step 3: Serum',
-      product: 'The Ordinary Serum',
-      exp: 'Exp in 11 mo 7 days',
-      done: false,
-      date: '20:10',
-      image: require('../../assets/product-placeholder.jpg'),
-    },
-  ];
+      // Map doneStatus ke done agar style & icon konsisten
+      const updatedTasks = res.data.map(t => ({
+        ...t,
+        done: t.doneStatus, // <-- ini bikin UI tetap konsisten
+      }));
 
-  //Toggle Done Status
-  const [morningTasks, setMorningTasks] = useState(morningData);
-  const [nightTasks, setNightTasks] = useState(nightData);
-
-  const toggleDone = (id, type) => {
-    const setter = type === 'Morning' ? setMorningTasks : setNightTasks;
-    const tasks = type === 'Morning' ? morningTasks : nightTasks;
-
-    setter(
-      tasks
-        .map(task => (task.id === id ? { ...task, done: !task.done } : task))
-        .sort((a, b) => {
-          if (a.done === b.done) {
-            return a.order - b.order;
-          }
-          return a.done ? 1 : -1;
-        }),
-    );
+      const setter = type === 'Morning' ? setMorningTasks : setNightTasks;
+      setter(updatedTasks);
+    } catch (error) {
+      console.error('Failed to toggle done:', error);
+    }
   };
 
   const currentData = activeTab === 'Morning' ? morningTasks : nightTasks;
 
+  const formatDuration = dur => {
+    const parts = [];
+    if (dur.years) parts.push(`${dur.years} yr`);
+    if (dur.months) parts.push(`${dur.months} mo`);
+    if (dur.days) parts.push(`${dur.days} d`);
+    return parts.join(' ');
+  };
+
+  function safeDate(value, isTimeOnly = false) {
+    if (!value) return null;
+
+    if (isTimeOnly) {
+      return new Date(`1970-01-01T${value}`);
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T00:00:00`);
+    }
+
+    if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+      const [day, month, year] = value.split('-');
+      return new Date(`${year}-${month}-${day}T00:00:00`);
+    }
+
+    return new Date(value);
+  }
+
   // Function to handle tab change & reset
   useEffect(() => {
-    const checkTime = () => {
+    const checkTime = async () => {
       const hour = new Date().getHours();
       let newTab = hour >= 6 && hour < 18 ? 'Morning' : 'Night';
-
       setActiveTab(newTab);
 
-      if (newTab === 'Morning') {
-        setMorningTasks(morningData.map(t => ({ ...t, done: false })));
-      } else {
-        setNightTasks(nightData.map(t => ({ ...t, done: false })));
+      try {
+        const res = await api.get(
+          `/routine-products/view/${newTab.toLowerCase()}`,
+        );
+        const tasks = res.data.map(t => ({
+          ...t,
+          done: t.done || false,
+        }));
+
+        if (newTab === 'Morning') {
+          setMorningTasks(tasks);
+        } else {
+          setNightTasks(tasks);
+        }
+      } catch (err) {
+        console.error('Failed to fetch tasks:', err);
       }
     };
 
@@ -219,23 +182,56 @@ const Calendar = ({ navigation }) => {
   const renderCard = (item, type) => (
     <TouchableOpacity
       key={item.id}
-      style={[styles.card, item.done && styles.cardDone]}
+      style={[styles.card, item.doneStatus && styles.cardDone]}
       onPress={() => toggleDone(item.id, type)}
     >
-      <Text style={styles.time}>{item.date}</Text>
+      <Text style={styles.time}>
+        {safeDate(item.reminderTime, true)
+          ? format(safeDate(item.reminderTime, true), 'HH:mm')
+          : '-'}
+      </Text>
       <View style={styles.infoBox}>
-        {item.image && (
-          <Image source={item.image} style={styles.productImage} />
-        )}
+        <Image
+          source={
+            item.Product?.productImage
+              ? { uri: `http://10.0.2.2:3000${item.Product.productImage}` }
+              : require('../../assets/product-placeholder.jpg')
+          }
+          style={styles.productImage}
+        />
         <View style={styles.info}>
-          <Text style={styles.step}>{item.step}</Text>
-          <Text style={styles.product}>{item.product}</Text>
-          <Text style={styles.exp}>{item.exp}</Text>
+          <Text style={styles.step}>Step {item.Product?.productStep}</Text>
+          <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
+            {item.Product?.productName}
+          </Text>
+          <Text style={styles.exp}>
+            Exp at{' '}
+            {safeDate(item.Product?.expirationDate)
+              ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
+              : '-'}
+            {'  '}
+            {safeDate(item.Product?.expirationDate) ? (
+              new Date(item.Product?.expirationDate) <= new Date() ? (
+                <Text style={{ color: 'red' }}>(Expired!)</Text>
+              ) : (
+                <Text>
+                  (
+                  {formatDuration(
+                    intervalToDuration({
+                      start: new Date(),
+                      end: safeDate(item.Product?.expirationDate),
+                    }),
+                  )}
+                  )
+                </Text>
+              )
+            ) : null}
+          </Text>
         </View>
         <Icon
-          name={item.done ? 'check-circle' : 'circle-o'}
+          name={item.doneStatus ? 'check-circle' : 'circle-o'}
           size={22}
-          color={item.done ? '#ac4cafff' : '#dea9d1ff'}
+          color={item.doneStatus ? '#ac4cafff' : '#dea9d1ff'}
           style={{ marginLeft: 'auto' }}
         />
       </View>
@@ -453,6 +449,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#E06287',
+    flexShrink: 1,
+    maxWidth: 200,
+    marginRight: 8,
   },
   exp: {
     fontSize: 11,

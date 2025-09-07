@@ -40,18 +40,25 @@ module.exports = {
         type: Sequelize.STRING,
       },
       dayOfWeek: {
-        type: Sequelize.ENUM(
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
-        ),
+        type: Sequelize.JSONB,
+        allowNull: true,
       },
       customDate: {
         type: Sequelize.DATEONLY,
+        allowNull: true,
+      },
+      order: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      doneDate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true,
+      },
+      doneStatus: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

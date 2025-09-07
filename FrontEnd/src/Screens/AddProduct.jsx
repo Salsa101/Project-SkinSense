@@ -19,6 +19,8 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DatePicker from 'react-native-date-picker';
 
+import { Picker } from '@react-native-picker/picker';
+
 import { launchImageLibrary } from 'react-native-image-picker';
 
 const AddProduct = ({ navigation }) => {
@@ -41,6 +43,23 @@ const AddProduct = ({ navigation }) => {
     { label: 'Weekly', value: 'weekly' },
     { label: 'Custom', value: 'custom' },
   ]);
+
+  //Routine Day
+  const [openRoutineDay, setOpenRoutineDay] = useState(false);
+  const [routineValueDay, setRoutineValueDay] = useState([]);
+  const [routineItemsDay, setRoutineItemsDay] = useState([
+    { label: 'Monday', value: 'monday' },
+    { label: 'Tuesday', value: 'tuesday' },
+    { label: 'Wednesday', value: 'Wednesday' },
+    { label: 'Thursday', value: 'thursday' },
+    { label: 'Friday', value: 'friday' },
+    { label: 'Saturday', value: 'saturday' },
+    { label: 'Sunday', value: 'sunday' },
+  ]);
+
+  // Custom date
+  const [customDate, setCustomDate] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   //Time of Day
   const [openTimeDay, setOpenTimeDay] = useState(false);
@@ -81,11 +100,40 @@ const AddProduct = ({ navigation }) => {
     });
   };
 
+  const handleRoutineChange = callback => value => {
+    setRoutineValue(value);
+
+    if (value === 'weekly') {
+      setCustomDate(null); // reset custom kalau pilih weekly
+    } else if (value === 'custom') {
+      setRoutineValueDay([]); // reset weekly kalau pilih custom
+    } else {
+      // daily
+      setRoutineValueDay([]);
+      setCustomDate(null);
+    }
+
+    if (callback) callback(value);
+  };
+
   // simpan data + kirim ke backend
   const handleSave = async () => {
     try {
       if (!routineValue || !timeDayValue) {
         Alert.alert('Error', 'Please select routine type and time of day');
+        return;
+      }
+
+      // Validasi timeOfDay
+      const hour = time.getHours();
+      if (
+        (timeDayValue === 'morning' && (hour < 5 || hour > 11)) ||
+        (timeDayValue === 'night' && (hour < 18 || hour > 23))
+      ) {
+        Alert.alert(
+          'Invalid Time',
+          `Selected time doesn't match with ${timeDayValue}.`,
+        );
         return;
       }
 
@@ -103,6 +151,18 @@ const AddProduct = ({ navigation }) => {
       formData.append('reminderTime', time.toTimeString().split(' ')[0]);
       formData.append('routineType', routineValue);
       formData.append('timeOfDay', timeDayValue);
+      // if (routineValueDay.length > 0) {
+      //   formData.append('dayOfWeek', routineValueDay.join(','));
+      // }
+
+      if (routineValueDay.length > 0) {
+        const dayOfWeekJson = routineValueDay.map(d => d.toLowerCase());
+        formData.append('dayOfWeek', JSON.stringify(dayOfWeekJson));
+      }
+
+      if (customDate instanceof Date && !isNaN(customDate)) {
+        formData.append('customDate', customDate.toISOString().split('T')[0]);
+      }
 
       const response = await api.post('/add-routine-products', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -238,7 +298,7 @@ const AddProduct = ({ navigation }) => {
                 value={routineValue}
                 items={routineItems}
                 setOpen={setOpenRoutine}
-                setValue={setRoutineValue}
+                setValue={handleRoutineChange(setRoutineValue)}
                 setItems={setRoutineItems}
                 placeholder="Select routine type"
                 style={styles.dropdownPicker}
@@ -252,8 +312,65 @@ const AddProduct = ({ navigation }) => {
               />
             </View>
 
+            {/* Weekly: Routine Day */}
+            {routineValue === 'weekly' && (
+              <View style={[styles.form, { zIndex: 98 }]}>
+                <Text style={styles.formText}>Routine Day</Text>
+                <DropDownPicker
+                  multiple={true}
+                  min={0}
+                  max={7}
+                  open={openRoutineDay}
+                  value={routineValueDay}
+                  items={routineItemsDay}
+                  setOpen={setOpenRoutineDay}
+                  setValue={setRoutineValueDay}
+                  setItems={setRoutineItemsDay}
+                  placeholder="Select days"
+                  style={styles.dropdownPicker}
+                  dropDownContainerStyle={[
+                    styles.dropdownStyle,
+                    { maxHeight: 800 },
+                  ]}
+                  ArrowDownIconComponent={() => (
+                    <Icon name="chevron-down" size={20} color="#bf828dff" />
+                  )}
+                  ArrowUpIconComponent={() => (
+                    <Icon name="chevron-up" size={20} color="#bf828dff" />
+                  )}
+                />
+              </View>
+            )}
+
+            {/* Custom: pilih tanggal sekali */}
+            {routineValue === 'custom' && (
+              <View style={styles.form}>
+                <Text style={styles.formText}>Custom Date</Text>
+                <View
+                  style={[
+                    styles.inputContainer,
+                    { paddingVertical: 13, paddingLeft: 20 },
+                  ]}
+                >
+                  <Text style={styles.input}>
+                    {customDate
+                      ? customDate.toLocaleDateString()
+                      : 'Pick a date'}
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                    <Icon
+                      name="calendar"
+                      size={20}
+                      color="#bf828dff"
+                      style={styles.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
             {/* Time of Day */}
-            <View style={[styles.form, { zIndex: 98 }]}>
+            <View style={[styles.form, { zIndex: 97 }]}>
               <Text style={styles.formText}>Time of Day</Text>
               <DropDownPicker
                 open={openTimeDay}
@@ -356,6 +473,18 @@ const AddProduct = ({ navigation }) => {
       </ScrollView>
 
       {/* Date Pickers */}
+      <DatePicker
+        modal
+        mode="date"
+        open={showDatePicker}
+        date={customDate || new Date()}
+        onConfirm={date => {
+          setShowDatePicker(false);
+          setCustomDate(date);
+        }}
+        onCancel={() => setShowDatePicker(false)}
+      />
+
       <DatePicker
         modal
         mode="date"

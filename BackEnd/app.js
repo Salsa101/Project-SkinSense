@@ -7,14 +7,14 @@ require('dotenv').config();
 const routes = require("./routes/router");
 const path = require("path");
 
-// app.use("/uploads", express.static("uploads"));
-// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use("/", routes);
+
+require("./cron");
 
 app.get("/", (req, res) => {
   res.send("API is running!");

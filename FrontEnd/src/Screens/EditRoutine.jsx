@@ -7,17 +7,23 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
+import { format, intervalToDuration } from 'date-fns';
 
 import api from '../api';
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
 
 const EditRoutine = ({ navigation }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
   const [activeRoutineTab, setActiveRoutineTab] = useState('Daily');
   const [routineData, setRoutineData] = useState([]);
+
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Calendar');
+  });
 
   const fetchRoutine = async () => {
     try {
@@ -34,7 +40,36 @@ const EditRoutine = ({ navigation }) => {
     fetchRoutine();
   }, [activeRoutineTab, activeTab]);
 
-  const currentData = routineData;
+  const currentData = [...routineData].sort((a, b) => {
+    return Number(a.Product?.productStep) - Number(b.Product?.productStep);
+  });
+
+  const formatDuration = dur => {
+    const parts = [];
+    if (dur.years) parts.push(`${dur.years} yr`);
+    if (dur.months) parts.push(`${dur.months} mo`);
+    if (dur.days) parts.push(`${dur.days} d`);
+    return parts.join(' ');
+  };
+
+  function safeDate(value, isTimeOnly = false) {
+    if (!value) return null;
+
+    if (isTimeOnly) {
+      return new Date(`1970-01-01T${value}`);
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T00:00:00`);
+    }
+
+    if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+      const [day, month, year] = value.split('-');
+      return new Date(`${year}-${month}-${day}T00:00:00`);
+    }
+
+    return new Date(value);
+  }
 
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
@@ -48,9 +83,54 @@ const EditRoutine = ({ navigation }) => {
           style={styles.productImage}
         />
         <View style={styles.info}>
-          <Text style={styles.step}>Step {item.Product?.productStep}</Text>
-          <Text style={styles.product}>{item.Product?.productName}</Text>
-          <Text style={styles.exp}>Exp: {item.Product?.expirationDate}</Text>
+          <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
+            {item.Product?.productName}
+          </Text>
+
+          <Text style={styles.step}>
+            Step {item.Product?.productStep} ·{' '}
+            {item.Product?.productType
+              ? item.Product.productType.charAt(0).toUpperCase() +
+                item.Product.productType.slice(1)
+              : ''}
+          </Text>
+          <Text style={styles.exp}>
+            Opened at{' '}
+            {safeDate(item.Product?.dateOpened)
+              ? format(safeDate(item.Product?.dateOpened), 'dd MMM yyyy')
+              : '-'}
+          </Text>
+
+          <Text style={styles.exp}>
+            Exp at{' '}
+            {safeDate(item.Product?.expirationDate)
+              ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
+              : '-'}
+            {'  '}
+            {safeDate(item.Product?.expirationDate) ? (
+              new Date(item.Product?.expirationDate) <= new Date() ? (
+                <Text style={{ color: 'red' }}>(Expired!)</Text>
+              ) : (
+                <Text>
+                  (
+                  {formatDuration(
+                    intervalToDuration({
+                      start: new Date(),
+                      end: safeDate(item.Product?.expirationDate),
+                    }),
+                  )}
+                  )
+                </Text>
+              )
+            ) : null}
+          </Text>
+
+          <Text style={styles.exp}>
+            Reminder at{' '}
+            {safeDate(item.reminderTime, true)
+              ? format(safeDate(item.reminderTime, true), 'HH:mm')
+              : '-'}
+          </Text>
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
           <TouchableOpacity
@@ -70,7 +150,7 @@ const EditRoutine = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ marginBottom: 90 }}>
+      <ScrollView>
         <View style={styles.headerContainer}>
           <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
             My Skincare Routine
@@ -204,9 +284,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: 50,
-    height: 70,
-    // borderBottomLeftRadius: 8,
-    // borderTopLeftRadius: 8,
+    height: 85,
     borderRadius: 8,
     backgroundColor: '#000000ff',
     marginRight: 10,
@@ -269,6 +347,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#E06287',
+    flexShrink: 1,
+    maxWidth: 200,
+    marginRight: 8,
   },
   exp: {
     fontSize: 11,

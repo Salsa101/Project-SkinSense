@@ -12,6 +12,7 @@ import AddProduct from '../Screens/AddProduct';
 import RNBootSplash from 'react-native-bootsplash';
 
 import api from '../api';
+import SkinQuiz from '../Screens/SkinQuiz';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +85,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="AddProduct"
           component={AddProduct}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SkinQuiz"
+          component={SkinQuiz}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

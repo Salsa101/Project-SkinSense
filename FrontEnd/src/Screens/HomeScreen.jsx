@@ -13,7 +13,7 @@ import api from '../api';
 import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import { useExitAppHandler } from '../Hooks/CustomBackHandler';
+import { useExitAppHandler } from '../Handler/CustomBackHandler';
 
 const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);

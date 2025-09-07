@@ -1,16 +1,9 @@
 import { React } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-import { useExitAppHandler } from '../Hooks/CustomBackHandler';
+import { useExitAppHandler } from '../Handler/CustomBackHandler';
 
 const AccountOption = ({ navigation }) => {
-
   //Handler Exit app
   useExitAppHandler();
 
