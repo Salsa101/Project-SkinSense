@@ -209,29 +209,42 @@ const Calendar = ({ navigation }) => {
           <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
             {item.Product?.productName}
           </Text>
-          <Text style={styles.exp}>
-            Exp at{' '}
-            {safeDate(item.Product?.expirationDate)
-              ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
-              : '-'}
-            {'  '}
-            {safeDate(item.Product?.expirationDate) ? (
-              new Date(item.Product?.expirationDate) <= new Date() ? (
-                <Text style={{ color: 'red' }}>(Expired!)</Text>
-              ) : (
-                <Text>
-                  (
-                  {formatDuration(
-                    intervalToDuration({
-                      start: new Date(),
-                      end: safeDate(item.Product?.expirationDate),
-                    }),
-                  )}
-                  )
-                </Text>
-              )
-            ) : null}
-          </Text>
+          {safeDate(item.Product?.expirationDate) ? (
+            new Date(item.Product?.expirationDate) <= new Date() ? (
+              <Text style={[styles.exp, { color: 'red' }]}>
+                Product Expired!
+              </Text>
+            ) : (
+              (() => {
+                const duration = intervalToDuration({
+                  start: new Date(),
+                  end: safeDate(item.Product?.expirationDate),
+                });
+
+                const totalMs =
+                  safeDate(item.Product?.expirationDate).getTime() -
+                  new Date().getTime();
+                const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+
+                if (totalDays <= 30) {
+                  return (
+                    <Text style={[styles.exp, { color: '#cf7f24ff' }]}>
+                      Expiring Soon! ({totalDays}d)
+                    </Text>
+                  );
+                }
+
+                const parts = [];
+                if (duration.years) parts.push(`${duration.years}yr`);
+                if (duration.months) parts.push(`${duration.months}mo`);
+                if (duration.days) parts.push(`${duration.days}d`);
+
+                return <Text style={styles.exp}>Exp in {parts.join(' ')}</Text>;
+              })()
+            )
+          ) : (
+            <Text style={styles.exp}>-</Text>
+          )}
         </View>
         <Icon
           name={item.doneStatus ? 'check-circle' : 'circle-o'}
@@ -245,7 +258,7 @@ const Calendar = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ marginBottom: 90 }}>
+      <ScrollView style={{ marginBottom: 75 }}>
         {/* Header */}
         <View style={styles.headerContainer}>
           <View style={styles.headerText}>
@@ -259,7 +272,7 @@ const Calendar = ({ navigation }) => {
               Skincare Tracker
             </Text>
             <View style={styles.monthlyDate}>
-              <Icon name="calendar" size={20} color="#E07C8E" />
+              <Icon name="calendar" size={15} color="#E07C8E" />
               <Text style={styles.monthYearText}>{monthYear}</Text>
             </View>
           </View>
@@ -480,8 +493,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   time: {
-    width: 60,
-    marginRight: 0,
+    marginRight: 8,
     fontWeight: 'light',
     color: '#D3586E',
     marginLeft: 5,

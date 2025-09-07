@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     marginTop: 30,
     marginHorizontal: 15,
-    marginBottom: 80,
+    marginBottom: 75,
   },
   header: {
     display: 'flex',
