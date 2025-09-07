@@ -27,7 +27,7 @@ const Navbar = ({ active, onPress }) => {
           >
             <Icon
               name={item.icon}
-              size={30}
+              size={25}
               color={isActive ? "#a05c5c" : "#aaa"}
             />
             <Text style={[styles.label, isActive && styles.activeLabel]}>
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f9f4f0',
     paddingTop: 8,
-    paddingBottom: 25,
+    paddingBottom: 15,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },

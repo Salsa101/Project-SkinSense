@@ -106,23 +106,6 @@ const EditRoutine = ({ navigation }) => {
             {safeDate(item.Product?.expirationDate)
               ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
               : '-'}
-            {'  '}
-            {safeDate(item.Product?.expirationDate) ? (
-              new Date(item.Product?.expirationDate) <= new Date() ? (
-                <Text style={{ color: 'red' }}>(Expired!)</Text>
-              ) : (
-                <Text>
-                  (
-                  {formatDuration(
-                    intervalToDuration({
-                      start: new Date(),
-                      end: safeDate(item.Product?.expirationDate),
-                    }),
-                  )}
-                  )
-                </Text>
-              )
-            ) : null}
           </Text>
 
           <Text style={styles.exp}>
@@ -152,7 +135,13 @@ const EditRoutine = ({ navigation }) => {
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.headerContainer}>
-          <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: '#E07C8E' }}>
+          <Text
+            style={{
+              fontFamily: 'Poppins-Bold',
+              fontSize: 20,
+              color: '#E07C8E',
+            }}
+          >
             My Skincare Routine
           </Text>
 
@@ -188,12 +177,12 @@ const EditRoutine = ({ navigation }) => {
             borderRadius: 20,
             shadowColor: '#AB8C8C',
             shadowOffset: {
-             width: 0,
-             height: 4,
-          },
-             shadowOpacity: 0.5,
-             shadowRadius: 4,
-             elevation: 4,
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 4,
+            elevation: 4,
           }}
         >
           <View style={styles.toggleWrapper}>
@@ -274,7 +263,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FCF7F2'
+    backgroundColor: '#FCF7F2',
   },
   headerContainer: {
     paddingHorizontal: 20,
@@ -335,7 +324,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     color: '#E06287',
     marginBottom: 15,
-   fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-Bold',
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
   },
   card: {
