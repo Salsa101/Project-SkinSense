@@ -67,14 +67,14 @@ const Calendar = ({ navigation }) => {
   };
 
   const DateItem = ({ day, date, isToday }) => (
-    <View style={[styles.date, isToday && { backgroundColor: '#d87bbfff' }]}>
+    <View style={[styles.date, isToday && { backgroundColor: '#ED97A0' }]}>
       <Text
-        style={{ fontFamily: isToday ? 'Poppins-Bold' : 'Poppins-Regular' }}
+        style={{ fontFamily: isToday ? 'Poppins-Bold' : 'Poppins-Medium' , color: isToday ? 'white' : 'white'}}
       >
         {day}
       </Text>
       <Text
-        style={{ fontWeight: isToday ? 'Poppins-Bold' : 'Poppins-Regular' }}
+        style={{ fontWeight: isToday ? 'Poppins-Bold' : 'Poppins-Medium', color: isToday ? 'white' : 'white' }}
       >
         {date}
       </Text>
@@ -231,7 +231,7 @@ const Calendar = ({ navigation }) => {
         <Icon
           name={item.doneStatus ? 'check-circle' : 'circle-o'}
           size={22}
-          color={item.doneStatus ? '#ac4cafff' : '#dea9d1ff'}
+          color={item.doneStatus ? '#E07C8E' : '#f49babff'}
           style={{ marginLeft: 'auto' }}
         />
       </View>
@@ -244,12 +244,12 @@ const Calendar = ({ navigation }) => {
         {/* Header */}
         <View style={styles.headerContainer}>
           <View style={styles.headerText}>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+            <Text style={{ fontSize: 20, color: '#E07C8E' , fontFamily: 'Poppins-Bold'}}>
               Skincare Tracker
             </Text>
             <View style={styles.monthlyDate}>
-              <Icon name="calendar" size={20} color="#000000" />
-              <Text style={{ marginHorizontal: 8 }}>{monthYear}</Text>
+              <Icon name="calendar" size={20} color="#E07C8E" />
+              <Text style={styles.monthYearText}>{monthYear}</Text>
             </View>
           </View>
 
@@ -268,8 +268,16 @@ const Calendar = ({ navigation }) => {
             paddingLeft: 7,
             margin: 16,
             marginBottom: 20,
-            backgroundColor: '#b4b4b4ff',
+            backgroundColor: '#FFF9F3',
             borderRadius: 20,
+            shadowColor: '#AB8C8C',
+            shadowOffset: {
+             width: 0,
+             height: 4,
+          },
+             shadowOpacity: 0.5,
+             shadowRadius: 4,
+             elevation: 4,
           }}
         >
           {/* Toggle */}
@@ -284,7 +292,7 @@ const Calendar = ({ navigation }) => {
               <Icon1
                 name="sun"
                 size={20}
-                color={activeTab === 'Morning' ? 'orange' : 'gray'}
+                color={activeTab === 'Morning' ? '#E07C8E' : '#DBABB3'}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -297,7 +305,7 @@ const Calendar = ({ navigation }) => {
               <Icon1
                 name="moon"
                 size={20}
-                color={activeTab === 'Night' ? 'blue' : 'gray'}
+                color={activeTab === 'Night' ? '#E07C8E' : '#DBABB3'}
               />
             </TouchableOpacity>
           </View>
@@ -343,12 +351,27 @@ const Calendar = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1 ,backgroundColor: '#FCF7F2'},
   headerContainer: {
-    backgroundColor: 'lightgray',
+    backgroundColor: '#FFF9F3',
     padding: 20,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
+     shadowColor: '#AB8C8C',
+            shadowOffset: {
+             width: 0,
+             height: 4,
+          },
+             shadowOpacity: 0.5,
+             shadowRadius: 4,
+             elevation: 4,
+  },
+  monthYearText: {
+    marginHorizontal: 8,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
+    alignItems: 'center',
   },
   headerText: {
     flexDirection: 'row',
@@ -357,13 +380,25 @@ const styles = StyleSheet.create({
   },
   cardDone: {
     opacity: 0.8,
-    backgroundColor: '#f5a7f5ff',
+    backgroundColor: '#ED97A0',
     borderRadius: 12,
   },
   monthlyDate: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 8,
+    backgroundColor: '#FFFFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    shadowColor: '#030303ff',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   dateContainer: {
     flexDirection: 'row',
@@ -373,7 +408,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 10,
     borderRadius: 5,
-    backgroundColor: 'white',
+    backgroundColor: '#F8D3D5',
     justifyContent: 'center',
     alignItems: 'center',
     height: 60,
@@ -390,15 +425,23 @@ const styles = StyleSheet.create({
   toggleWrapper: {
     flexDirection: 'row',
     alignSelf: 'center',
-    backgroundColor: '#8f4141ff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 25,
     marginBottom: 10,
     marginTop: 15,
+    shadowColor: '#AB8C8C',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
   toggleButton: {
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: '#8f4141ff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 25,
   },
   activeTab: {
@@ -407,7 +450,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     color: '#E06287',
     marginBottom: 40,
     textAlign: 'center',
@@ -415,6 +458,8 @@ const styles = StyleSheet.create({
   progress: {
     alignSelf: 'flex-end',
     backgroundColor: '#FDE5EB',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
@@ -429,8 +474,8 @@ const styles = StyleSheet.create({
   time: {
     width: 60,
     marginRight: 0,
-    fontWeight: 'bold',
-    color: '#666',
+    fontWeight: 'light',
+    color: '#D3586E',
     marginLeft: 5,
   },
   infoBox: {
@@ -443,11 +488,13 @@ const styles = StyleSheet.create({
   },
   step: {
     color: '#666',
-    fontSize: 12,
+    fontSize: 11,
+    fontFamily: 'Poppins-Regular',
+  
   },
   product: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     color: '#E06287',
     flexShrink: 1,
     maxWidth: 200,
@@ -456,13 +503,14 @@ const styles = StyleSheet.create({
   exp: {
     fontSize: 11,
     color: '#999',
+    fontFamily: 'Poppins-Light',
     marginTop: 2,
   },
   floatingBubble: {
     position: 'absolute',
     bottom: 100,
     right: 20,
-    backgroundColor: '#ae02c9ff',
+    backgroundColor: '#E07C8E',
     borderRadius: 60,
     padding: 15,
     alignItems: 'center',
