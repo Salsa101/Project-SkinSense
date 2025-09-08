@@ -345,7 +345,9 @@ const Calendar = ({ navigation }) => {
               style={{
                 textAlign: 'center',
                 marginVertical: 30,
-                color: '#000000ff',
+                color: '#B67F89',
+                fontFamily: 'Poppins-Medium',
+                fontSize: 11,
               }}
             >
               No data available

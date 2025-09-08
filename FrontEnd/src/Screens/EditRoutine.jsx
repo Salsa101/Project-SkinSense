@@ -117,12 +117,36 @@ const EditRoutine = ({ navigation }) => {
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
           <TouchableOpacity
-            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 30,
+              padding: 7,
+              shadowColor: 'rgba(95, 52, 52, 1)',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
           >
             <Icon name="pencil" size={18} color="#E07C8E" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 30,
+              padding: 7,
+              shadowColor: 'rgba(95, 52, 52, 1)',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
           >
             <Icon name="trash" size={18} color="#E07C8E" />
           </TouchableOpacity>
@@ -342,8 +366,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   step: {
-    color: '#666',
+    color: '#4d4c4cff',
     fontSize: 12,
+    fontFamily: 'Poppins-Medium',
+    marginTop: 2,
   },
   product: {
     fontSize: 14,
@@ -355,8 +381,12 @@ const styles = StyleSheet.create({
   },
   exp: {
     fontSize: 11,
-    color: '#999',
+    color: '#726b6bff',
     marginTop: 2,
+    fontFamily: 'Poppins-Medium',
+  },
+  info: {
+    flex: 1,
   },
 });
 
