@@ -24,10 +24,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      productStep: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       productType: {
         type: Sequelize.ENUM(
           "cleanser",
@@ -38,12 +34,6 @@ module.exports = {
           "mask"
         ),
         allowNull: false,
-      },
-      dateOpened: {
-        type: Sequelize.DATEONLY,
-      },
-      expirationDate: {
-        type: Sequelize.DATEONLY,
       },
       productImage: {
         type: Sequelize.STRING,

@@ -30,6 +30,10 @@ module.exports = {
         type: Sequelize.DATEONLY,
         allowNull: true,
       },
+      role: {
+        type: Sequelize.STRING,
+        defaultValue: "user",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

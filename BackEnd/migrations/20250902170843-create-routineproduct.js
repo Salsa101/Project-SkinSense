@@ -52,6 +52,16 @@ module.exports = {
         allowNull: false,
         defaultValue: 0,
       },
+      productStep: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      dateOpened: {
+        type: Sequelize.DATEONLY,
+      },
+      expirationDate: {
+        type: Sequelize.DATEONLY,
+      },
       doneDate: {
         type: Sequelize.DATEONLY,
         allowNull: true,

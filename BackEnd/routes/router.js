@@ -23,12 +23,15 @@ const {
   deleteRoutineProduct,
   uploadProduct,
   toggleDone,
+  searchProducts,
 } = require("../Controllers/RoutineProductController");
 const {
   getQuestions,
   submitAnswers,
 } = require("../Controllers/QuizController");
 const upload = require("../Middlewares/UploadImage");
+
+const { isAdmin } = require("../Middlewares/AdminMiddleware");
 
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
@@ -43,32 +46,28 @@ router.put("/profile", validateToken, updateProfile);
 router.delete("/profile", validateToken, deleteAccount);
 
 //Routine Product
-router.post(
-  "/add-routine-products",
-  validateToken,
-  upload.single("productImage"),
-  addProductToRoutine
-);
-router.get(
-  "/routine-products/view/:routineType/:timeOfDay",
-  validateToken,
-  viewRoutineByCategory
-);
-router.get(
-  "/routine-products/view/:routineName",
-  validateToken,
-  viewRoutineByTime
-);
+router.post("/add-routine-products", validateToken, upload.single("productImage"), addProductToRoutine);
+router.get("/routine-products/view/:routineType/:timeOfDay", validateToken, viewRoutineByCategory);
+router.get("/routine-products/view/:routineName", validateToken, viewRoutineByTime);
 router.patch("/routine-products/toggle-done", validateToken, toggleDone);
+router.delete("/routine-products/delete", validateToken, deleteRoutineProduct);
+router.get("/routine-products/search", validateToken, searchProducts);
+
+//Add Image
+router.post("/upload-product", upload.single("productImage"), uploadProduct);
 
 //Skin Quiz
 router.get("/question", validateToken, getQuestions);
 router.post("/answer", validateToken, submitAnswers);
 
+//Admin Role
+router.get("/check-auth", validateToken, (req, res) => {
+  res.json({ message: "Token valid", user: req.user });
+});
+router.get("/products", validateToken, isAdmin, getRoutineProduct);
+router.post("/add-products", validateToken, isAdmin, addProductToRoutine);
+
 router.get("/routine-products/:id", getRoutineProduct); // Get detail
 router.put("/routine-products/:id", updateRoutineProduct); // Update
-router.delete("/routine-products/:id", deleteRoutineProduct); // Delete
-
-router.post("/upload-product", upload.single("productImage"), uploadProduct);
 
 module.exports = router;

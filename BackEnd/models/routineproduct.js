@@ -41,6 +41,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 0,
       },
+      productStep: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      dateOpened: {
+        type: DataTypes.DATEONLY,
+      },
+      expirationDate: {
+        type: DataTypes.DATEONLY,
+      },
       doneDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,

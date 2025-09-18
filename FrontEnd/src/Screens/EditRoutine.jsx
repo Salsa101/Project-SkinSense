@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
@@ -41,7 +42,7 @@ const EditRoutine = ({ navigation }) => {
   }, [activeRoutineTab, activeTab]);
 
   const currentData = [...routineData].sort((a, b) => {
-    return Number(a.Product?.productStep) - Number(b.Product?.productStep);
+    return Number(a.productStep) - Number(b.productStep);
   });
 
   const formatDuration = dur => {
@@ -71,6 +72,30 @@ const EditRoutine = ({ navigation }) => {
     return new Date(value);
   }
 
+  const handleDelete = routineProductId => {
+    Alert.alert(
+      'Delete Routine',
+      'Are you sure you want to delete this routine?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete('/routine-products/delete', {
+                data: { routineProductId },
+              });
+              fetchRoutine();
+            } catch (err) {
+              console.error(err);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
       <View style={styles.infoBox}>
@@ -88,7 +113,7 @@ const EditRoutine = ({ navigation }) => {
           </Text>
 
           <Text style={styles.step}>
-            Step {item.Product?.productStep} ·{' '}
+            Step {item.productStep} ·{' '}
             {item.Product?.productType
               ? item.Product.productType.charAt(0).toUpperCase() +
                 item.Product.productType.slice(1)
@@ -96,15 +121,15 @@ const EditRoutine = ({ navigation }) => {
           </Text>
           <Text style={styles.exp}>
             Opened at{' '}
-            {safeDate(item.Product?.dateOpened)
-              ? format(safeDate(item.Product?.dateOpened), 'dd MMM yyyy')
+            {safeDate(item.dateOpened)
+              ? format(safeDate(item.dateOpened), 'dd MMM yyyy')
               : '-'}
           </Text>
 
           <Text style={styles.exp}>
             Exp at{' '}
-            {safeDate(item.Product?.expirationDate)
-              ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
+            {safeDate(item.expirationDate)
+              ? format(safeDate(item.expirationDate), 'dd MMM yyyy')
               : '-'}
           </Text>
 
@@ -122,6 +147,7 @@ const EditRoutine = ({ navigation }) => {
             <Icon name="pencil" size={18} color="#E07C8E" />
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={() => handleDelete(item.id)}
             style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
           >
             <Icon name="trash" size={18} color="#E07C8E" />
