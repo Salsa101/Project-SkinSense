@@ -416,16 +416,26 @@ const AddProduct = ({ navigation }) => {
                   setValue={setRoutineValueDay}
                   setItems={setRoutineItemsDay}
                   placeholder="Select days"
+                  placeholderStyle={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                textStyle={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#E07C8E',
+                  fontSize: 12,
+                }}
                   style={styles.dropdownPicker}
                   dropDownContainerStyle={[
                     styles.dropdownStyle,
                     { maxHeight: 800 },
                   ]}
                   ArrowDownIconComponent={() => (
-                    <Icon name="chevron-down" size={20} color="#bf828dff" />
+                    <Icon name="chevron-down" size={20} color="#E07C8E" />
                   )}
                   ArrowUpIconComponent={() => (
-                    <Icon name="chevron-up" size={20} color="#bf828dff" />
+                    <Icon name="chevron-up" size={20} color="#E07C8E" />
                   )}
                 />
               </View>
@@ -450,7 +460,7 @@ const AddProduct = ({ navigation }) => {
                     <Icon
                       name="calendar"
                       size={20}
-                      color="#bf828dff"
+                      color="#E07C8E"
                       style={styles.icon}
                     />
                   </TouchableOpacity>
