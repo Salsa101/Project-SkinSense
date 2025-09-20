@@ -1,8 +1,11 @@
 const { User, Product } = require("../models");
+const { News, Category } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config/config");
 const { validationResult } = require("express-validator");
+
+// ========== Auth Page ==========
 
 //Login
 const adminLoginController = async (req, res) => {
@@ -49,6 +52,8 @@ const adminLogoutController = async (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logout berhasil" });
 };
+
+// ========== Product Page ==========
 
 //View Product
 const getAllProducts = async (req, res) => {
@@ -173,6 +178,224 @@ const verifiedProduct = async (req, res) => {
   }
 };
 
+// ========== News Page ==========
+
+//Get News
+const getNews = async (req, res) => {
+  try {
+    const { search, category } = req.query;
+
+    const where = {};
+    if (search) where.title = { [Op.iLike]: `%${search}%` };
+    if (category) where.categoryId = category;
+
+    const news = await News.findAll({
+      where,
+      include: [{ model: Category, attributes: ["id", "name"] }],
+    });
+
+    res.json(news);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Add News
+const addNews = async (req, res) => {
+  try {
+    const { title, content, categoryId } = req.body;
+    const newsImage = req.file ? req.file.path : null;
+
+    if (!title || !content || !categoryId)
+      return res.status(400).json({ message: "All fields are required" });
+
+    const category = await Category.findByPk(categoryId);
+    if (!category)
+      return res.status(404).json({ message: "Category not found" });
+
+    const news = await News.create({ title, content, categoryId, newsImage });
+    res.status(201).json(news);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Get News Detail
+const getNewsDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const news = await News.findByPk(id, {
+      include: [{ model: Category, attributes: ["id", "name"] }],
+      attributes: [
+        "id",
+        "title",
+        "content",
+        "newsImage",
+        "categoryId",
+        "createdAt",
+      ],
+    });
+
+    if (!news) return res.status(404).json({ message: "News not found" });
+
+    res.json(news);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Edit News
+const editNews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, categoryId } = req.body;
+    const newsImage = req.file ? req.file.path : null;
+
+    const news = await News.findByPk(id);
+    if (!news) return res.status(404).json({ message: "News not found" });
+
+    if (categoryId) {
+      const category = await Category.findByPk(categoryId);
+      if (!category)
+        return res.status(404).json({ message: "Category not found" });
+      news.categoryId = categoryId;
+    }
+    if (title) news.title = title;
+    if (content) news.content = content;
+    if (newsImage) news.newsImage = newsImage;
+
+    await news.save();
+    res.json(news);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Delete News
+const deleteNews = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const news = await News.findByPk(id);
+    if (!news) return res.status(404).json({ message: "News not found" });
+
+    await news.destroy();
+
+    res.json({ message: "News deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Category
+const addCategory = async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: "Name required" });
+
+    const existing = await Category.findOne({ where: { name } });
+    if (existing)
+      return res.status(400).json({ message: "Category already exists" });
+
+    const category = await Category.create({ name });
+    res.status(201).json(category);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCategory = async (req, res) => {
+  try {
+    const categories = await Category.findAll({
+      attributes: ["id", "name", "isActive"],
+    });
+    res.json(categories);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const editCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const category = await Category.findByPk(id);
+    if (!category)
+      return res.status(404).json({ message: "Category not found" });
+
+    category.name = name;
+    await category.save();
+
+    res.json(category);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findByPk(id);
+    if (!category)
+      return res.status(404).json({ message: "Category not found" });
+
+    // Soft delete
+    category.isActive = false;
+    await category.save();
+
+    res.json({ message: "Category archived (soft delete)" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCategoryDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const category = await Category.findByPk(id);
+
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json(category);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const isActiveCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const category = await Category.findByPk(id);
+    if (!category)
+      return res.status(404).json({ message: "Category not found" });
+
+    category.isActive = isActive;
+    await category.save();
+
+    res.json({ message: "Category status updated", category });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   adminLoginController,
   adminLogoutController,
@@ -182,4 +405,15 @@ module.exports = {
   getProductById,
   updateProduct,
   verifiedProduct,
+  getNews,
+  addNews,
+  getNewsDetail,
+  editNews,
+  deleteNews,
+  addCategory,
+  getCategory,
+  editCategory,
+  deleteCategory,
+  getCategoryDetail,
+  isActiveCategory,
 };

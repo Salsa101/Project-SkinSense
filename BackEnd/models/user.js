@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         as: "products", // nama alias supaya mudah di include
       });
+      User.belongsToMany(models.News, {
+        through: models.Bookmark,
+        foreignKey: "userId",
+        otherKey: "newsId",
+      });
     }
   }
   User.init(

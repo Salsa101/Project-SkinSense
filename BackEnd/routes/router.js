@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
+//Import Controller
 const {
   registerController,
   loginController,
@@ -26,13 +27,22 @@ const {
   searchProducts,
 } = require("../Controllers/RoutineProductController");
 const {
+  getNews,
+  getNewsDetail,
+  bookmarkNews,
+  unbookmarkNews,
+  listBookmarks,
+} = require("../Controllers/NewsController");
+const {
   getQuestions,
   submitAnswers,
 } = require("../Controllers/QuizController");
 const upload = require("../Middlewares/UploadImage");
 
+//Admin Role
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
 
+//Auth
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
 router.post("/logout", logoutController);
@@ -52,6 +62,7 @@ router.post(
   upload.single("productImage"),
   addProductToRoutine
 );
+router.post("/upload-product", upload.single("productImage"), uploadProduct);
 router.get(
   "/routine-products/view/:routineType/:timeOfDay",
   validateToken,
@@ -65,9 +76,20 @@ router.get(
 router.patch("/routine-products/toggle-done", validateToken, toggleDone);
 router.delete("/routine-products/delete", validateToken, deleteRoutineProduct);
 router.get("/routine-products/search", validateToken, searchProducts);
+router.get("/routine-products/:id", validateToken, getRoutineProduct); // Get detail
+router.put(
+  "/routine-products/:id",
+  validateToken,
+  upload.single("productImage"),
+  updateRoutineProduct
+);
 
-//Add Image
-router.post("/upload-product", upload.single("productImage"), uploadProduct);
+//News Route
+router.get("/news", getNews);
+router.get("/news/:id", getNewsDetail);
+router.post("/news/:newsId/bookmark", validateToken, bookmarkNews);
+router.delete("/news/:newsId/bookmark", validateToken, unbookmarkNews);
+router.get("/news/bookmarks", validateToken, listBookmarks);
 
 //Skin Quiz
 router.get("/question", validateToken, getQuestions);
@@ -79,13 +101,5 @@ router.get("/check-auth", validateToken, (req, res) => {
 });
 router.get("/products", validateToken, isAdmin, getRoutineProduct);
 router.post("/add-products", validateToken, isAdmin, addProductToRoutine);
-
-router.get("/routine-products/:id", validateToken, getRoutineProduct); // Get detail
-router.put(
-  "/routine-products/:id",
-  validateToken,
-  upload.single("productImage"), // biar bisa baca req.file
-  updateRoutineProduct
-);
 
 module.exports = router;
