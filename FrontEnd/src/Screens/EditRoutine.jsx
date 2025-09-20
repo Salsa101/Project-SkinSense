@@ -133,6 +133,26 @@ const EditRoutine = ({ navigation }) => {
               : '-'}
           </Text>
 
+          {item.routineType !== 'daily' && (
+            <Text style={styles.exp}>
+              Reminder on{' '}
+              {item.routineType === 'weekly' && item.dayOfWeek
+                ? item.dayOfWeek
+                    .map(
+                      d =>
+                        d.slice(0, 3).charAt(0).toUpperCase() + d.slice(1, 3),
+                    )
+                    .join(', ')
+                : item.routineType === 'custom' && item.customDate
+                ? new Date(item.customDate).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                : ''}
+            </Text>
+          )}
+
           <Text style={styles.exp}>
             Reminder at{' '}
             {safeDate(item.reminderTime, true)
@@ -336,8 +356,8 @@ const styles = StyleSheet.create({
     width: 40,
   },
   productImage: {
-    width: 50,
-    height: 100,
+    width: 65,
+    height: 120,
     borderRadius: 5,
     backgroundColor: '#000000ff',
     marginRight: 10,

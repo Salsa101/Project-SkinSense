@@ -114,6 +114,7 @@ const EditProduct = ({ route, navigation }) => {
           setRoutineValueDay(p.routineDay || []);
           setCustomDate(p.customDate ? new Date(p.customDate) : null);
           setTimeDayValue(p.timeOfDay || null);
+          setRoutineValueDay(p.dayOfWeek || null);
           setDateOpened(p.dateOpened ? new Date(p.dateOpened) : null);
           setExpirationDate(
             p.expirationDate ? new Date(p.expirationDate) : null,

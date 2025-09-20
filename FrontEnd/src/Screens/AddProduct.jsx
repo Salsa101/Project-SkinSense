@@ -338,7 +338,7 @@ const AddProduct = ({ navigation }) => {
 
           {/* Product Name */}
           <View style={styles.inputFormContainer}>
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Product Name</Text>
               <View
                 style={[
@@ -358,7 +358,7 @@ const AddProduct = ({ navigation }) => {
             </View>
 
             {/* Product Brand */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Product Brand</Text>
               <View
                 style={[
@@ -378,7 +378,7 @@ const AddProduct = ({ navigation }) => {
             </View>
 
             {/* Step */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Step</Text>
               <View style={styles.inputContainer}>
                 <TextInput
@@ -505,7 +505,7 @@ const AddProduct = ({ navigation }) => {
 
             {/* Custom: pilih tanggal sekali */}
             {routineValue === 'custom' && (
-              <View style={styles.form}>
+              <View style={[styles.form, { zIndex: 97 }]}>
                 <Text style={styles.formText}>Custom Date</Text>
                 <View
                   style={[
@@ -531,7 +531,7 @@ const AddProduct = ({ navigation }) => {
             )}
 
             {/* Time of Day */}
-            <View style={[styles.form, { zIndex: 97 }]}>
+            <View style={[styles.form, { zIndex: 96 }]}>
               <Text style={styles.formText}>Time of Day</Text>
               <DropDownPicker
                 open={openTimeDay}
@@ -563,7 +563,7 @@ const AddProduct = ({ navigation }) => {
             </View>
 
             {/* Date Opened */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 95 }]}>
               <Text style={styles.formText}>Date Opened</Text>
               <View
                 style={[
