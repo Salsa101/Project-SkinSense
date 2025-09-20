@@ -155,6 +155,24 @@ const updateProduct = async (req, res) => {
   }
 };
 
+//Verified Admin
+const verifiedProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isVerified } = req.body;
+
+    const product = await Product.findByPk(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.isVerified = isVerified;
+    await product.save();
+
+    res.json({ message: "Product verification updated", product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   adminLoginController,
   adminLogoutController,
@@ -163,4 +181,5 @@ module.exports = {
   deleteAdminProduct,
   getProductById,
   updateProduct,
+  verifiedProduct,
 };

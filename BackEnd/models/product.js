@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "productId",
         onDelete: "CASCADE",
       });
-      Product.belongsTo(models.User, { foreignKey: "userId", as: "user", });
+      Product.belongsTo(models.User, { foreignKey: "userId", as: "user" });
     }
   }
 
@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       productImage: {
         type: DataTypes.STRING,
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false, // admin yang set true
       },
     },
     {

@@ -60,6 +60,7 @@ const addProductToRoutine = async (req, res) => {
           productBrand,
           productType,
           productImage: imageUrl,
+          isVerified: false, // default
         });
         finalProductId = newProduct.id;
       }
@@ -251,49 +252,50 @@ const getRoutineProduct = async (req, res) => {
 // Update
 // const updateRoutineProduct = async (req, res) => {
 //   try {
-//     const {
-//       productName,
-//       brand,
-//       type,
-//       dateOpened,
-//       expirationDate,
-//       routineName,
-//       category,
-//       reminderTime,
-//       notificationFrequency,
-//       dayOfWeek,
-//       customDate,
-//     } = req.body;
+//     const routine = await RoutineProduct.findByPk(req.params.id, {
+//       include: [Product],
+//     });
+//     if (!routine) return res.status(404).json({ message: "Not found" });
 
-//     const routineProduct = await RoutineProduct.findByPk(req.params.id);
-//     if (!routineProduct) return res.status(404).json({ error: "Not found" });
-
-//     const product = await Product.findByPk(routineProduct.productId);
-//     if (product) {
-//       await product.update({
-//         productName,
-//         brand,
-//         type,
-//         dateOpened,
-//         expirationDate,
-//       });
-//     }
-
-//     await routineProduct.update({
-//       routineName,
-//       category,
-//       reminderTime,
-//       notificationFrequency,
-//       dayOfWeek,
-//       customDate,
+//     // update RoutineProduct (productStep ada di sini)
+//     await routine.update({
+//       productStep: req.body.productStep || routine.productStep,
+//       routineType: req.body.routineType || routine.routineType,
+//       routineDay: req.body.routineDay || routine.routineDay,
+//       customDate: req.body.customDate || routine.customDate,
+//       timeOfDay: req.body.timeOfDay || routine.timeOfDay,
+//       dateOpened: req.body.dateOpened || routine.dateOpened,
+//       expirationDate: req.body.expirationDate || routine.expirationDate,
+//       reminderTime: req.body.reminderTime || routine.reminderTime,
 //     });
 
-//     res.json(routineProduct);
+//     // update Product (cuma kolom milik Product saja)
+//     if (routine.Product) {
+//       const updateData = {
+//         productName: req.body.productName || routine.Product.productName,
+//         productBrand: req.body.productBrand || routine.Product.productBrand,
+//         productType: req.body.productType || routine.Product.productType,
+//       };
+
+//       if (req.file) {
+//         updateData.productImage = `/uploads/${req.file.filename}`;
+//       }
+
+//       await routine.Product.update(updateData);
+//     }
+
+//     const updated = await RoutineProduct.findByPk(req.params.id, {
+//       include: [Product],
+//     });
+
+//     res.json({ message: "Routine + Product updated", routine: updated });
 //   } catch (err) {
+//     console.error(err);
 //     res.status(500).json({ error: err.message });
 //   }
 // };
 
+// Update
 const updateRoutineProduct = async (req, res) => {
   try {
     const routine = await RoutineProduct.findByPk(req.params.id, {
@@ -301,7 +303,7 @@ const updateRoutineProduct = async (req, res) => {
     });
     if (!routine) return res.status(404).json({ message: "Not found" });
 
-    // update RoutineProduct (productStep ada di sini)
+    // update RoutineProduct (selalu boleh diubah)
     await routine.update({
       productStep: req.body.productStep || routine.productStep,
       routineType: req.body.routineType || routine.routineType,
@@ -313,8 +315,8 @@ const updateRoutineProduct = async (req, res) => {
       reminderTime: req.body.reminderTime || routine.reminderTime,
     });
 
-    // update Product (cuma kolom milik Product saja)
-    if (routine.Product) {
+    // cek verifikasi sebelum update Product
+    if (routine.Product && !routine.Product.isVerified) {
       const updateData = {
         productName: req.body.productName || routine.Product.productName,
         productBrand: req.body.productBrand || routine.Product.productBrand,
@@ -374,13 +376,27 @@ const searchProducts = async (req, res) => {
       return res.json([]);
     }
 
+    const whereCondition = {
+      [Op.or]: [
+        { productName: { [Op.iLike]: `%${query}%` } },
+        { productBrand: { [Op.iLike]: `%${query}%` } },
+      ],
+    };
+
+    if (!req.user || req.user.role !== "admin") {
+      whereCondition.isVerified = true;
+    }
+
     const products = await Product.findAll({
-      where: {
-        [Op.or]: [
-          { productName: { [Op.iLike]: `%${query}%` } },
-          { productBrand: { [Op.iLike]: `%${query}%` } },
-        ],
-      },
+      where: whereCondition,
+      attributes: [
+        "id",
+        "productName",
+        "productBrand",
+        "productType",
+        "productImage",
+        "isVerified",
+      ],
       limit: 10,
     });
 

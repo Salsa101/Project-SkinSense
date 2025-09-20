@@ -80,6 +80,8 @@ const EditProduct = ({ route, navigation }) => {
   const [openTime, setOpenTime] = useState(false);
   const [time, setTime] = useState(null);
 
+  const [isVerified, setIsVerified] = useState(false);
+
   const handleRoutineChange = callback => value => {
     setRoutineValue(value);
 
@@ -103,6 +105,7 @@ const EditProduct = ({ route, navigation }) => {
         const p = res.data;
 
         if (p.Product) {
+          setIsVerified(p.Product.isVerified);
           setProductName(p.Product.productName);
           setProductBrand(p.Product.productBrand);
           setProductStep(p.productStep);
@@ -190,13 +193,48 @@ const EditProduct = ({ route, navigation }) => {
     }
   };
 
+  const validateTime = (time, timeDay) => {
+    if (!time) return true;
+
+    const hour = time.getHours();
+
+    if (timeDay === 'morning') {
+      // 05:00 - 11:59
+      return hour >= 5 && hour < 12;
+    }
+
+    if (timeDay === 'night') {
+      // 18:00 - 23:59
+      return hour >= 18 && hour < 24;
+    }
+
+    return true;
+  };
+
+  const handleSetTime = selectedTime => {
+    if (!validateTime(selectedTime, timeDayValue)) {
+      Alert.alert(
+        'Invalid Time',
+        `Reminder time doesn't match with ${timeDayValue} schedule`,
+      );
+      setOpenTime(false); // <- tutup modal walau invalid
+      return;
+    }
+    setTime(selectedTime);
+    setOpenTime(false); // <- tutup modal kalau valid juga
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.headerText}>Edit Product</Text>
         <View style={styles.formContainer}>
           <View style={{ alignItems: 'center', marginTop: 10 }}>
-            <TouchableOpacity style={styles.box} onPress={handleUpload}>
+            <TouchableOpacity
+              style={styles.box}
+              onPress={handleUpload}
+              disabled={isVerified}
+            >
               {imageUri ? (
                 <Image
                   source={
@@ -227,13 +265,19 @@ const EditProduct = ({ route, navigation }) => {
           <View style={styles.inputFormContainer}>
             <View style={styles.form}>
               <Text style={styles.formText}>Product Name</Text>
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  isVerified && styles.disabledField,
+                ]}
+              >
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
                   placeholderTextColor="#E07C8E"
                   value={productName}
                   onChangeText={setProductName}
+                  editable={!isVerified}
                 />
               </View>
             </View>
@@ -241,13 +285,19 @@ const EditProduct = ({ route, navigation }) => {
             {/* Product Brand */}
             <View style={styles.form}>
               <Text style={styles.formText}>Product Brand</Text>
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  isVerified && styles.disabledField,
+                ]}
+              >
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
                   placeholderTextColor="#E07C8E"
                   value={productBrand}
                   onChangeText={setProductBrand}
+                  editable={!isVerified}
                 />
               </View>
             </View>
@@ -280,6 +330,7 @@ const EditProduct = ({ route, navigation }) => {
                 setOpen={setOpenProduct}
                 setValue={setProductValue}
                 setItems={setProductItems}
+                disabled={isVerified}
                 placeholder="Select product type"
                 placeholderStyle={{
                   color: '#E07C8E',
@@ -291,7 +342,10 @@ const EditProduct = ({ route, navigation }) => {
                   color: '#E07C8E',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
+                style={[
+                  styles.dropdownPicker,
+                  isVerified && styles.disabledField,
+                ]}
                 dropDownContainerStyle={styles.dropdownStyle}
                 ArrowDownIconComponent={() => (
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
@@ -562,10 +616,7 @@ const EditProduct = ({ route, navigation }) => {
         mode="time"
         open={openTime}
         date={time || new Date()}
-        onConfirm={selectedTime => {
-          setOpenTime(false);
-          setTime(selectedTime);
-        }}
+        onConfirm={selectedTime => handleSetTime(selectedTime)}
         onCancel={() => setOpenTime(false)}
       />
     </View>
@@ -667,6 +718,9 @@ const styles = StyleSheet.create({
     borderColor: '#E07C8E',
     borderRadius: 25,
     paddingHorizontal: 15,
+  },
+  disabledField: {
+    backgroundColor: '#f4ebebff', // agak tua dikit
   },
 });
 

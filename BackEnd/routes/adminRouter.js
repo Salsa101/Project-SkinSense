@@ -14,6 +14,7 @@ const {
   deleteAdminProduct,
   getProductById,
   updateProduct,
+  verifiedProduct,
 } = require("../Controllers/AdminController");
 
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
@@ -53,5 +54,7 @@ router.put(
   isAdmin,
   updateProduct
 );
+
+router.put("/products/:id/verify", validateToken, isAdmin, verifiedProduct);
 
 module.exports = router;
