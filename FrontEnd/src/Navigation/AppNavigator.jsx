@@ -50,7 +50,10 @@ const AppNavigator = () => {
     >
       <Stack.Navigator
         initialRouteName={initialRoute}
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
       >
         <Stack.Screen
           name="AccountOption"
