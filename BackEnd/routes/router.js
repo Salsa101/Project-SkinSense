@@ -46,9 +46,22 @@ router.put("/profile", validateToken, updateProfile);
 router.delete("/profile", validateToken, deleteAccount);
 
 //Routine Product
-router.post("/add-routine-products", validateToken, upload.single("productImage"), addProductToRoutine);
-router.get("/routine-products/view/:routineType/:timeOfDay", validateToken, viewRoutineByCategory);
-router.get("/routine-products/view/:routineName", validateToken, viewRoutineByTime);
+router.post(
+  "/add-routine-products",
+  validateToken,
+  upload.single("productImage"),
+  addProductToRoutine
+);
+router.get(
+  "/routine-products/view/:routineType/:timeOfDay",
+  validateToken,
+  viewRoutineByCategory
+);
+router.get(
+  "/routine-products/view/:routineName",
+  validateToken,
+  viewRoutineByTime
+);
 router.patch("/routine-products/toggle-done", validateToken, toggleDone);
 router.delete("/routine-products/delete", validateToken, deleteRoutineProduct);
 router.get("/routine-products/search", validateToken, searchProducts);
@@ -67,7 +80,12 @@ router.get("/check-auth", validateToken, (req, res) => {
 router.get("/products", validateToken, isAdmin, getRoutineProduct);
 router.post("/add-products", validateToken, isAdmin, addProductToRoutine);
 
-router.get("/routine-products/:id", getRoutineProduct); // Get detail
-router.put("/routine-products/:id", updateRoutineProduct); // Update
+router.get("/routine-products/:id", validateToken, getRoutineProduct); // Get detail
+router.put(
+  "/routine-products/:id",
+  validateToken,
+  upload.single("productImage"), // biar bisa baca req.file
+  updateRoutineProduct
+);
 
 module.exports = router;

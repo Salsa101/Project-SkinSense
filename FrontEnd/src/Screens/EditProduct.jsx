@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   Alert,
   Image,
 } from 'react-native';
-
 import api from '../api';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/Feather';
@@ -19,11 +19,14 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DatePicker from 'react-native-date-picker';
 
-import { Picker } from '@react-native-picker/picker';
+const EditProduct = ({ route, navigation }) => {
+  const { id } = route.params; // id product dikirim saat navigate
+  const [productName, setProductName] = useState('');
+  const [productBrand, setProductBrand] = useState('');
+  const [productStep, setProductStep] = useState('');
+  const [imageUri, setImageUri] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-import { launchImageLibrary } from 'react-native-image-picker';
-
-const AddProduct = ({ navigation }) => {
   // Product Type
   const [openProduct, setOpenProduct] = useState(false);
   const [productValue, setProductValue] = useState(null);
@@ -77,29 +80,6 @@ const AddProduct = ({ navigation }) => {
   const [openTime, setOpenTime] = useState(false);
   const [time, setTime] = useState(null);
 
-  const [productName, setProductName] = useState('');
-  const [productBrand, setProductBrand] = useState('');
-
-  const [imageUri, setImageUri] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const [productStep, setProductStep] = useState('');
-
-  // pilih & preview image
-  const handleUpload = () => {
-    launchImageLibrary({ mediaType: 'photo' }, response => {
-      if (response.assets && response.assets.length > 0) {
-        const file = response.assets[0];
-        setImageUri(file.uri);
-        setSelectedFile({
-          uri: file.uri,
-          type: file.type,
-          name: file.fileName,
-        });
-      }
-    });
-  };
-
   const handleRoutineChange = callback => value => {
     setRoutineValue(value);
 
@@ -115,160 +95,106 @@ const AddProduct = ({ navigation }) => {
     if (callback) callback(value);
   };
 
-  const handleSave = async () => {
+  // GET product saat buka halaman
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await api.get(`/routine-products/${id}`);
+        const p = res.data;
+
+        if (p.Product) {
+          setProductName(p.Product.productName);
+          setProductBrand(p.Product.productBrand);
+          setProductStep(p.productStep);
+          setProductValue(p.Product.productType || null);
+          setRoutineValue(p.routineType || null);
+          setRoutineValueDay(p.routineDay || []);
+          setCustomDate(p.customDate ? new Date(p.customDate) : null);
+          setTimeDayValue(p.timeOfDay || null);
+          setDateOpened(p.dateOpened ? new Date(p.dateOpened) : null);
+          setExpirationDate(
+            p.expirationDate ? new Date(p.expirationDate) : null,
+          );
+          setTime(
+            p.reminderTime ? new Date(`1970-01-01T${p.reminderTime}`) : null,
+          );
+
+          if (p.Product.productImage) {
+            setImageUri(`http://10.0.2.2:3000${p.Product.productImage}`);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        Alert.alert('Error', 'Gagal ambil data produk');
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  // upload gambar
+  const handleUpload = () => {
+    launchImageLibrary({ mediaType: 'photo' }, response => {
+      if (response.assets && response.assets.length > 0) {
+        const file = response.assets[0];
+        setImageUri(file.uri);
+        setSelectedFile({
+          uri: file.uri,
+          type: file.type,
+          name: file.fileName,
+        });
+      }
+    });
+  };
+
+  // UPDATE product
+  const handleUpdate = async () => {
     try {
-      if (!routineValue || !timeDayValue) {
-        Alert.alert('Error', 'Please select routine type and time of day');
-        return;
-      }
-
       const payload = new FormData();
-
-      if (selectedProductId) {
-        // Produk existing → cukup ID
-        payload.append('productId', selectedProductId);
-      } else {
-        // Produk baru → kirim data master
-        if (!productName || !productBrand) {
-          Alert.alert('Error', 'Please enter product name and brand');
-          return;
-        }
-        payload.append('productName', productName);
-        payload.append('productBrand', productBrand);
-        payload.append('productType', productValue);
-
-        if (selectedFile) {
-          payload.append('productImage', selectedFile);
-        }
-      }
-
-      // Data rutinitas
+      payload.append('productName', productName);
+      payload.append('productBrand', productBrand);
       payload.append('productStep', productStep);
-      payload.append('dateOpened', dateOpened.toISOString().split('T')[0]);
-      payload.append(
-        'expirationDate',
-        expirationDate.toISOString().split('T')[0],
-      );
-      payload.append('reminderTime', time.toTimeString().split(' ')[0]);
+      payload.append('productType', productValue);
+      if (selectedFile) {
+        payload.append('productImage', selectedFile);
+      }
+
+      // kolom RoutineProduct
       payload.append('routineType', routineValue);
-      payload.append('timeOfDay', timeDayValue);
-
-      if (routineValueDay.length > 0) {
-        payload.append(
-          'dayOfWeek',
-          JSON.stringify(routineValueDay.map(d => d.toLowerCase())),
-        );
+      payload.append('routineDay', JSON.stringify(routineValueDay)); // array harus di-serialize
+      if (customDate) payload.append('customDate', customDate.toISOString());
+      if (timeDayValue) payload.append('timeOfDay', timeDayValue);
+      if (dateOpened) payload.append('dateOpened', dateOpened.toISOString());
+      if (expirationDate)
+        payload.append('expirationDate', expirationDate.toISOString());
+      if (time) {
+        // hanya jam-menit
+        const hours = time.getHours().toString().padStart(2, '0');
+        const minutes = time.getMinutes().toString().padStart(2, '0');
+        payload.append('reminderTime', `${hours}:${minutes}`);
       }
 
-      if (customDate instanceof Date && !isNaN(customDate)) {
-        payload.append('customDate', customDate.toISOString().split('T')[0]);
-      }
-
-      const res = await api.post('/add-routine-products', payload, {
+      const res = await api.put(`/routine-products/${id}`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      Alert.alert('Success', 'Product added to routine!', [
+      Alert.alert('Success', 'Produk berhasil diupdate', [
         { text: 'OK', onPress: () => navigation.navigate('EditRoutine') },
       ]);
-      console.log('Saved:', res.data);
+      console.log('Updated:', res.data);
     } catch (err) {
       console.error(err);
       Alert.alert(
         'Error',
-        err.response?.data?.message || err.message || 'Something went wrong',
+        err.response?.data?.message || 'Gagal update produk',
       );
     }
-  };
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState(null);
-
-  const handleSearch = async text => {
-    setSearchQuery(text);
-    if (text.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const res = await api.get(`/routine-products/search?query=${text}`);
-      setSearchResults(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Search produk
-  const handleSelectProduct = product => {
-    setSelectedProductId(product.id);
-    setProductName(product.productName);
-    setProductBrand(product.productBrand);
-    setProductValue(product.productType);
-
-    if (product.productImage) {
-      setImageUri(`http://10.0.2.2:3000${product.productImage}`);
-    } else {
-      setImageUri(null);
-    }
-
-    setSelectedFile(null);
-    setSearchResults([]);
-    setSearchQuery(product.productName);
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.headerText}>Add Product</Text>
+        <Text style={styles.headerText}>Edit Product</Text>
         <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Icon name="search" size={20} color="#E07C8E" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Search by product name"
-              placeholderTextColor="#E07C8E"
-              value={searchQuery}
-              onChangeText={handleSearch}
-            />
-          </View>
-
-          {searchResults.length > 0 && (
-            <View
-              style={{ backgroundColor: '#fff', borderRadius: 8, marginTop: 5 }}
-            >
-              {searchResults.map(item => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={{
-                    padding: 10,
-                    borderBottomWidth: 1,
-                    borderColor: '#eee',
-                  }}
-                  onPress={() => handleSelectProduct(item)}
-                >
-                  <Text
-                    style={{ fontFamily: 'Poppins-Medium', color: '#E07C8E' }}
-                  >
-                    {item.productName} - {item.productBrand}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          <Text
-            style={{
-              marginVertical: 20,
-              alignSelf: 'center',
-              fontFamily: 'Poppins-Medium',
-              color: '#E07C8E',
-            }}
-          >
-            or add manually
-          </Text>
-
           <View style={{ alignItems: 'center', marginTop: 10 }}>
             <TouchableOpacity style={styles.box} onPress={handleUpload}>
               {imageUri ? (
@@ -587,8 +513,8 @@ const AddProduct = ({ navigation }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Text style={styles.saveBtnText}>Save</Text>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleUpdate}>
+              <Text style={styles.saveBtnText}>Update</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -744,4 +670,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddProduct;
+export default EditProduct;

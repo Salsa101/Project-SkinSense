@@ -89,18 +89,18 @@ const Calendar = ({ navigation }) => {
 
   const today = new Date();
   const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
+    'Jan',
+    'Febr',
+    'Mar',
+    'Apr',
     'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   const monthYear = `${monthNames[today.getMonth()]}, ${today.getFullYear()}`;
   const weekDays = getWeekDays();

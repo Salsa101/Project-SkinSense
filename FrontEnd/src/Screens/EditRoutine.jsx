@@ -142,6 +142,7 @@ const EditRoutine = ({ navigation }) => {
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
           <TouchableOpacity
+            onPress={() => navigation.navigate('EditProduct', { id: item.id })}
             style={{
               backgroundColor: '#ffffff',
               borderRadius: 30,
@@ -336,8 +337,8 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: 50,
-    height: 85,
-    borderRadius: 8,
+    height: 100,
+    borderRadius: 5,
     backgroundColor: '#000000ff',
     marginRight: 10,
   },

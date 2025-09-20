@@ -33,18 +33,14 @@ const addProductToRoutine = async (req, res) => {
       }
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : productImage || null;
+    const imageUrl = req.file
+      ? `/uploads/${req.file.filename}`
+      : productImage || null;
 
     let finalProductId = productId;
 
-    if (finalProductId) {
-      // kalau search (sudah ada productId) → update tanggal
-      await Product.update(
-        { dateOpened, expirationDate },
-        { where: { id: finalProductId } }
-      );
-    } else {
-      // input manual → cek dulu apakah produk dengan data sama sudah ada
+    if (!finalProductId) {
+      // input manual → cek apakah produk dengan data sama sudah ada
       if (!productName || !productBrand || !productType) {
         return res
           .status(400)
@@ -52,18 +48,11 @@ const addProductToRoutine = async (req, res) => {
       }
 
       let existingProduct = await Product.findOne({
-        where: {
-          userId,
-          productName,
-          productBrand,
-          productType,
-        },
+        where: { productName, productBrand, productType },
       });
 
       if (existingProduct) {
         finalProductId = existingProduct.id;
-        // update tanggal kalau perlu
-        await existingProduct.update({ dateOpened, expirationDate });
       } else {
         const newProduct = await Product.create({
           userId,
@@ -71,8 +60,6 @@ const addProductToRoutine = async (req, res) => {
           productBrand,
           productType,
           productImage: imageUrl,
-          dateOpened,
-          expirationDate,
         });
         finalProductId = newProduct.id;
       }
@@ -118,9 +105,6 @@ const addProductToRoutine = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-
-
 
 const toggleDone = async (req, res) => {
   try {
@@ -250,61 +234,107 @@ const viewRoutineByCategory = async (req, res) => {
   }
 };
 
-// Get detail
+// Get detail product
 const getRoutineProduct = async (req, res) => {
   try {
-    const data = await RoutineProduct.findByPk(req.params.id, {
-      include: [Product],
+    const routine = await RoutineProduct.findByPk(req.params.id, {
+      include: [Product], // ikut ambil detail product
     });
-    if (!data) return res.status(404).json({ error: "Not found" });
-    res.json(data);
+    if (!routine) return res.status(404).json({ message: "Not found" });
+
+    res.json(routine);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
 // Update
+// const updateRoutineProduct = async (req, res) => {
+//   try {
+//     const {
+//       productName,
+//       brand,
+//       type,
+//       dateOpened,
+//       expirationDate,
+//       routineName,
+//       category,
+//       reminderTime,
+//       notificationFrequency,
+//       dayOfWeek,
+//       customDate,
+//     } = req.body;
+
+//     const routineProduct = await RoutineProduct.findByPk(req.params.id);
+//     if (!routineProduct) return res.status(404).json({ error: "Not found" });
+
+//     const product = await Product.findByPk(routineProduct.productId);
+//     if (product) {
+//       await product.update({
+//         productName,
+//         brand,
+//         type,
+//         dateOpened,
+//         expirationDate,
+//       });
+//     }
+
+//     await routineProduct.update({
+//       routineName,
+//       category,
+//       reminderTime,
+//       notificationFrequency,
+//       dayOfWeek,
+//       customDate,
+//     });
+
+//     res.json(routineProduct);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
 const updateRoutineProduct = async (req, res) => {
   try {
-    const {
-      productName,
-      brand,
-      type,
-      dateOpened,
-      expirationDate,
-      routineName,
-      category,
-      reminderTime,
-      notificationFrequency,
-      dayOfWeek,
-      customDate,
-    } = req.body;
+    const routine = await RoutineProduct.findByPk(req.params.id, {
+      include: [Product],
+    });
+    if (!routine) return res.status(404).json({ message: "Not found" });
 
-    const routineProduct = await RoutineProduct.findByPk(req.params.id);
-    if (!routineProduct) return res.status(404).json({ error: "Not found" });
-
-    const product = await Product.findByPk(routineProduct.productId);
-    if (product) {
-      await product.update({
-        productName,
-        brand,
-        type,
-        dateOpened,
-        expirationDate,
-      });
-    }
-
-    await routineProduct.update({
-      routineName,
-      category,
-      reminderTime,
-      notificationFrequency,
-      dayOfWeek,
-      customDate,
+    // update RoutineProduct (productStep ada di sini)
+    await routine.update({
+      productStep: req.body.productStep || routine.productStep,
+      routineType: req.body.routineType || routine.routineType,
+      routineDay: req.body.routineDay || routine.routineDay,
+      customDate: req.body.customDate || routine.customDate,
+      timeOfDay: req.body.timeOfDay || routine.timeOfDay,
+      dateOpened: req.body.dateOpened || routine.dateOpened,
+      expirationDate: req.body.expirationDate || routine.expirationDate,
+      reminderTime: req.body.reminderTime || routine.reminderTime,
     });
 
-    res.json(routineProduct);
+    // update Product (cuma kolom milik Product saja)
+    if (routine.Product) {
+      const updateData = {
+        productName: req.body.productName || routine.Product.productName,
+        productBrand: req.body.productBrand || routine.Product.productBrand,
+        productType: req.body.productType || routine.Product.productType,
+      };
+
+      if (req.file) {
+        updateData.productImage = `/uploads/${req.file.filename}`;
+      }
+
+      await routine.Product.update(updateData);
+    }
+
+    const updated = await RoutineProduct.findByPk(req.params.id, {
+      include: [Product],
+    });
+
+    res.json({ message: "Routine + Product updated", routine: updated });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
