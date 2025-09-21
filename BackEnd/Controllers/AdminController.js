@@ -183,15 +183,17 @@ const verifiedProduct = async (req, res) => {
 //Get News
 const getNews = async (req, res) => {
   try {
-    const { search, category } = req.query;
-
-    const where = {};
-    if (search) where.title = { [Op.iLike]: `%${search}%` };
-    if (category) where.categoryId = category;
-
     const news = await News.findAll({
-      where,
-      include: [{ model: Category, attributes: ["id", "name"] }],
+      include: [
+        {
+          model: Category,
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+          where: { isActive: true },
+          required: false,
+        },
+      ],
+      attributes: ["id", "title", "content", "newsImage", "createdAt"],
     });
 
     res.json(news);
@@ -204,18 +206,21 @@ const getNews = async (req, res) => {
 //Add News
 const addNews = async (req, res) => {
   try {
-    const { title, content, categoryId } = req.body;
+    let { title, content, categoryIds } = req.body;
     const newsImage = req.file ? req.file.path : null;
 
-    if (!title || !content || !categoryId)
+    if (!title || !content || !categoryIds)
       return res.status(400).json({ message: "All fields are required" });
 
-    const category = await Category.findByPk(categoryId);
-    if (!category)
-      return res.status(404).json({ message: "Category not found" });
+    if (!Array.isArray(categoryIds)) categoryIds = [categoryIds];
 
-    const news = await News.create({ title, content, categoryId, newsImage });
-    res.status(201).json(news);
+    categoryIds = categoryIds.map((id) => parseInt(id));
+
+    const news = await News.create({ title, content, newsImage });
+
+    await news.setCategories(categoryIds);
+
+    res.status(201).json({ message: "News added successfully", news });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -228,15 +233,14 @@ const getNewsDetail = async (req, res) => {
     const { id } = req.params;
 
     const news = await News.findByPk(id, {
-      include: [{ model: Category, attributes: ["id", "name"] }],
-      attributes: [
-        "id",
-        "title",
-        "content",
-        "newsImage",
-        "categoryId",
-        "createdAt",
+      include: [
+        {
+          model: Category,
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
       ],
+      attributes: ["id", "title", "content", "newsImage", "createdAt"],
     });
 
     if (!news) return res.status(404).json({ message: "News not found" });
@@ -252,24 +256,30 @@ const getNewsDetail = async (req, res) => {
 const editNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, categoryId } = req.body;
+    const { title, content, categoryIds } = req.body; // categoryIds = array
     const newsImage = req.file ? req.file.path : null;
 
     const news = await News.findByPk(id);
     if (!news) return res.status(404).json({ message: "News not found" });
 
-    if (categoryId) {
-      const category = await Category.findByPk(categoryId);
-      if (!category)
-        return res.status(404).json({ message: "Category not found" });
-      news.categoryId = categoryId;
-    }
     if (title) news.title = title;
     if (content) news.content = content;
     if (newsImage) news.newsImage = newsImage;
 
     await news.save();
-    res.json(news);
+
+    if (categoryIds && Array.isArray(categoryIds)) {
+      const validCategories = await Category.findAll({
+        where: { id: categoryIds },
+      });
+      await news.setCategories(validCategories);
+    }
+
+    const updatedNews = await News.findByPk(id, {
+      include: [{ model: Category, attributes: ["id", "name"] }],
+    });
+
+    res.json(updatedNews);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -293,7 +303,7 @@ const deleteNews = async (req, res) => {
   }
 };
 
-//Category
+//Add Category
 const addCategory = async (req, res) => {
   try {
     const { name } = req.body;
@@ -311,6 +321,7 @@ const addCategory = async (req, res) => {
   }
 };
 
+//Get Category
 const getCategory = async (req, res) => {
   try {
     const categories = await Category.findAll({
@@ -323,6 +334,7 @@ const getCategory = async (req, res) => {
   }
 };
 
+//Update Category
 const editCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -342,6 +354,7 @@ const editCategory = async (req, res) => {
   }
 };
 
+//Delete Category
 const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -360,6 +373,7 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+//Get Detail Category
 const getCategoryDetail = async (req, res) => {
   try {
     const { id } = req.params;
@@ -377,6 +391,7 @@ const getCategoryDetail = async (req, res) => {
   }
 };
 
+//Is Active Category
 const isActiveCategory = async (req, res) => {
   try {
     const { id } = req.params;

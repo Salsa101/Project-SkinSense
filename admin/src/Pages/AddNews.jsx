@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
-
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
@@ -11,17 +10,16 @@ function AddNews() {
   const [form, setForm] = useState({
     title: "",
     content: "",
-    categoryId: "",
+    categoryIds: [],
   });
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
 
-  // ambil list kategori dari API
+  // Ambil list kategori
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await api.get("/admin/categories");
-        console.log("categories API:", res.data);
         setCategories(res.data);
       } catch (err) {
         console.error(err);
@@ -30,20 +28,28 @@ function AddNews() {
     fetchCategories();
   }, []);
 
+  // Handle input biasa
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle file
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("content", form.content);
-    formData.append("categoryId", form.categoryId);
+
+    // cast ke integer & append multiple categories
+    form.categoryIds.forEach((id) =>
+      formData.append("categoryIds[]", parseInt(id))
+    );
+
     if (file) formData.append("newsImage", file);
 
     try {
@@ -62,6 +68,7 @@ function AddNews() {
     <div className="container mt-4">
       <h2>Add News</h2>
       <form onSubmit={handleSubmit} className="mt-3">
+        {/* Title */}
         <div className="mb-3">
           <label className="form-label">Title</label>
           <input
@@ -73,6 +80,8 @@ function AddNews() {
             required
           />
         </div>
+
+        {/* Content */}
         <div className="mb-3">
           <label className="form-label">Content</label>
           <ReactQuill
@@ -82,26 +91,35 @@ function AddNews() {
             style={{ height: "200px", marginBottom: "50px" }}
           />
         </div>
+
+        {/* Category */}
         <div className="mb-3">
           <label className="form-label">Category</label>
-          <select
-            name="categoryId"
-            className="form-select"
-            value={form.categoryId}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Select Category --</option>
-            {categories
-              .filter((c) => c.isActive)
-              .map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-          </select>
+          {categories
+            .filter((c) => c.isActive)
+            .map((c) => (
+              <div key={c.id} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  value={c.id}
+                  checked={form.categoryIds.includes(c.id.toString())}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setForm({
+                      ...form,
+                      categoryIds: form.categoryIds.includes(id)
+                        ? form.categoryIds.filter((i) => i !== id)
+                        : [...form.categoryIds, id],
+                    });
+                  }}
+                />
+                <label className="form-check-label">{c.name}</label>
+              </div>
+            ))}
         </div>
 
+        {/* Image */}
         <div className="mb-3">
           <label className="form-label">Image</label>
           <input

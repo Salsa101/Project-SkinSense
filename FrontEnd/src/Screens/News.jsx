@@ -1,299 +1,3 @@
-// import { React, useState } from 'react';
-// import {
-//   View,
-//   ScrollView,
-//   Text,
-//   StyleSheet,
-//   TextInput,
-//   TouchableOpacity,
-//   Image,
-// } from 'react-native';
-
-// import Navbar from '../Components/Navbar';
-// import Icon from 'react-native-vector-icons/FontAwesome';
-
-// const News = ({ navigation }) => {
-//   const [active, setActive] = useState('News');
-//   const [bookmarked, setBookmarked] = useState(false);
-
-//   return (
-//     <View style={styles.container}>
-//       <ScrollView style={{ marginBottom: 75 }}>
-//         <View style={styles.newsContainer}>
-//           <Text style={styles.titlePage}>Skincare Tips</Text>
-//           <View style={styles.searchContainer}>
-//             <View style={styles.inputContainer}>
-//               <Icon
-//                 name="search"
-//                 size={18}
-//                 color="#E07C8E"
-//                 style={styles.icon}
-//               />
-//               <TextInput
-//                 style={styles.input}
-//                 placeholder="Search by title..."
-//                 placeholderTextColor="#aaa"
-//               />
-//             </View>
-
-//             <TouchableOpacity style={styles.bookmarkButton}>
-//               <Icon name="star" size={20} color="#fff" />
-//             </TouchableOpacity>
-//           </View>
-
-//           <View>
-//             <Text style={styles.newsContainerTitle}>From SkinSense</Text>
-//             {/* Card News - Skinsense */}
-//             <View style={styles.card}>
-//               <View style={styles.imageContainer}>
-//                 <Image
-//                   source={{
-//                     uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
-//                   }}
-//                   style={styles.image}
-//                 />
-//                 <TouchableOpacity
-//                   style={styles.bookmarkBtn}
-//                   onPress={() => setBookmarked(!bookmarked)}
-//                 >
-//                   <Icon
-//                     name={bookmarked ? 'star' : 'star-o'}
-//                     size={20}
-//                     color="#E07C8E"
-//                   />
-//                 </TouchableOpacity>
-//               </View>
-
-//               {/* Content */}
-//               <View style={styles.content}>
-//                 <Text style={styles.title}>
-//                   Skincare 101: What You Need To Know
-//                 </Text>
-
-//                 <View style={styles.categoryContainer}>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>Tips & Tricks</Text>
-//                   </View>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>News</Text>
-//                   </View>
-//                 </View>
-//               </View>
-//             </View>
-
-//             <View style={styles.card}>
-//               <View style={styles.imageContainer}>
-//                 <Image
-//                   source={{
-//                     uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
-//                   }}
-//                   style={styles.image}
-//                 />
-//                 <TouchableOpacity
-//                   style={styles.bookmarkBtn}
-//                   onPress={() => setBookmarked(!bookmarked)}
-//                 >
-//                   <Icon
-//                     name={bookmarked ? 'star' : 'star-o'}
-//                     size={20}
-//                     color="#E07C8E"
-//                   />
-//                 </TouchableOpacity>
-//               </View>
-
-//               {/* Content */}
-//               <View style={styles.content}>
-//                 <Text style={styles.title}>
-//                   Skincare 101: What You Need To Know
-//                 </Text>
-
-//                 <View style={styles.categoryContainer}>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>Tips & Tricks</Text>
-//                   </View>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>News</Text>
-//                   </View>
-//                 </View>
-//               </View>
-//             </View>
-
-//             {/* Card News - Others */}
-//             <View>
-//               <View style={{ marginTop: 15 }}>
-//                 <Text style={styles.newsContainerTitle}>Others</Text>
-//               </View>
-
-//               {/* Category News */}
-//               <View style={{ marginBottom: 10 }}>
-//                 <View style={styles.categoryContainer}>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>Tips & Tricks</Text>
-//                   </View>
-//                   <View style={styles.categoryBadge}>
-//                     <Text style={styles.categoryText}>News</Text>
-//                   </View>
-//                 </View>
-//               </View>
-
-//               {/* Card News - Skinsense */}
-//               <View style={styles.card}>
-//                 <View style={styles.imageContainer}>
-//                   <Image
-//                     source={{
-//                       uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
-//                     }}
-//                     style={styles.image}
-//                   />
-//                   <TouchableOpacity
-//                     style={styles.bookmarkBtn}
-//                     onPress={() => setBookmarked(!bookmarked)}
-//                   >
-//                     <Icon
-//                       name={bookmarked ? 'star' : 'star-o'}
-//                       size={20}
-//                       color="#E07C8E"
-//                     />
-//                   </TouchableOpacity>
-//                 </View>
-
-//                 {/* Content */}
-//                 <View style={styles.content}>
-//                   <Text style={styles.title}>
-//                     Skincare 101: What You Need To Know
-//                   </Text>
-
-//                   <View style={styles.categoryContainer}>
-//                     <View style={styles.categoryBadge}>
-//                       <Text style={styles.categoryText}>Tips & Tricks</Text>
-//                     </View>
-//                     <View style={styles.categoryBadge}>
-//                       <Text style={styles.categoryText}>News</Text>
-//                     </View>
-//                   </View>
-//                 </View>
-//               </View>
-//             </View>
-//           </View>
-//         </View>
-//       </ScrollView>
-
-//       {/* Navbar */}
-//       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-//         <Navbar active={active} onPress={setActive} />
-//       </View>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-//   newsContainer: {
-//     padding: 25,
-//   },
-//   titlePage: {
-//     marginBottom: 20,
-//   },
-//   searchContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 15,
-//   },
-//   inputContainer: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     borderWidth: 1,
-//     borderColor: '#E07C8E',
-//     borderRadius: 25,
-//     paddingHorizontal: 12,
-//     backgroundColor: '#fff',
-//     height: 40,
-//     marginRight: 10,
-//   },
-//   icon: {
-//     marginRight: 8,
-//   },
-//   input: {
-//     flex: 1,
-//     fontFamily: 'Poppins-Medium',
-//     fontSize: 12,
-//     color: '#E07C8E',
-//   },
-//   bookmarkButton: {
-//     width: 40,
-//     height: 40,
-//     borderRadius: 20,
-//     backgroundColor: '#E07C8E',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   newsContainerTitle: {
-//     marginBottom: 10,
-//   },
-
-//   card: {
-//     backgroundColor: '#fff',
-//     borderRadius: 20,
-//     overflow: 'hidden',
-//     marginBottom: 15,
-//     shadowColor: '#000',
-//     shadowOpacity: 0.1,
-//     shadowRadius: 5,
-//     shadowOffset: { width: 0, height: 3 },
-//     elevation: 3,
-//   },
-//   imageContainer: {
-//     position: 'relative',
-//   },
-//   image: {
-//     width: '100%',
-//     height: 160,
-//     borderTopLeftRadius: 15,
-//     borderTopRightRadius: 15,
-//   },
-//   bookmarkBtn: {
-//     position: 'absolute',
-//     top: 15,
-//     right: 15,
-//     backgroundColor: '#fff',
-//     borderRadius: 20,
-//     padding: 6,
-//     elevation: 3,
-//   },
-//   content: {
-//     padding: 12,
-//     backgroundColor: '#FFEFF1',
-//   },
-//   title: {
-//     fontSize: 14,
-//     fontWeight: '600',
-//     color: '#E07C8E',
-//     marginBottom: 8,
-//   },
-//   categoryContainer: {
-//     flexDirection: 'row',
-//     gap: 8,
-//   },
-//   categoryBadge: {
-//     backgroundColor: '#fff',
-//     borderRadius: 15,
-//     paddingHorizontal: 12,
-//     paddingVertical: 4,
-//     borderWidth: 1,
-//     borderColor: '#F4B4C0',
-//   },
-//   categoryText: {
-//     fontSize: 12,
-//     color: '#E07C8E',
-//     fontWeight: '500',
-//   },
-// });
-
-// export default News;
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -307,7 +11,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Components/Navbar';
-import api from '../api'; // pastikan ini path api-mu
+import api from '../api';
 
 const News = ({ navigation }) => {
   const [active, setActive] = useState('News');
@@ -315,10 +19,15 @@ const News = ({ navigation }) => {
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [categories, setCategories] = useState([]);
+  const [search, setSearch] = useState('');
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await api.get('/news'); // ambil dari backend
+        const res = await api.get('/news', {
+          params: { search },
+        });
         setNewsList(res.data);
       } catch (err) {
         console.error(err);
@@ -327,11 +36,26 @@ const News = ({ navigation }) => {
       }
     };
     fetchNews();
-  }, []);
+  }, [search]);
 
   const toggleBookmark = id => {
     setBookmarked(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/categories', {
+        params: { isActive: true },
+      });
+      setCategories(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   if (loading) {
     return (
@@ -358,6 +82,8 @@ const News = ({ navigation }) => {
                 style={styles.input}
                 placeholder="Search by title..."
                 placeholderTextColor="#aaa"
+                value={search}
+                onChangeText={setSearch}
               />
             </View>
 
@@ -366,14 +92,45 @@ const News = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
+          <Text style={styles.newsContainerTitle}>From SkinSense</Text>
+
+          {/* Category News */}
+          <View style={{ marginBottom: 10 }}>
+            <View style={styles.categoryContainer}>
+              {categories.map(category => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={styles.categoryBadge}
+                  onPress={() =>
+                    navigation.navigate('CategoryNews', {
+                      categoryId: category.id,
+                      categoryName: category.name,
+                    })
+                  }
+                >
+                  <Text style={styles.categoryText}>{category.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           {newsList.map(news => (
-            <View key={news.id} style={styles.card}>
+            <TouchableOpacity
+              key={news.id}
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate('NewsDetail', {
+                  id: news.id, // lempar id ke route params
+                })
+              }
+              activeOpacity={0.8}
+            >
               <View style={styles.imageContainer}>
                 <Image
                   source={
                     news.newsImage
                       ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
-                      : require('../../assets/category-admin.jpg') // kalau pakai local fallback
+                      : require('../../assets/category-admin.jpg')
                   }
                   style={styles.image}
                 />
@@ -383,7 +140,7 @@ const News = ({ navigation }) => {
                 >
                   <Icon
                     name={bookmarked[news.id] ? 'star' : 'star-o'}
-                    size={20}
+                    size={24}
                     color="#E07C8E"
                   />
                 </TouchableOpacity>
@@ -392,16 +149,23 @@ const News = ({ navigation }) => {
               <View style={styles.content}>
                 <Text style={styles.title}>{news.title}</Text>
                 <View style={styles.categoryContainer}>
-                  {news.Category && (
-                    <View style={styles.categoryBadge}>
-                      <Text style={styles.categoryText}>
-                        {news.Category.name}
-                      </Text>
-                    </View>
-                  )}
+                  {news.Categories?.map(category => (
+                    <TouchableOpacity
+                      key={category.id}
+                      style={styles.categoryBadge}
+                      onPress={() =>
+                        navigation.navigate('CategoryNews', {
+                          categoryId: category.id,
+                          categoryName: category.name,
+                        })
+                      }
+                    >
+                      <Text style={styles.categoryText}>{category.name}</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -426,7 +190,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   imageContainer: { position: 'relative' },
-  image: { width: '100%', height: 160 },
+  image: { width: '100%', height: 140 },
   bookmarkBtn: {
     position: 'absolute',
     top: 15,
@@ -434,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 6,
-    elevation: 3,
+    elevation: 10,
   },
   content: { padding: 12, backgroundColor: '#FFEFF1' },
   title: { fontSize: 14, fontWeight: '600', color: '#E07C8E', marginBottom: 8 },
@@ -472,6 +236,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: 40,
     marginRight: 10,
+  },
+  newsContainerTitle: {
+    marginBottom: 10,
   },
 });
 

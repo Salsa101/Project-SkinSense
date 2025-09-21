@@ -15,6 +15,8 @@ import News from '../Screens/News';
 
 import RNBootSplash from 'react-native-bootsplash';
 import api from '../api';
+import CategoryNews from '../Screens/CategoryNews';
+import NewsDetail from '../Screens/NewsDetail';
 
 const Stack = createNativeStackNavigator();
 
@@ -108,6 +110,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="News"
           component={News}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CategoryNews"
+          component={CategoryNews}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NewsDetail"
+          component={NewsDetail}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

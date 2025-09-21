@@ -12,17 +12,15 @@ function EditNews() {
   const [form, setForm] = useState({
     title: "",
     content: "",
-    categoryId: "",
+    categoryIds: [],
   });
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
 
-  // ambil list kategori aktif
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await api.get("/admin/categories");
-        // hanya kategori aktif
         setCategories(res.data.filter((c) => c.isActive));
       } catch (err) {
         console.error(err);
@@ -31,7 +29,6 @@ function EditNews() {
     fetchCategories();
   }, []);
 
-  // ambil data news
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -39,7 +36,7 @@ function EditNews() {
         setForm({
           title: res.data.title,
           content: res.data.content,
-          categoryId: res.data.categoryId,
+          categoryIds: res.data.Categories?.map((c) => c.id) || [],
         });
       } catch (err) {
         console.error(err);
@@ -57,13 +54,24 @@ function EditNews() {
     setFile(e.target.files[0]);
   };
 
+  const handleCheckboxChange = (categoryId, checked) => {
+    if (checked) {
+      setForm({ ...form, categoryIds: [...form.categoryIds, categoryId] });
+    } else {
+      setForm({
+        ...form,
+        categoryIds: form.categoryIds.filter((id) => id !== categoryId),
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("content", form.content);
-    formData.append("categoryId", form.categoryId);
+    form.categoryIds.forEach((id) => formData.append("categoryIds[]", id));
     if (file) formData.append("newsImage", file);
 
     try {
@@ -105,21 +113,24 @@ function EditNews() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Category</label>
-          <select
-            name="categoryId"
-            className="form-select"
-            value={form.categoryId}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Select Category --</option>
+          <label className="form-label">Categories</label>
+          <div>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+              <div className="form-check form-check-inline" key={c.id}>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`cat-${c.id}`}
+                  value={c.id}
+                  checked={form.categoryIds.includes(c.id)}
+                  onChange={(e) => handleCheckboxChange(c.id, e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor={`cat-${c.id}`}>
+                  {c.name}
+                </label>
+              </div>
             ))}
-          </select>
+          </div>
         </div>
 
         <div className="mb-3">

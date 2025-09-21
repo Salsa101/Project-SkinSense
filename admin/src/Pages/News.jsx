@@ -48,14 +48,16 @@ function News() {
       ? n.title.toLowerCase().includes(search.toLowerCase())
       : true;
     const matchCategory = categoryFilter
-      ? n.Category?.name === categoryFilter
+      ? n.Categories?.some((c) => c.name === categoryFilter)
       : true;
 
     return matchSearch && matchCategory;
   });
 
   // ambil list unik kategori untuk dropdown
-  const uniqueCategories = [...new Set(newsList.map((n) => n.Category?.name))];
+  const uniqueCategories = [
+    ...new Set(newsList.flatMap((n) => n.Categories?.map((c) => c.name) || [])),
+  ];
 
   return (
     <div>
@@ -115,14 +117,23 @@ function News() {
                     <img
                       src={`http://localhost:3000/${n.newsImage}`}
                       alt={n.title}
-                      style={{ width: "100px", height: "100px", objectFit: "contain" }}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "contain",
+                      }}
                     />
                   ) : (
                     "No Image"
                   )}
                 </td>
                 <td>{n.title}</td>
-                <td>{n.Category?.name || "Unknown"}</td>
+                <td>
+                  {n.Categories?.length > 0
+                    ? n.Categories.map((c) => c.name).join(", ")
+                    : "Unknown"}
+                </td>
+
                 <td>{new Date(n.createdAt).toLocaleDateString()}</td>
                 <td>
                   <a

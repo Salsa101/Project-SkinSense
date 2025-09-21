@@ -32,6 +32,8 @@ const {
   bookmarkNews,
   unbookmarkNews,
   listBookmarks,
+  getCategory,
+  getNewsByCategory,
 } = require("../Controllers/NewsController");
 const {
   getQuestions,
@@ -90,6 +92,8 @@ router.get("/news/:id", getNewsDetail);
 router.post("/news/:newsId/bookmark", validateToken, bookmarkNews);
 router.delete("/news/:newsId/bookmark", validateToken, unbookmarkNews);
 router.get("/news/bookmarks", validateToken, listBookmarks);
+router.get("/categories", validateToken, getCategory);
+router.get("/news/category/:categoryId", getNewsByCategory);
 
 //Skin Quiz
 router.get("/question", validateToken, getQuestions);
