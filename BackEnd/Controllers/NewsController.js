@@ -114,26 +114,25 @@ const listBookmarks = async (req, res) => {
     const userId = req.user.id;
 
     const user = await User.findByPk(userId, {
-      include: {
-        model: News,
-        include: [{ model: Category, attributes: ["id", "name"] }],
-        attributes: [
-          "id",
-          "title",
-          "content",
-          "newsImage",
-          "categoryId",
-          "createdAt",
-        ],
-      },
+      include: [
+        {
+          model: News,
+          include: [
+            { model: Category, attributes: ['id', 'name'], through: { attributes: [] } },
+          ],
+          attributes: ['id', 'title', 'content', 'newsImage', 'sourceType', 'isActive', 'createdAt'],
+          through: { attributes: [] }, // supaya data pivot Bookmark tidak muncul
+        },
+      ],
     });
 
-    res.json(user.News);
+    res.json(user ? user.News : []);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 const getCategory = async (req, res) => {
   try {

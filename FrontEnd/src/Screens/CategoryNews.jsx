@@ -35,8 +35,36 @@ const CategoryNews = ({ route, navigation }) => {
     fetchNewsByCategory();
   }, [categoryId]);
 
-  const toggleBookmark = id => {
-    setBookmarked(prev => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const res = await api.get('/news/bookmarks');
+
+        const bmMap = {};
+        res.data.forEach(n => {
+          bmMap[n.id] = true;
+        });
+        setBookmarked(bmMap);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBookmarks();
+  }, []);
+
+  const toggleBookmark = async newsId => {
+    try {
+      if (bookmarked[newsId]) {
+        await api.delete(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: false }));
+      } else {
+        await api.post(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal update bookmark ❌');
+    }
   };
 
   if (loading) {

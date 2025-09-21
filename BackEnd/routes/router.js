@@ -88,10 +88,10 @@ router.put(
 
 //News Route
 router.get("/news", getNews);
+router.get("/news/bookmarks", validateToken, listBookmarks);
 router.get("/news/:id", getNewsDetail);
 router.post("/news/:newsId/bookmark", validateToken, bookmarkNews);
 router.delete("/news/:newsId/bookmark", validateToken, unbookmarkNews);
-router.get("/news/bookmarks", validateToken, listBookmarks);
 router.get("/categories", validateToken, getCategory);
 router.get("/news/category/:categoryId", getNewsByCategory);
 

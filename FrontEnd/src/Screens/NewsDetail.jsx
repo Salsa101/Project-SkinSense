@@ -20,6 +20,7 @@ const NewsDetail = ({ route, navigation }) => {
   const { id } = route.params; // ambil id dari navigation params
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [bookmarked, setBookmarked] = useState({});
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -34,6 +35,39 @@ const NewsDetail = ({ route, navigation }) => {
     };
     fetchNews();
   }, [id]);
+
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const res = await api.get('/news/bookmarks'); // endpoint list bookmark user
+        const bmMap = {};
+        res.data.forEach(n => {
+          bmMap[n.id] = true;
+        });
+        setBookmarked(bmMap);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBookmarks();
+  }, []);
+
+  const toggleBookmark = async newsId => {
+    try {
+      if (bookmarked[newsId]) {
+        // Sudah dibookmark → unbookmark
+        await api.delete(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: false }));
+      } else {
+        // Belum dibookmark → bookmark
+        await api.post(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal update bookmark ❌');
+    }
+  };
 
   if (loading) {
     return (
@@ -61,8 +95,12 @@ const NewsDetail = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="star-outline" size={30} color="#E07C8E" />
+        <TouchableOpacity onPress={() => toggleBookmark(news.id)}>
+          <Icon
+            name={bookmarked[news.id] ? 'star' : 'star-outline'}
+            size={30}
+            color="#E07C8E"
+          />
         </TouchableOpacity>
       </View>
 

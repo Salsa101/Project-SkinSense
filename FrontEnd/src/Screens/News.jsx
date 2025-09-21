@@ -13,6 +13,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Components/Navbar';
 import api from '../api';
 
+import { useFocusEffect } from '@react-navigation/native';
+
 const News = ({ navigation }) => {
   const [active, setActive] = useState('News');
   const [bookmarked, setBookmarked] = useState({});
@@ -38,8 +40,38 @@ const News = ({ navigation }) => {
     fetchNews();
   }, [search]);
 
-  const toggleBookmark = id => {
-    setBookmarked(prev => ({ ...prev, [id]: !prev[id] }));
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchBookmarks = async () => {
+        try {
+          const res = await api.get('/news/bookmarks');
+          const bmMap = {};
+          res.data.forEach(n => {
+            bmMap[n.id] = true;
+          });
+          setBookmarked(bmMap);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchBookmarks();
+    }, []),
+  );
+
+  const toggleBookmark = async newsId => {
+    try {
+      if (bookmarked[newsId]) {
+        await api.delete(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: false }));
+      } else {
+        await api.post(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal update bookmark ❌');
+    }
   };
 
   const fetchCategories = async () => {
@@ -87,7 +119,10 @@ const News = ({ navigation }) => {
               />
             </View>
 
-            <TouchableOpacity style={styles.bookmarkButton}>
+            <TouchableOpacity
+              style={styles.bookmarkButton}
+              onPress={() => navigation.navigate('BookmarkLists')}
+            >
               <Icon name="star" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -112,115 +147,138 @@ const News = ({ navigation }) => {
             </View>
           </View>
 
-          <Text style={styles.newsContainerTitle}>From SkinSense</Text>
-          {newsList
-            .filter(n => n.sourceType === 'skinsense')
-            .map(news => (
-              <TouchableOpacity
-                key={news.id}
-                style={styles.card}
-                onPress={() =>
-                  navigation.navigate('NewsDetail', { id: news.id })
-                }
-                activeOpacity={0.8}
-              >
-                <View style={styles.imageContainer}>
-                  <Image
-                    source={
-                      news.newsImage
-                        ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
-                        : require('../../assets/category-admin.jpg')
-                    }
-                    style={styles.image}
-                  />
+          {/* From SkinSense */}
+          {newsList.filter(n => n.sourceType === 'skinsense').length > 0 && (
+            <>
+              <Text style={styles.newsContainerTitle}>From SkinSense</Text>
+              {newsList
+                .filter(n => n.sourceType === 'skinsense')
+                .map(news => (
                   <TouchableOpacity
-                    style={styles.bookmarkBtn}
-                    onPress={() => toggleBookmark(news.id)}
-                  >
-                    <Icon
-                      name={bookmarked[news.id] ? 'star' : 'star-o'}
-                      size={24}
-                      color="#E07C8E"
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.content}>
-                  <Text style={styles.title}>{news.title}</Text>
-                  <View style={styles.categoryContainer}>
-                    {news.Categories?.map(category => (
-                      <TouchableOpacity
-                        key={category.id}
-                        style={styles.categoryBadge}
-                        onPress={() =>
-                          navigation.navigate('CategoryNews', {
-                            categoryId: category.id,
-                            categoryName: category.name,
-                          })
-                        }
-                      >
-                        <Text style={styles.categoryText}>{category.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-
-          <Text style={styles.newsContainerTitle}>Others</Text>
-          {newsList
-            .filter(n => n.sourceType === 'others')
-            .map(news => (
-              <TouchableOpacity
-                key={news.id}
-                style={styles.card}
-                onPress={() =>
-                  navigation.navigate('NewsDetail', { id: news.id })
-                }
-                activeOpacity={0.8}
-              >
-                <View style={styles.imageContainer}>
-                  <Image
-                    source={
-                      news.newsImage
-                        ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
-                        : require('../../assets/category-admin.jpg')
+                    key={news.id}
+                    style={styles.card}
+                    onPress={() =>
+                      navigation.navigate('NewsDetail', { id: news.id })
                     }
-                    style={styles.image}
-                  />
-                  <TouchableOpacity
-                    style={styles.bookmarkBtn}
-                    onPress={() => toggleBookmark(news.id)}
+                    activeOpacity={0.8}
                   >
-                    <Icon
-                      name={bookmarked[news.id] ? 'star' : 'star-o'}
-                      size={24}
-                      color="#E07C8E"
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.content}>
-                  <Text style={styles.title}>{news.title}</Text>
-                  <View style={styles.categoryContainer}>
-                    {news.Categories?.map(category => (
-                      <TouchableOpacity
-                        key={category.id}
-                        style={styles.categoryBadge}
-                        onPress={() =>
-                          navigation.navigate('CategoryNews', {
-                            categoryId: category.id,
-                            categoryName: category.name,
-                          })
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={
+                          news.newsImage
+                            ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                            : require('../../assets/category-admin.jpg')
                         }
+                        style={styles.image}
+                      />
+                      <TouchableOpacity
+                        style={styles.bookmarkBtn}
+                        onPress={() => toggleBookmark(news.id)}
                       >
-                        <Text style={styles.categoryText}>{category.name}</Text>
+                        <Icon
+                          name={bookmarked[news.id] ? 'star' : 'star-o'}
+                          size={24}
+                          color="#E07C8E"
+                        />
                       </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                    </View>
+
+                    <View style={styles.content}>
+                      <Text style={styles.title}>{news.title}</Text>
+                      <View style={styles.categoryContainer}>
+                        {news.Categories?.map(category => (
+                          <TouchableOpacity
+                            key={category.id}
+                            style={styles.categoryBadge}
+                            onPress={() =>
+                              navigation.navigate('CategoryNews', {
+                                categoryId: category.id,
+                                categoryName: category.name,
+                              })
+                            }
+                          >
+                            <Text style={styles.categoryText}>
+                              {category.name}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+            </>
+          )}
+
+          {/* Others */}
+          {newsList.filter(n => n.sourceType === 'others').length > 0 && (
+            <>
+              <Text style={styles.newsContainerTitle}>Others</Text>
+              {newsList
+                .filter(n => n.sourceType === 'others')
+                .map(news => (
+                  <TouchableOpacity
+                    key={news.id}
+                    style={styles.card}
+                    onPress={() =>
+                      navigation.navigate('NewsDetail', { id: news.id })
+                    }
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={
+                          news.newsImage
+                            ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                            : require('../../assets/category-admin.jpg')
+                        }
+                        style={styles.image}
+                      />
+                      <TouchableOpacity
+                        style={styles.bookmarkBtn}
+                        onPress={() => toggleBookmark(news.id)}
+                      >
+                        <Icon
+                          name={bookmarked[news.id] ? 'star' : 'star-o'}
+                          size={24}
+                          color="#E07C8E"
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.content}>
+                      <Text style={styles.title}>{news.title}</Text>
+                      <View style={styles.categoryContainer}>
+                        {news.Categories?.map(category => (
+                          <TouchableOpacity
+                            key={category.id}
+                            style={styles.categoryBadge}
+                            onPress={() =>
+                              navigation.navigate('CategoryNews', {
+                                categoryId: category.id,
+                                categoryName: category.name,
+                              })
+                            }
+                          >
+                            <Text style={styles.categoryText}>
+                              {category.name}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+            </>
+          )}
+
+          {newsList.filter(n => n.sourceType === 'skinsense').length === 0 &&
+            newsList.filter(n => n.sourceType === 'others').length === 0 && (
+              <Text
+                style={{ textAlign: 'center', marginTop: 20, color: '#555' }}
+              >
+                No news on the list
+              </Text>
+            )}
         </View>
       </ScrollView>
 
@@ -293,6 +351,7 @@ const styles = StyleSheet.create({
   },
   newsContainerTitle: {
     marginBottom: 10,
+    marginTop: 10,
   },
 });
 
