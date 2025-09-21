@@ -26,6 +26,7 @@ const {
   deleteCategory,
   getCategoryDetail,
   isActiveCategory,
+  toggleNewsActive,
 } = require("../Controllers/AdminController");
 
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
@@ -85,6 +86,7 @@ router.put(
   editNews
 );
 router.delete("/news/delete/:id", validateToken, isAdmin, deleteNews);
+router.put("/news/:id/active", validateToken, isAdmin, toggleNewsActive);
 
 //Category Route
 router.get("/categories", validateToken, isAdmin, getCategory);

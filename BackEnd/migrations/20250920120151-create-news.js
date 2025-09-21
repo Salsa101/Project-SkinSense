@@ -18,6 +18,14 @@ module.exports = {
       content: {
         type: Sequelize.TEXT,
       },
+      sourceType: {
+        type: Sequelize.ENUM("skinsense", "others"),
+        allowNull: false,
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

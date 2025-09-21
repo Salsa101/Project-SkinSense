@@ -6,7 +6,13 @@ const getNews = async (req, res) => {
     const { search, category } = req.query;
 
     const where = {};
-    if (search) where.title = { [Op.iLike]: `%${search}%` };
+    if (search) {
+      // kalau search, abaikan filter isActive
+      where.title = { [Op.iLike]: `%${search}%` };
+    } else {
+      // kalau bukan search, tampilkan hanya yang active
+      where.isActive = true;
+    }
 
     const include = [
       {
@@ -14,14 +20,22 @@ const getNews = async (req, res) => {
         attributes: ["id", "name", "isActive"],
         through: { attributes: [] },
         where: { isActive: true, ...(category ? { id: category } : {}) },
-        required: false, // supaya news tanpa kategori aktif tetap muncul
+        required: false,
       },
     ];
 
     const news = await News.findAll({
       where,
       include,
-      attributes: ["id", "title", "content", "newsImage", "createdAt"],
+      attributes: [
+        "id",
+        "title",
+        "content",
+        "newsImage",
+        "sourceType",
+        "isActive",
+        "createdAt",
+      ],
     });
 
     res.json(news);

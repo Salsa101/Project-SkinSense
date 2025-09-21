@@ -11,6 +11,7 @@ function AddNews() {
     title: "",
     content: "",
     categoryIds: [],
+    sourceType: "",
   });
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -44,6 +45,7 @@ function AddNews() {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("content", form.content);
+    formData.append("sourceType", form.sourceType);
 
     // cast ke integer & append multiple categories
     form.categoryIds.forEach((id) =>
@@ -117,6 +119,22 @@ function AddNews() {
                 <label className="form-check-label">{c.name}</label>
               </div>
             ))}
+        </div>
+
+        {/* Source Type */}
+        <div className="mb-3">
+          <label className="form-label">Source Type</label>
+          <select
+            name="sourceType"
+            className="form-select"
+            value={form.sourceType}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Pilih Source</option>
+            <option value="skinsense">SkinSense</option>
+            <option value="others">Others</option>
+          </select>
         </div>
 
         {/* Image */}

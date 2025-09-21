@@ -193,7 +193,15 @@ const getNews = async (req, res) => {
           required: false,
         },
       ],
-      attributes: ["id", "title", "content", "newsImage", "createdAt"],
+      attributes: [
+        "id",
+        "title",
+        "content",
+        "newsImage",
+        "isActive",
+        "sourceType",
+        "createdAt",
+      ],
     });
 
     res.json(news);
@@ -206,7 +214,10 @@ const getNews = async (req, res) => {
 //Add News
 const addNews = async (req, res) => {
   try {
-    let { title, content, categoryIds } = req.body;
+    let { title, content, categoryIds, isActive, sourceType } = req.body;
+    if (isActive === undefined) isActive = true; // fallback default
+    if (!sourceType) sourceType = "skinsense";
+
     const newsImage = req.file ? req.file.path : null;
 
     if (!title || !content || !categoryIds)
@@ -216,7 +227,13 @@ const addNews = async (req, res) => {
 
     categoryIds = categoryIds.map((id) => parseInt(id));
 
-    const news = await News.create({ title, content, newsImage });
+    const news = await News.create({
+      title,
+      content,
+      newsImage,
+      isActive,
+      sourceType,
+    });
 
     await news.setCategories(categoryIds);
 
@@ -240,7 +257,14 @@ const getNewsDetail = async (req, res) => {
           through: { attributes: [] },
         },
       ],
-      attributes: ["id", "title", "content", "newsImage", "createdAt"],
+      attributes: [
+        "id",
+        "title",
+        "content",
+        "newsImage",
+        "sourceType",
+        "createdAt",
+      ],
     });
 
     if (!news) return res.status(404).json({ message: "News not found" });
@@ -256,7 +280,7 @@ const getNewsDetail = async (req, res) => {
 const editNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, categoryIds } = req.body; // categoryIds = array
+    const { title, content, categoryIds, sourceType, isActive } = req.body;
     const newsImage = req.file ? req.file.path : null;
 
     const news = await News.findByPk(id);
@@ -265,6 +289,8 @@ const editNews = async (req, res) => {
     if (title) news.title = title;
     if (content) news.content = content;
     if (newsImage) news.newsImage = newsImage;
+    if (sourceType) news.sourceType = sourceType; // ✅ Tambahin ini
+    if (typeof isActive !== "undefined") news.isActive = isActive;
 
     await news.save();
 
@@ -297,6 +323,24 @@ const deleteNews = async (req, res) => {
     await news.destroy();
 
     res.json({ message: "News deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleNewsActive = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const news = await News.findByPk(id);
+    if (!news) return res.status(404).json({ message: "News not found" });
+
+    news.isActive = isActive;
+    await news.save();
+
+    res.json({ message: "News status updated", news });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -431,4 +475,5 @@ module.exports = {
   deleteCategory,
   getCategoryDetail,
   isActiveCategory,
+  toggleNewsActive,
 };

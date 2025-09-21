@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       newsImage: DataTypes.STRING,
       content: DataTypes.TEXT,
+      sourceType: {
+        type: DataTypes.ENUM("skinsense", "others"),
+        allowNull: false,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

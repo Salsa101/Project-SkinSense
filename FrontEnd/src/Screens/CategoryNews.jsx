@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   imageContainer: { position: 'relative' },
-  image: { width: '100%', height: 160 },
+  image: { width: '100%', height: 140 },
   bookmarkBtn: {
     position: 'absolute',
     top: 15,

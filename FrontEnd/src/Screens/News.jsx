@@ -92,8 +92,6 @@ const News = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.newsContainerTitle}>From SkinSense</Text>
-
           {/* Category News */}
           <View style={{ marginBottom: 10 }}>
             <View style={styles.categoryContainer}>
@@ -114,59 +112,115 @@ const News = ({ navigation }) => {
             </View>
           </View>
 
-          {newsList.map(news => (
-            <TouchableOpacity
-              key={news.id}
-              style={styles.card}
-              onPress={() =>
-                navigation.navigate('NewsDetail', {
-                  id: news.id, // lempar id ke route params
-                })
-              }
-              activeOpacity={0.8}
-            >
-              <View style={styles.imageContainer}>
-                <Image
-                  source={
-                    news.newsImage
-                      ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
-                      : require('../../assets/category-admin.jpg')
-                  }
-                  style={styles.image}
-                />
-                <TouchableOpacity
-                  style={styles.bookmarkBtn}
-                  onPress={() => toggleBookmark(news.id)}
-                >
-                  <Icon
-                    name={bookmarked[news.id] ? 'star' : 'star-o'}
-                    size={24}
-                    color="#E07C8E"
+          <Text style={styles.newsContainerTitle}>From SkinSense</Text>
+          {newsList
+            .filter(n => n.sourceType === 'skinsense')
+            .map(news => (
+              <TouchableOpacity
+                key={news.id}
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('NewsDetail', { id: news.id })
+                }
+                activeOpacity={0.8}
+              >
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={
+                      news.newsImage
+                        ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                        : require('../../assets/category-admin.jpg')
+                    }
+                    style={styles.image}
                   />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.content}>
-                <Text style={styles.title}>{news.title}</Text>
-                <View style={styles.categoryContainer}>
-                  {news.Categories?.map(category => (
-                    <TouchableOpacity
-                      key={category.id}
-                      style={styles.categoryBadge}
-                      onPress={() =>
-                        navigation.navigate('CategoryNews', {
-                          categoryId: category.id,
-                          categoryName: category.name,
-                        })
-                      }
-                    >
-                      <Text style={styles.categoryText}>{category.name}</Text>
-                    </TouchableOpacity>
-                  ))}
+                  <TouchableOpacity
+                    style={styles.bookmarkBtn}
+                    onPress={() => toggleBookmark(news.id)}
+                  >
+                    <Icon
+                      name={bookmarked[news.id] ? 'star' : 'star-o'}
+                      size={24}
+                      color="#E07C8E"
+                    />
+                  </TouchableOpacity>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+
+                <View style={styles.content}>
+                  <Text style={styles.title}>{news.title}</Text>
+                  <View style={styles.categoryContainer}>
+                    {news.Categories?.map(category => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.categoryBadge}
+                        onPress={() =>
+                          navigation.navigate('CategoryNews', {
+                            categoryId: category.id,
+                            categoryName: category.name,
+                          })
+                        }
+                      >
+                        <Text style={styles.categoryText}>{category.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+          <Text style={styles.newsContainerTitle}>Others</Text>
+          {newsList
+            .filter(n => n.sourceType === 'others')
+            .map(news => (
+              <TouchableOpacity
+                key={news.id}
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('NewsDetail', { id: news.id })
+                }
+                activeOpacity={0.8}
+              >
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={
+                      news.newsImage
+                        ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                        : require('../../assets/category-admin.jpg')
+                    }
+                    style={styles.image}
+                  />
+                  <TouchableOpacity
+                    style={styles.bookmarkBtn}
+                    onPress={() => toggleBookmark(news.id)}
+                  >
+                    <Icon
+                      name={bookmarked[news.id] ? 'star' : 'star-o'}
+                      size={24}
+                      color="#E07C8E"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.content}>
+                  <Text style={styles.title}>{news.title}</Text>
+                  <View style={styles.categoryContainer}>
+                    {news.Categories?.map(category => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.categoryBadge}
+                        onPress={() =>
+                          navigation.navigate('CategoryNews', {
+                            categoryId: category.id,
+                            categoryName: category.name,
+                          })
+                        }
+                      >
+                        <Text style={styles.categoryText}>{category.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
         </View>
       </ScrollView>
 

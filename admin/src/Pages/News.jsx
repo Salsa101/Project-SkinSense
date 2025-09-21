@@ -104,6 +104,8 @@ function News() {
               <th>Image</th>
               <th>Title</th>
               <th>Category</th>
+              <th>Source Type</th>
+              <th>Active</th>
               <th>Created At</th>
               <th>Action</th>
             </tr>
@@ -132,6 +134,34 @@ function News() {
                   {n.Categories?.length > 0
                     ? n.Categories.map((c) => c.name).join(", ")
                     : "Unknown"}
+                </td>
+                <td>{n.sourceType}</td>
+                <td>
+                  <div className="form-check form-switch">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={n.isActive}
+                      onChange={async (e) => {
+                        try {
+                          const newVal = e.target.checked;
+                          await api.put(`/admin/news/${n.id}/active`, {
+                            isActive: newVal,
+                          });
+                          setNewsList(
+                            newsList.map((item) =>
+                              item.id === n.id
+                                ? { ...item, isActive: newVal }
+                                : item
+                            )
+                          );
+                        } catch (err) {
+                          console.error(err);
+                          alert("Gagal update status active ❌");
+                        }
+                      }}
+                    />
+                  </div>
                 </td>
 
                 <td>{new Date(n.createdAt).toLocaleDateString()}</td>
