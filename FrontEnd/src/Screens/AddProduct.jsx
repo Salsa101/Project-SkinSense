@@ -71,11 +71,11 @@ const AddProduct = ({ navigation }) => {
 
   const [openDateOpened, setOpenDateOpened] = useState(false);
   const [openExpiration, setOpenExpiration] = useState(false);
-  const [dateOpened, setDateOpened] = useState(new Date());
-  const [expirationDate, setExpirationDate] = useState(new Date());
+  const [dateOpened, setDateOpened] = useState(null);
+  const [expirationDate, setExpirationDate] = useState(null);
 
   const [openTime, setOpenTime] = useState(false);
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState(null);
 
   const [productName, setProductName] = useState('');
   const [productBrand, setProductBrand] = useState('');
@@ -84,6 +84,8 @@ const AddProduct = ({ navigation }) => {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [productStep, setProductStep] = useState('');
+
+  const [isVerified, setIsVerified] = useState(false);
 
   // pilih & preview image
   const handleUpload = () => {
@@ -108,7 +110,6 @@ const AddProduct = ({ navigation }) => {
     } else if (value === 'custom') {
       setRoutineValueDay([]);
     } else {
-      // daily
       setRoutineValueDay([]);
       setCustomDate(null);
     }
@@ -123,59 +124,133 @@ const AddProduct = ({ navigation }) => {
         return;
       }
 
-      const hour = time.getHours();
-      if (
-        (timeDayValue === 'morning' && (hour < 5 || hour > 11)) ||
-        (timeDayValue === 'night' && (hour < 18 || hour > 23))
-      ) {
-        Alert.alert(
-          'Invalid Time',
-          `Selected time doesn't match with ${timeDayValue}.`,
-        );
-        return;
+      const payload = new FormData();
+
+      if (selectedProductId) {
+        // Produk existing → cukup ID
+        payload.append('productId', selectedProductId);
+      } else {
+        // Produk baru → kirim data master
+        if (!productName || !productBrand) {
+          Alert.alert('Error', 'Please enter product name and brand');
+          return;
+        }
+        payload.append('productName', productName);
+        payload.append('productBrand', productBrand);
+        payload.append('productType', productValue);
+
+        if (selectedFile) {
+          payload.append('productImage', selectedFile);
+        }
       }
 
-      const formData = new FormData();
-      formData.append('productImage', selectedFile);
-      formData.append('productName', productName);
-      formData.append('productBrand', productBrand);
-      formData.append('productStep', productStep);
-      formData.append('productType', productValue);
-      formData.append('dateOpened', dateOpened.toISOString().split('T')[0]);
-      formData.append(
+      // Data rutinitas
+      payload.append('productStep', productStep);
+      payload.append('dateOpened', dateOpened.toISOString().split('T')[0]);
+      payload.append(
         'expirationDate',
         expirationDate.toISOString().split('T')[0],
       );
-      formData.append('reminderTime', time.toTimeString().split(' ')[0]);
-      formData.append('routineType', routineValue);
-      formData.append('timeOfDay', timeDayValue);
+      payload.append('reminderTime', time.toTimeString().split(' ')[0]);
+      payload.append('routineType', routineValue);
+      payload.append('timeOfDay', timeDayValue);
 
       if (routineValueDay.length > 0) {
-        const dayOfWeekJson = routineValueDay.map(d => d.toLowerCase());
-        formData.append('dayOfWeek', JSON.stringify(dayOfWeekJson));
+        payload.append(
+          'dayOfWeek',
+          JSON.stringify(routineValueDay.map(d => d.toLowerCase())),
+        );
       }
 
       if (customDate instanceof Date && !isNaN(customDate)) {
-        formData.append('customDate', customDate.toISOString().split('T')[0]);
+        payload.append('customDate', customDate.toISOString().split('T')[0]);
       }
 
-      const response = await api.post('/add-routine-products', formData, {
+      const res = await api.post('/add-routine-products', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       Alert.alert('Success', 'Product added to routine!', [
         { text: 'OK', onPress: () => navigation.navigate('EditRoutine') },
       ]);
-      console.log('Saved:', response.data);
-    } catch (error) {
-      console.error(error);
+      console.log('Saved:', res.data);
+    } catch (err) {
+      console.error(err);
       Alert.alert(
         'Error',
-        error.response?.data?.message ||
-          error.message ||
-          'Something went wrong',
+        err.response?.data?.message || err.message || 'Something went wrong',
       );
     }
+  };
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
+  const handleSearch = async text => {
+    setSearchQuery(text);
+    if (text.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const res = await api.get(`/routine-products/search?query=${text}`);
+      setSearchResults(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Search produk
+  const handleSelectProduct = product => {
+    setSelectedProductId(product.id);
+    setProductName(product.productName);
+    setProductBrand(product.productBrand);
+    setProductValue(product.productType);
+
+    if (product.productImage) {
+      setImageUri(`http://10.0.2.2:3000${product.productImage}`);
+    } else {
+      setImageUri(null);
+    }
+
+    setSelectedFile(null);
+    setSearchResults([]);
+    setSearchQuery(product.productName);
+
+    setIsVerified(product.isVerified); //isverified
+  };
+
+  const validateTime = (time, timeDay) => {
+    if (!time) return true;
+
+    const hour = time.getHours();
+
+    if (timeDay === 'morning') {
+      // 05:00 - 11:59
+      return hour >= 5 && hour < 12;
+    }
+
+    if (timeDay === 'night') {
+      // 18:00 - 23:59
+      return hour >= 18 && hour < 24;
+    }
+
+    return true;
+  };
+
+  const handleSetTime = selectedTime => {
+    if (!validateTime(selectedTime, timeDayValue)) {
+      Alert.alert(
+        'Invalid Time',
+        `Reminder time doesn't match with ${timeDayValue} schedule`,
+      );
+      setOpenTime(false); // <- tutup modal walau invalid
+      return;
+    }
+    setTime(selectedTime);
+    setOpenTime(false); // <- tutup modal kalau valid juga
   };
 
   return (
@@ -189,8 +264,35 @@ const AddProduct = ({ navigation }) => {
               style={styles.input}
               placeholder="Search by product name"
               placeholderTextColor="#E07C8E"
+              value={searchQuery}
+              onChangeText={handleSearch}
             />
           </View>
+
+          {searchResults.length > 0 && (
+            <View
+              style={{ backgroundColor: '#fff', borderRadius: 8, marginTop: 5 }}
+            >
+              {searchResults.map(item => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    padding: 10,
+                    borderBottomWidth: 1,
+                    borderColor: '#eee',
+                  }}
+                  onPress={() => handleSelectProduct(item)}
+                >
+                  <Text
+                    style={{ fontFamily: 'Poppins-Medium', color: '#E07C8E' }}
+                  >
+                    {item.productName} - {item.productBrand}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
           <Text
             style={{
               marginVertical: 20,
@@ -203,16 +305,25 @@ const AddProduct = ({ navigation }) => {
           </Text>
 
           <View style={{ alignItems: 'center', marginTop: 10 }}>
-            <TouchableOpacity style={styles.box} onPress={handleUpload}>
+            <TouchableOpacity
+              style={styles.box}
+              onPress={handleUpload}
+              disabled={isVerified}
+            >
               {imageUri ? (
                 <Image
-                  source={{ uri: imageUri }}
+                  source={
+                    imageUri.startsWith('http')
+                      ? { uri: imageUri } // kalau dari database
+                      : { uri: imageUri } // kalau dari local
+                  }
                   style={{ width: 120, height: 120, borderRadius: 12 }}
                 />
               ) : (
                 <Icon1 name="plus" size={80} color="#FFFFFF" />
               )}
             </TouchableOpacity>
+
             <Text
               style={{
                 alignSelf: 'center',
@@ -227,35 +338,47 @@ const AddProduct = ({ navigation }) => {
 
           {/* Product Name */}
           <View style={styles.inputFormContainer}>
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Product Name</Text>
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  isVerified && styles.disabledField,
+                ]}
+              >
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
                   placeholderTextColor="#E07C8E"
                   value={productName}
                   onChangeText={setProductName}
+                  editable={!isVerified}
                 />
               </View>
             </View>
 
             {/* Product Brand */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Product Brand</Text>
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  isVerified && styles.disabledField,
+                ]}
+              >
                 <TextInput
                   style={styles.input}
                   placeholder="Type here..."
                   placeholderTextColor="#E07C8E"
                   value={productBrand}
                   onChangeText={setProductBrand}
+                  editable={!isVerified}
                 />
               </View>
             </View>
 
             {/* Step */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Step</Text>
               <View style={styles.inputContainer}>
                 <TextInput
@@ -282,6 +405,7 @@ const AddProduct = ({ navigation }) => {
                 setOpen={setOpenProduct}
                 setValue={setProductValue}
                 setItems={setProductItems}
+                disabled={isVerified}
                 placeholder="Select product type"
                 placeholderStyle={{
                   color: '#E07C8E',
@@ -293,7 +417,10 @@ const AddProduct = ({ navigation }) => {
                   color: '#E07C8E',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
+                style={[
+                  styles.dropdownPicker,
+                  isVerified && styles.disabledField,
+                ]}
                 dropDownContainerStyle={styles.dropdownStyle}
                 ArrowDownIconComponent={() => (
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
@@ -351,16 +478,26 @@ const AddProduct = ({ navigation }) => {
                   setValue={setRoutineValueDay}
                   setItems={setRoutineItemsDay}
                   placeholder="Select days"
+                  placeholderStyle={{
+                    color: '#E07C8E',
+                    fontFamily: 'Poppins-Medium',
+                    fontSize: 12,
+                  }}
+                  textStyle={{
+                    fontFamily: 'Poppins-Medium',
+                    color: '#E07C8E',
+                    fontSize: 12,
+                  }}
                   style={styles.dropdownPicker}
                   dropDownContainerStyle={[
                     styles.dropdownStyle,
                     { maxHeight: 800 },
                   ]}
                   ArrowDownIconComponent={() => (
-                    <Icon name="chevron-down" size={20} color="#bf828dff" />
+                    <Icon name="chevron-down" size={20} color="#E07C8E" />
                   )}
                   ArrowUpIconComponent={() => (
-                    <Icon name="chevron-up" size={20} color="#bf828dff" />
+                    <Icon name="chevron-up" size={20} color="#E07C8E" />
                   )}
                 />
               </View>
@@ -368,7 +505,7 @@ const AddProduct = ({ navigation }) => {
 
             {/* Custom: pilih tanggal sekali */}
             {routineValue === 'custom' && (
-              <View style={styles.form}>
+              <View style={[styles.form, { zIndex: 97 }]}>
                 <Text style={styles.formText}>Custom Date</Text>
                 <View
                   style={[
@@ -385,7 +522,7 @@ const AddProduct = ({ navigation }) => {
                     <Icon
                       name="calendar"
                       size={20}
-                      color="#bf828dff"
+                      color="#E07C8E"
                       style={styles.icon}
                     />
                   </TouchableOpacity>
@@ -394,7 +531,7 @@ const AddProduct = ({ navigation }) => {
             )}
 
             {/* Time of Day */}
-            <View style={[styles.form, { zIndex: 97 }]}>
+            <View style={[styles.form, { zIndex: 96 }]}>
               <Text style={styles.formText}>Time of Day</Text>
               <DropDownPicker
                 open={openTimeDay}
@@ -426,7 +563,7 @@ const AddProduct = ({ navigation }) => {
             </View>
 
             {/* Date Opened */}
-            <View style={styles.form}>
+            <View style={[styles.form, { zIndex: 95 }]}>
               <Text style={styles.formText}>Date Opened</Text>
               <View
                 style={[
@@ -435,7 +572,9 @@ const AddProduct = ({ navigation }) => {
                 ]}
               >
                 <Text style={styles.input}>
-                  {dateOpened.toLocaleDateString()}
+                  {dateOpened
+                    ? dateOpened.toLocaleDateString()
+                    : 'Please select open date'}
                 </Text>
 
                 <TouchableOpacity onPress={() => setOpenDateOpened(true)}>
@@ -459,7 +598,9 @@ const AddProduct = ({ navigation }) => {
                 ]}
               >
                 <Text style={styles.input}>
-                  {expirationDate.toLocaleDateString()}
+                  {expirationDate
+                    ? expirationDate.toLocaleDateString()
+                    : 'Please select exp date'}
                 </Text>
 
                 <TouchableOpacity onPress={() => setOpenExpiration(true)}>
@@ -482,10 +623,12 @@ const AddProduct = ({ navigation }) => {
                 ]}
               >
                 <Text style={styles.input}>
-                  {time.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {time
+                    ? time.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : 'Please select reminder time'}
                 </Text>
 
                 <TouchableOpacity onPress={() => setOpenTime(true)}>
@@ -523,7 +666,7 @@ const AddProduct = ({ navigation }) => {
         modal
         mode="date"
         open={openDateOpened}
-        date={dateOpened}
+        date={dateOpened || new Date()}
         onConfirm={selectedDate => {
           setOpenDateOpened(false);
           setDateOpened(selectedDate);
@@ -535,7 +678,7 @@ const AddProduct = ({ navigation }) => {
         modal
         mode="date"
         open={openExpiration}
-        date={expirationDate}
+        date={expirationDate || new Date()}
         onConfirm={selectedDate => {
           setOpenExpiration(false);
           setExpirationDate(selectedDate);
@@ -547,11 +690,8 @@ const AddProduct = ({ navigation }) => {
         modal
         mode="time"
         open={openTime}
-        date={time}
-        onConfirm={selectedTime => {
-          setOpenTime(false);
-          setTime(selectedTime);
-        }}
+        date={time || new Date()}
+        onConfirm={selectedTime => handleSetTime(selectedTime)}
         onCancel={() => setOpenTime(false)}
       />
     </View>
@@ -653,6 +793,9 @@ const styles = StyleSheet.create({
     borderColor: '#E07C8E',
     borderRadius: 25,
     paddingHorizontal: 15,
+  },
+  disabledField: {
+    backgroundColor: '#f4ebebff', // agak tua dikit
   },
 });
 

@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "productId",
         onDelete: "CASCADE",
       });
-      Product.belongsTo(models.User, { foreignKey: "userId" });
+      Product.belongsTo(models.User, { foreignKey: "userId", as: "user" });
     }
   }
 
@@ -19,10 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       productBrand: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      productStep: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -37,14 +33,12 @@ module.exports = (sequelize, DataTypes) => {
         ),
         allowNull: false,
       },
-      dateOpened: {
-        type: DataTypes.DATEONLY,
-      },
-      expirationDate: {
-        type: DataTypes.DATEONLY,
-      },
       productImage: {
         type: DataTypes.STRING,
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false, // admin yang set true
       },
     },
     {

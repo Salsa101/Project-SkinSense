@@ -9,10 +9,15 @@ import ProfilePage from '../Screens/ProfilePage';
 import Calendar from '../Screens/Calendar';
 import EditRoutine from '../Screens/EditRoutine';
 import AddProduct from '../Screens/AddProduct';
-import RNBootSplash from 'react-native-bootsplash';
-
-import api from '../api';
 import SkinQuiz from '../Screens/SkinQuiz';
+import EditProduct from '../Screens/EditProduct';
+import News from '../Screens/News';
+
+import RNBootSplash from 'react-native-bootsplash';
+import api from '../api';
+import CategoryNews from '../Screens/CategoryNews';
+import NewsDetail from '../Screens/NewsDetail';
+import BookmarkLists from '../Screens/BookmarkLists';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,7 +51,13 @@ const AppNavigator = () => {
     <NavigationContainer
       onReady={async () => await RNBootSplash.hide({ fade: true })}
     >
-      <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName={initialRoute}
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
         <Stack.Screen
           name="AccountOption"
           component={AccountOption}
@@ -90,6 +101,31 @@ const AppNavigator = () => {
         <Stack.Screen
           name="SkinQuiz"
           component={SkinQuiz}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditProduct"
+          component={EditProduct}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="News"
+          component={News}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CategoryNews"
+          component={CategoryNews}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NewsDetail"
+          component={NewsDetail}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BookmarkLists"
+          component={BookmarkLists}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

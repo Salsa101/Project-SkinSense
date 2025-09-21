@@ -73,6 +73,7 @@ const loginController = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        role: user.role,
       },
       jwtSecret,
       { expiresIn: "7d" }

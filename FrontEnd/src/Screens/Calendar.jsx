@@ -89,18 +89,18 @@ const Calendar = ({ navigation }) => {
 
   const today = new Date();
   const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
+    'Jan',
+    'Febr',
+    'Mar',
+    'Apr',
     'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   const monthYear = `${monthNames[today.getMonth()]}, ${today.getFullYear()}`;
   const weekDays = getWeekDays();
@@ -205,12 +205,18 @@ const Calendar = ({ navigation }) => {
           style={styles.productImage}
         />
         <View style={styles.info}>
-          <Text style={styles.step}>Step {item.Product?.productStep}</Text>
+          <Text style={styles.step}>
+            Step {item.productStep}:{' '}
+            {item.Product?.productType
+              ? item.Product.productType.charAt(0).toUpperCase() +
+                item.Product.productType.slice(1)
+              : ''}
+          </Text>
           <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
             {item.Product?.productName}
           </Text>
-          {safeDate(item.Product?.expirationDate) ? (
-            new Date(item.Product?.expirationDate) <= new Date() ? (
+          {safeDate(item.expirationDate) ? (
+            new Date(item.expirationDate) <= new Date() ? (
               <Text style={[styles.exp, { color: 'red' }]}>
                 Product Expired!
               </Text>
@@ -218,26 +224,26 @@ const Calendar = ({ navigation }) => {
               (() => {
                 const duration = intervalToDuration({
                   start: new Date(),
-                  end: safeDate(item.Product?.expirationDate),
+                  end: safeDate(item.expirationDate),
                 });
 
                 const totalMs =
-                  safeDate(item.Product?.expirationDate).getTime() -
+                  safeDate(item.expirationDate).getTime() -
                   new Date().getTime();
                 const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
 
                 if (totalDays <= 30) {
                   return (
                     <Text style={[styles.exp, { color: '#cf7f24ff' }]}>
-                      Expiring Soon! ({totalDays}d)
+                      Expiring Soon! ({totalDays} d)
                     </Text>
                   );
                 }
 
                 const parts = [];
-                if (duration.years) parts.push(`${duration.years}yr`);
-                if (duration.months) parts.push(`${duration.months}mo`);
-                if (duration.days) parts.push(`${duration.days}d`);
+                if (duration.years) parts.push(`${duration.years} yr`);
+                if (duration.months) parts.push(`${duration.months} mo`);
+                if (duration.days) parts.push(`${duration.days} d`);
 
                 return <Text style={styles.exp}>Exp in {parts.join(' ')}</Text>;
               })()
@@ -345,7 +351,9 @@ const Calendar = ({ navigation }) => {
               style={{
                 textAlign: 'center',
                 marginVertical: 30,
-                color: '#000000ff',
+                color: '#B67F89',
+                fontFamily: 'Poppins-Medium',
+                fontSize: 11,
               }}
             >
               No data available

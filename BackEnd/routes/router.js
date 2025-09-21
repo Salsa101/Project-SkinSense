@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
+//Import Controller
 const {
   registerController,
   loginController,
@@ -23,13 +24,27 @@ const {
   deleteRoutineProduct,
   uploadProduct,
   toggleDone,
+  searchProducts,
 } = require("../Controllers/RoutineProductController");
+const {
+  getNews,
+  getNewsDetail,
+  bookmarkNews,
+  unbookmarkNews,
+  listBookmarks,
+  getCategory,
+  getNewsByCategory,
+} = require("../Controllers/NewsController");
 const {
   getQuestions,
   submitAnswers,
 } = require("../Controllers/QuizController");
 const upload = require("../Middlewares/UploadImage");
 
+//Admin Role
+const { isAdmin } = require("../Middlewares/AdminMiddleware");
+
+//Auth
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
 router.post("/logout", logoutController);
@@ -49,6 +64,7 @@ router.post(
   upload.single("productImage"),
   addProductToRoutine
 );
+router.post("/upload-product", upload.single("productImage"), uploadProduct);
 router.get(
   "/routine-products/view/:routineType/:timeOfDay",
   validateToken,
@@ -60,15 +76,34 @@ router.get(
   viewRoutineByTime
 );
 router.patch("/routine-products/toggle-done", validateToken, toggleDone);
+router.delete("/routine-products/delete", validateToken, deleteRoutineProduct);
+router.get("/routine-products/search", validateToken, searchProducts);
+router.get("/routine-products/:id", validateToken, getRoutineProduct); // Get detail
+router.put(
+  "/routine-products/:id",
+  validateToken,
+  upload.single("productImage"),
+  updateRoutineProduct
+);
+
+//News Route
+router.get("/news", getNews);
+router.get("/news/bookmarks", validateToken, listBookmarks);
+router.get("/news/:id", getNewsDetail);
+router.post("/news/:newsId/bookmark", validateToken, bookmarkNews);
+router.delete("/news/:newsId/bookmark", validateToken, unbookmarkNews);
+router.get("/categories", validateToken, getCategory);
+router.get("/news/category/:categoryId", getNewsByCategory);
 
 //Skin Quiz
 router.get("/question", validateToken, getQuestions);
 router.post("/answer", validateToken, submitAnswers);
 
-router.get("/routine-products/:id", getRoutineProduct); // Get detail
-router.put("/routine-products/:id", updateRoutineProduct); // Update
-router.delete("/routine-products/:id", deleteRoutineProduct); // Delete
-
-router.post("/upload-product", upload.single("productImage"), uploadProduct);
+//Admin Role
+router.get("/check-auth", validateToken, (req, res) => {
+  res.json({ message: "Token valid", user: req.user });
+});
+router.get("/products", validateToken, isAdmin, getRoutineProduct);
+router.post("/add-products", validateToken, isAdmin, addProductToRoutine);
 
 module.exports = router;

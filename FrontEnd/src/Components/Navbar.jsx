@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-const Navbar = ({ active, onPress }) => {
+const Navbar = (active, onPress) => {
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -19,20 +19,30 @@ const Navbar = ({ active, onPress }) => {
     <View style={styles.container}>
       {items.map((item, index) => {
         const isActive = route.name === item.name;
+        const isCenter = item.name === 'SkinQuiz';
+
         return (
           <TouchableOpacity
             key={index}
-            style={styles.item}
+            style={[styles.item, isCenter && styles.centerWrapper]}
             onPress={() => navigation.navigate(item.name)}
           >
-            <Icon
-              name={item.icon}
-              size={25}
-              color={isActive ? "#a05c5c" : "#aaa"}
-            />
-            <Text style={[styles.label, isActive && styles.activeLabel]}>
-              {item.name}
-            </Text>
+            {isCenter ? (
+              <View style={styles.centerButton}>
+                <Icon name={item.icon} size={30} color="#fff" />
+              </View>
+            ) : (
+              <>
+                <Icon
+                  name={item.icon}
+                  size={28}
+                  color={isActive ? '#a05c5c' : '#aaa'}
+                />
+                <Text style={[styles.label, isActive && styles.activeLabel]}>
+                  {item.name}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -52,6 +62,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
   },
   item: {
+    flex: 1,
     alignItems: 'center',
   },
   label: {
@@ -63,6 +74,23 @@ const styles = StyleSheet.create({
   activeLabel: {
     color: '#a05c5c',
     fontWeight: 'bold',
+  },
+  centerWrapper: {
+    position: 'relative',
+    top: -28, // naik dari navbar
+  },
+  centerButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#a05c5c',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
 });
 

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
@@ -41,7 +42,7 @@ const EditRoutine = ({ navigation }) => {
   }, [activeRoutineTab, activeTab]);
 
   const currentData = [...routineData].sort((a, b) => {
-    return Number(a.Product?.productStep) - Number(b.Product?.productStep);
+    return Number(a.productStep) - Number(b.productStep);
   });
 
   const formatDuration = dur => {
@@ -71,6 +72,30 @@ const EditRoutine = ({ navigation }) => {
     return new Date(value);
   }
 
+  const handleDelete = routineProductId => {
+    Alert.alert(
+      'Delete Routine',
+      'Are you sure you want to delete this routine?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete('/routine-products/delete', {
+                data: { routineProductId },
+              });
+              fetchRoutine();
+            } catch (err) {
+              console.error(err);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
       <View style={styles.infoBox}>
@@ -88,7 +113,7 @@ const EditRoutine = ({ navigation }) => {
           </Text>
 
           <Text style={styles.step}>
-            Step {item.Product?.productStep} ·{' '}
+            Step {item.productStep} ·{' '}
             {item.Product?.productType
               ? item.Product.productType.charAt(0).toUpperCase() +
                 item.Product.productType.slice(1)
@@ -96,17 +121,37 @@ const EditRoutine = ({ navigation }) => {
           </Text>
           <Text style={styles.exp}>
             Opened at{' '}
-            {safeDate(item.Product?.dateOpened)
-              ? format(safeDate(item.Product?.dateOpened), 'dd MMM yyyy')
+            {safeDate(item.dateOpened)
+              ? format(safeDate(item.dateOpened), 'dd MMM yyyy')
               : '-'}
           </Text>
 
           <Text style={styles.exp}>
             Exp at{' '}
-            {safeDate(item.Product?.expirationDate)
-              ? format(safeDate(item.Product?.expirationDate), 'dd MMM yyyy')
+            {safeDate(item.expirationDate)
+              ? format(safeDate(item.expirationDate), 'dd MMM yyyy')
               : '-'}
           </Text>
+
+          {item.routineType !== 'daily' && (
+            <Text style={styles.exp}>
+              Reminder on{' '}
+              {item.routineType === 'weekly' && item.dayOfWeek
+                ? item.dayOfWeek
+                    .map(
+                      d =>
+                        d.slice(0, 3).charAt(0).toUpperCase() + d.slice(1, 3),
+                    )
+                    .join(', ')
+                : item.routineType === 'custom' && item.customDate
+                ? new Date(item.customDate).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                : ''}
+            </Text>
+          )}
 
           <Text style={styles.exp}>
             Reminder at{' '}
@@ -117,12 +162,38 @@ const EditRoutine = ({ navigation }) => {
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
           <TouchableOpacity
-            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+            onPress={() => navigation.navigate('EditProduct', { id: item.id })}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 30,
+              padding: 7,
+              shadowColor: 'rgba(95, 52, 52, 1)',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
           >
             <Icon name="pencil" size={18} color="#E07C8E" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ backgroundColor: '#ffffff', borderRadius: 30, padding: 7 }}
+            onPress={() => handleDelete(item.id)}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 30,
+              padding: 7,
+              shadowColor: 'rgba(95, 52, 52, 1)',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
           >
             <Icon name="trash" size={18} color="#E07C8E" />
           </TouchableOpacity>
@@ -285,9 +356,9 @@ const styles = StyleSheet.create({
     width: 40,
   },
   productImage: {
-    width: 50,
-    height: 85,
-    borderRadius: 8,
+    width: 65,
+    height: 120,
+    borderRadius: 5,
     backgroundColor: '#000000ff',
     marginRight: 10,
   },
@@ -342,8 +413,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   step: {
-    color: '#666',
+    color: '#4d4c4cff',
     fontSize: 12,
+    fontFamily: 'Poppins-Medium',
+    marginTop: 2,
   },
   product: {
     fontSize: 14,
@@ -355,8 +428,12 @@ const styles = StyleSheet.create({
   },
   exp: {
     fontSize: 11,
-    color: '#999',
+    color: '#726b6bff',
     marginTop: 2,
+    fontFamily: 'Poppins-Medium',
+  },
+  info: {
+    flex: 1,
   },
 });
 
