@@ -10,7 +10,7 @@ const Navbar = (active, onPress) => {
   const items = [
     { name: 'Home', icon: 'home' },
     { name: 'News', icon: 'lightbulb-outline' },
-    { name: 'SkinQuiz', icon: 'crop-free' },
+    { name: 'LandingPage', icon: 'crop-free' },
     { name: 'Calendar', icon: 'calendar-today' },
     { name: 'Journal', icon: 'menu-book' },
   ];
@@ -19,7 +19,7 @@ const Navbar = (active, onPress) => {
     <View style={styles.container}>
       {items.map((item, index) => {
         const isActive = route.name === item.name;
-        const isCenter = item.name === 'SkinQuiz';
+        const isCenter = item.name === 'LandingPage';
 
         return (
           <TouchableOpacity
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   centerWrapper: {
     position: 'relative',
-    top: -28, // naik dari navbar
+    top: -28,
   },
   centerButton: {
     width: 60,
@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#a05c5c',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

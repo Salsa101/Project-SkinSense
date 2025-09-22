@@ -6,11 +6,12 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 
 import api from '../api';
 
-const SkinQuiz = () => {
+const SkinQuiz = ({ navigation }) => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -67,6 +68,14 @@ const SkinQuiz = () => {
     }
   };
 
+  const optionImages = {
+    1: require('../../assets/opt1.png'),
+    2: require('../../assets/opt2.png'),
+    3: require('../../assets/opt3.png'),
+    4: require('../../assets/opt4.png'),
+    5: require('../../assets/opt5.png'),
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -109,19 +118,50 @@ const SkinQuiz = () => {
             style={[
               styles.option,
               answers[current.id] === option.id && styles.selectedOption,
+              current.id === 1 ? styles.optionLeft : styles.optionCenter,
             ]}
             onPress={() => {
-              setSelected(option.id);
-              setAnswers(prev => ({
-                ...prev,
-                [current.id]: option.id,
-              }));
+              if (option.id === 5) {
+                navigation.navigate('SkinGuide');
+                return;
+              }
+
+              if (answers[current.id] === option.id) {
+                const updatedAnswers = { ...answers };
+                delete updatedAnswers[current.id];
+                setAnswers(updatedAnswers);
+              } else {
+                setAnswers(prev => ({
+                  ...prev,
+                  [current.id]: option.id,
+                }));
+              }
             }}
           >
-            <View style={styles.iconPlaceholder}></View>
+            {current.id === 1 && optionImages[option.id] && (
+              <Image
+                source={optionImages[option.id]}
+                style={styles.iconImage}
+              />
+            )}
+
             <View style={{ flex: 1 }}>
-              <Text style={styles.optionTitle}>{option.title}</Text>
-              <Text style={styles.optionDesc}>{option.description}</Text>
+              <Text
+                style={[
+                  styles.optionTitle,
+                  current.id === 1 ? styles.textLeft : styles.textCenter,
+                ]}
+              >
+                {option.title}
+              </Text>
+              <Text
+                style={[
+                  styles.optionDesc,
+                  current.id === 1 ? styles.textLeft : styles.textCenter,
+                ]}
+              >
+                {option.description}
+              </Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -144,7 +184,7 @@ const SkinQuiz = () => {
           <TouchableOpacity
             style={styles.nextButton}
             onPress={handleSubmit}
-            disabled={!selected}
+            disabled={!answers[current.id]}
           >
             <Text style={styles.nextText}>Submit</Text>
           </TouchableOpacity>
@@ -152,7 +192,7 @@ const SkinQuiz = () => {
           <TouchableOpacity
             style={styles.nextButton}
             onPress={handleNext}
-            disabled={!selected}
+            disabled={!answers[current.id]}
           >
             <Text style={styles.nextText}>Next →</Text>
           </TouchableOpacity>
@@ -193,8 +233,8 @@ const styles = StyleSheet.create({
     borderColor: '#DDD',
     marginRight: 15,
   },
-  optionTitle: { fontWeight: '600', marginBottom: 2 },
-  optionDesc: { color: '#4b4b4bff', fontSize: 12 },
+  optionTitle: { fontWeight: '600', marginBottom: 2, marginLeft: 10 },
+  optionDesc: { color: '#4b4b4bff', fontSize: 12, marginLeft: 10 },
   bottomButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -221,6 +261,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#F49CA5',
     borderRadius: 3,
   },
+  imageRow: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  iconImage: {
+    width: 40,
+    height: 40,
+    marginRight: 8,
+    borderRadius: 20,
+  },
+  textLeft: { textAlign: 'left' },
+  textCenter: { textAlign: 'center' },
 });
 
 export default SkinQuiz;

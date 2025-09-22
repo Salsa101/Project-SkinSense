@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert("QuizQuestions", [
       {
-        quizQuestion: "Apa warna langit di siang hari?",
+        quizQuestion: "What’s your skin type?",
         description: "Pilih jawaban yang paling benar.",
         createdAt: new Date(),
         updatedAt: new Date(),

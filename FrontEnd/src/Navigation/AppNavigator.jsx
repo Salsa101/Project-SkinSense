@@ -18,6 +18,8 @@ import api from '../api';
 import CategoryNews from '../Screens/CategoryNews';
 import NewsDetail from '../Screens/NewsDetail';
 import BookmarkLists from '../Screens/BookmarkLists';
+import LandingPage from '../Screens/LandingPage';
+import SkinGuide from '../Screens/SkinGuide';
 
 const Stack = createNativeStackNavigator();
 
@@ -126,6 +128,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="BookmarkLists"
           component={BookmarkLists}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LandingPage"
+          component={LandingPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SkinGuide"
+          component={SkinGuide}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
