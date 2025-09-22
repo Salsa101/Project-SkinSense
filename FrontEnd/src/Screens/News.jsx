@@ -291,9 +291,9 @@ const News = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1 , backgroundColor: '#FFF9F3' },
   newsContainer: { padding: 25 },
-  titlePage: { marginBottom: 20, fontSize: 18, fontWeight: '600' },
+  titlePage: { marginBottom: 20, fontSize: 20, fontFamily: 'Poppins-Bold', color: '#E07C8E' },
   card: {
     backgroundColor: '#fff',
     borderRadius: 20,
