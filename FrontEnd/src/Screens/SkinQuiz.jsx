@@ -161,14 +161,16 @@ const SkinQuiz = ({ navigation }) => {
               >
                 {option.title}
               </Text>
-              <Text
-                style={[
-                  styles.optionDesc,
-                  current.id === 1 ? styles.textLeft : styles.textCenter,
-                ]}
-              >
-                {option.description}
-              </Text>
+              {option.description ? (
+                <Text
+                  style={[
+                    styles.optionDesc,
+                    current.id === 1 ? styles.textLeft : styles.textCenter,
+                  ]}
+                >
+                  {option.description}
+                </Text>
+              ) : null}
             </View>
           </TouchableOpacity>
         ))}

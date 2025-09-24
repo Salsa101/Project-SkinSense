@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Camera,
@@ -15,7 +16,7 @@ import {
 import { useFaceDetector } from 'react-native-vision-camera-face-detector';
 import { Worklets } from 'react-native-worklets-core';
 import Icon from 'react-native-vector-icons/Ionicons';
-import api from '../api'; // pastikan sudah import instance axios
+import api from '../api';
 
 const BRIGHTNESS_LOW = 50;
 const BRIGHTNESS_HIGH = 200;
@@ -24,8 +25,9 @@ const FaceScan2 = () => {
   const device = useCameraDevice('front');
   const [hasPermission, setHasPermission] = useState(false);
   const [faceAligned, setFaceAligned] = useState(false);
-  const [facePhoto, setFacePhoto] = useState(null); // URI preview backend
+  const [facePhoto, setFacePhoto] = useState(null);
   const [brightness, setBrightness] = useState(null);
+  const [scanning, setScanning] = useState(false);
 
   const cameraRef = useRef(null);
   const faceBoundsRef = useRef(null);
@@ -45,7 +47,6 @@ const FaceScan2 = () => {
     })();
   }, []);
 
-  // --- Face detection ---
   const handleDetectedFaces = Worklets.createRunOnJS((faces, frameSize) => {
     if (faces.length > 0) {
       const face = faces[0];
@@ -66,12 +67,10 @@ const FaceScan2 = () => {
     }
   });
 
-  // --- Brightness ---
   const handleBrightness = Worklets.createRunOnJS(value =>
     setBrightness(value),
   );
 
-  // --- Frame processor ---
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -91,10 +90,11 @@ const FaceScan2 = () => {
     [detectFaces],
   );
 
-  // --- Ambil foto & upload ke backend ---
   const takeFacePhoto = async () => {
     if (!cameraRef.current || !faceBoundsRef.current) return;
     try {
+      setScanning(true);
+
       const photo = await cameraRef.current.takePhoto({ skipMetadata: true });
 
       const formData = new FormData();
@@ -109,10 +109,12 @@ const FaceScan2 = () => {
       });
 
       console.log('Upload response:', response.data);
-      // Preview dari backend
       setFacePhoto(`${api.defaults.baseURL}/${response.data.filePath}`);
+
+      // API AI
     } catch (e) {
       console.log('Error taking or uploading photo:', e);
+      setScanning(false);
     }
   };
 
@@ -144,46 +146,57 @@ const FaceScan2 = () => {
         />
       </View>
 
-      <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={[
-            styles.cameraBtn,
-            {
-              backgroundColor:
-                faceAligned &&
-                brightness >= BRIGHTNESS_LOW &&
-                brightness <= BRIGHTNESS_HIGH
-                  ? '#ff6680'
-                  : '#ccc',
-            },
-          ]}
-          disabled={
-            !faceAligned ||
-            !(brightness >= BRIGHTNESS_LOW && brightness <= BRIGHTNESS_HIGH)
-          }
-          onPress={takeFacePhoto}
-        >
-          <Icon name="camera" size={30} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {!scanning && (
+        <>
+          <View style={styles.bottomBar}>
+            <TouchableOpacity
+              style={[
+                styles.cameraBtn,
+                {
+                  backgroundColor:
+                    faceAligned &&
+                    brightness >= BRIGHTNESS_LOW &&
+                    brightness <= BRIGHTNESS_HIGH
+                      ? '#ff6680'
+                      : '#ccc',
+                },
+              ]}
+              disabled={
+                !faceAligned ||
+                !(brightness >= BRIGHTNESS_LOW && brightness <= BRIGHTNESS_HIGH)
+              }
+              onPress={takeFacePhoto}
+            >
+              <Icon name="camera" size={30} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-      <View style={{ position: 'absolute', top: 50, width: '100%' }}>
-        <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
-          Brightness: {brightness ? brightness.toFixed(0) : '...'}
-        </Text>
-        {brightness < BRIGHTNESS_LOW && (
-          <Text style={{ color: 'red', textAlign: 'center' }}>
-            Terlalu gelap
-          </Text>
-        )}
-        {brightness > BRIGHTNESS_HIGH && (
-          <Text style={{ color: 'yellow', textAlign: 'center' }}>
-            Terlalu terang
-          </Text>
-        )}
-      </View>
+          <View style={{ position: 'absolute', top: 50, width: '100%' }}>
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
+              Brightness: {brightness ? brightness.toFixed(0) : '...'}
+            </Text>
+            {brightness < BRIGHTNESS_LOW && (
+              <Text style={{ color: 'red', textAlign: 'center' }}>
+                Terlalu gelap
+              </Text>
+            )}
+            {brightness > BRIGHTNESS_HIGH && (
+              <Text style={{ color: 'yellow', textAlign: 'center' }}>
+                Terlalu terang
+              </Text>
+            )}
+          </View>
+        </>
+      )}
 
-      {facePhoto && (
+      {scanning && (
+        <View style={styles.scanningOverlay}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.scanningText}>Scanning the face...</Text>
+        </View>
+      )}
+
+      {facePhoto && !scanning && (
         <Image
           source={{ uri: facePhoto }}
           style={{
@@ -217,6 +230,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scanningOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanningText: { color: '#fff', marginTop: 15, fontSize: 18 },
 });
 
 export default FaceScan2;
