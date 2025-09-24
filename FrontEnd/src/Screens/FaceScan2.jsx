@@ -13,8 +13,9 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import { useFaceDetector } from 'react-native-vision-camera-face-detector';
-import { Worklets, runAtTargetFps } from 'react-native-worklets-core';
+import { Worklets } from 'react-native-worklets-core';
 import Icon from 'react-native-vector-icons/Ionicons';
+import api from '../api'; // pastikan sudah import instance axios
 
 const BRIGHTNESS_LOW = 50;
 const BRIGHTNESS_HIGH = 200;
@@ -23,7 +24,7 @@ const FaceScan2 = () => {
   const device = useCameraDevice('front');
   const [hasPermission, setHasPermission] = useState(false);
   const [faceAligned, setFaceAligned] = useState(false);
-  const [facePhoto, setFacePhoto] = useState(null);
+  const [facePhoto, setFacePhoto] = useState(null); // URI preview backend
   const [brightness, setBrightness] = useState(null);
 
   const cameraRef = useRef(null);
@@ -35,9 +36,7 @@ const FaceScan2 = () => {
     performanceMode: 'fast',
   });
 
-  useEffect(() => {
-    return () => stopListeners();
-  }, []);
+  useEffect(() => () => stopListeners(), []);
 
   useEffect(() => {
     (async () => {
@@ -46,7 +45,7 @@ const FaceScan2 = () => {
     })();
   }, []);
 
-  // --- Worklet untuk face detection ---
+  // --- Face detection ---
   const handleDetectedFaces = Worklets.createRunOnJS((faces, frameSize) => {
     if (faces.length > 0) {
       const face = faces[0];
@@ -67,7 +66,7 @@ const FaceScan2 = () => {
     }
   });
 
-  // --- Worklet untuk brightness ---
+  // --- Brightness ---
   const handleBrightness = Worklets.createRunOnJS(value =>
     setBrightness(value),
   );
@@ -76,34 +75,44 @@ const FaceScan2 = () => {
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
-
-      // --- Face detection ---
       const faces = detectFaces(frame);
       handleDetectedFaces(faces, { width: frame.width, height: frame.height });
 
-      // --- Brightness calculation ---
       try {
         const buffer = frame.toArrayBuffer();
         const data = new Uint8Array(buffer);
         let sum = 0;
         for (let i = 0; i < data.length; i++) sum += data[i];
-        const avgBrightness = sum / data.length;
-        handleBrightness(avgBrightness);
-      } catch (e) {
+        handleBrightness(sum / data.length);
+      } catch {
         handleBrightness(0);
       }
     },
     [detectFaces],
   );
 
-  // --- Ambil foto ---
+  // --- Ambil foto & upload ke backend ---
   const takeFacePhoto = async () => {
     if (!cameraRef.current || !faceBoundsRef.current) return;
     try {
       const photo = await cameraRef.current.takePhoto({ skipMetadata: true });
-      setFacePhoto(photo.path);
+
+      const formData = new FormData();
+      formData.append('facePhoto', {
+        uri: 'file://' + photo.path,
+        type: 'image/jpeg',
+        name: 'face.jpg',
+      });
+
+      const response = await api.post('/upload-face', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      console.log('Upload response:', response.data);
+      // Preview dari backend
+      setFacePhoto(`${api.defaults.baseURL}/${response.data.filePath}`);
     } catch (e) {
-      console.log('Error taking photo:', e);
+      console.log('Error taking or uploading photo:', e);
     }
   };
 
@@ -176,7 +185,7 @@ const FaceScan2 = () => {
 
       {facePhoto && (
         <Image
-          source={{ uri: 'file://' + facePhoto }}
+          source={{ uri: facePhoto }}
           style={{
             width: 150,
             height: 200,

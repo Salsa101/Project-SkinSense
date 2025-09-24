@@ -43,6 +43,7 @@ const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
+const { uploadFaceController } = require("../Controllers/FaceScanController");
 
 //Auth
 router.post("/register", validateRegister, registerController);
@@ -98,6 +99,14 @@ router.get("/news/category/:categoryId", getNewsByCategory);
 //Skin Quiz
 router.get("/question", validateToken, getQuestions);
 router.post("/answer", validateToken, submitAnswers);
+
+//FaceScan
+router.post(
+  "/upload-face",
+  validateToken,
+  upload.single("facePhoto"),
+  uploadFaceController
+);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {
