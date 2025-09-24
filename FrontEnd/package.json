@@ -31,11 +31,15 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-pager-view": "^6.8.1",
+    "react-native-progress": "^5.0.1",
     "react-native-reanimated": "^3.18.0",
     "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.11.1",
-    "react-native-vector-icons": "^10.3.0"
+    "react-native-vector-icons": "^10.3.0",
+    "react-native-vision-camera": "^4.7.2",
+    "react-native-vision-camera-face-detector": "^1.8.9",
+    "react-native-worklets-core": "^1.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

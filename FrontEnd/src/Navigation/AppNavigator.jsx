@@ -20,6 +20,8 @@ import NewsDetail from '../Screens/NewsDetail';
 import BookmarkLists from '../Screens/BookmarkLists';
 import LandingPage from '../Screens/LandingPage';
 import SkinGuide from '../Screens/SkinGuide';
+import FaceScan1 from '../Screens/FaceScan1';
+import FaceScan2 from '../Screens/FaceScan2';
 
 const Stack = createNativeStackNavigator();
 
@@ -138,6 +140,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="SkinGuide"
           component={SkinGuide}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FaceScan1"
+          component={FaceScan1}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FaceScan2"
+          component={FaceScan2}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 
 import api from '../api';
@@ -62,7 +63,13 @@ const SkinQuiz = ({ navigation }) => {
       );
 
       await api.post('/answer', { answers: payload });
-      alert('Jawaban tersimpan!');
+
+      Alert.alert('Sukses', 'Jawaban tersimpan!', [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('FaceScan1'),
+        },
+      ]);
     } catch (err) {
       console.log('Gagal submit:', err);
     }
