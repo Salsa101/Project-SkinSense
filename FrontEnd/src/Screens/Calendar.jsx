@@ -23,6 +23,8 @@ const Calendar = ({ navigation }) => {
   const [morningTasks, setMorningTasks] = useState([]);
   const [nightTasks, setNightTasks] = useState([]);
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   //Handler Back to Home
   useCustomBackHandler(() => {
     navigation.navigate('Home');
@@ -31,8 +33,13 @@ const Calendar = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resMorning = await api.get('/routine-products/view/morning');
-        const resNight = await api.get('/routine-products/view/night');
+        const dateParam = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd
+        const resMorning = await api.get(`/routine-products/view/morning`, {
+          params: { date: dateParam },
+        });
+        const resNight = await api.get(`/routine-products/view/night`, {
+          params: { date: dateParam },
+        });
 
         setMorningTasks(resMorning.data);
         setNightTasks(resNight.data);
@@ -42,7 +49,7 @@ const Calendar = ({ navigation }) => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedDate]);
 
   // Real Time Date
   const getWeekDays = () => {
@@ -66,25 +73,32 @@ const Calendar = ({ navigation }) => {
     });
   };
 
-  const DateItem = ({ day, date, isToday }) => (
-    <View style={[styles.date, isToday && { backgroundColor: '#ED97A0' }]}>
+  const DateItem = ({ day, date, isToday, fullDate, onPress, isSelected }) => (
+    <TouchableOpacity
+      style={[
+        styles.date,
+        isToday && { backgroundColor: '#ED97A0' },
+        isSelected && { backgroundColor: '#FF7F7F' },
+      ]}
+      onPress={() => onPress(fullDate)}
+    >
       <Text
         style={{
-          fontFamily: isToday ? 'Poppins-Bold' : 'Poppins-Medium',
-          color: isToday ? 'white' : 'white',
+          fontFamily: isToday || isSelected ? 'Poppins-Bold' : 'Poppins-Medium',
+          color: 'white',
         }}
       >
         {day}
       </Text>
       <Text
         style={{
-          fontWeight: isToday ? 'Poppins-Bold' : 'Poppins-Medium',
-          color: isToday ? 'white' : 'white',
+          fontWeight: isToday || isSelected ? 'bold' : 'normal',
+          color: 'white',
         }}
       >
         {date}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   const today = new Date();
@@ -282,9 +296,25 @@ const Calendar = ({ navigation }) => {
 
           {/* Date */}
           <View style={styles.dateContainer}>
-            {weekDays.map((d, i) => (
-              <DateItem key={i} day={d.day} date={d.date} isToday={d.isToday} />
-            ))}
+            {weekDays.map((d, i) => {
+              const fullDate = new Date();
+              fullDate.setDate(d.date);
+
+              const isSelected =
+                selectedDate.toDateString() === fullDate.toDateString();
+
+              return (
+                <DateItem
+                  key={i}
+                  day={d.day}
+                  date={d.date}
+                  isToday={d.isToday}
+                  fullDate={fullDate}
+                  onPress={setSelectedDate}
+                  isSelected={isSelected} // kirim info selected
+                />
+              );
+            })}
           </View>
         </View>
 

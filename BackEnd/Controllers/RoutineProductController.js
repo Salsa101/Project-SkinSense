@@ -161,9 +161,7 @@ const toggleDone = async (req, res) => {
         ],
       },
       include: [{ model: Product }],
-      order: [
-        ["productStep", "ASC"],
-      ],
+      order: [["productStep", "ASC"]],
     });
 
     res.json(
@@ -182,8 +180,9 @@ const viewRoutineByTime = async (req, res) => {
   try {
     const userId = req.user.id;
     const { routineName } = req.params;
+    const { date } = req.query; // new
 
-    const today = new Date();
+    const today = date ? new Date(date) : new Date();
     const dayName = today
       .toLocaleString("en-US", { weekday: "long" })
       .toLowerCase();
@@ -214,9 +213,7 @@ const viewRoutineByTime = async (req, res) => {
         ],
       },
       include: [{ model: Product }],
-      order: [
-        ["productStep", "ASC"],
-      ],
+      order: [["productStep", "ASC"]],
     });
 
     const result = products.map((p) => ({
