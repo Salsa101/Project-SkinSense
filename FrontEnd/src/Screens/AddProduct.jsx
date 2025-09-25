@@ -17,9 +17,8 @@ import Icon1 from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
 
 import DropDownPicker from 'react-native-dropdown-picker';
-import DatePicker from 'react-native-date-picker';
 
-import { Picker } from '@react-native-picker/picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { launchImageLibrary } from 'react-native-image-picker';
 
@@ -742,10 +741,9 @@ const AddProduct = ({ navigation }) => {
       </ScrollView>
 
       {/* Date Pickers */}
-      <DatePicker
-        modal
+      <DateTimePickerModal
+        isVisible={showDatePicker}
         mode="date"
-        open={showDatePicker}
         date={customDate || new Date()}
         onConfirm={date => {
           setShowDatePicker(false);
@@ -754,22 +752,23 @@ const AddProduct = ({ navigation }) => {
         onCancel={() => setShowDatePicker(false)}
       />
 
-      <DatePicker
-        modal
+      <DateTimePickerModal
+        isVisible={openDateOpened}
         mode="date"
-        open={openDateOpened}
         date={dateOpened || new Date()}
         onConfirm={selectedDate => {
           setOpenDateOpened(false);
           setDateOpened(selectedDate);
         }}
         onCancel={() => setOpenDateOpened(false)}
+        pickerContainerStyle={{
+          backgroundColor: '#E07C8E',
+        }}
       />
 
-      <DatePicker
-        modal
+      <DateTimePickerModal
+        isVisible={openExpiration}
         mode="date"
-        open={openExpiration}
         date={expirationDate || new Date()}
         onConfirm={selectedDate => {
           setOpenExpiration(false);
@@ -778,10 +777,9 @@ const AddProduct = ({ navigation }) => {
         onCancel={() => setOpenExpiration(false)}
       />
 
-      <DatePicker
-        modal
+      <DateTimePickerModal
+        isVisible={openTime}
         mode="time"
-        open={openTime}
         date={time || new Date()}
         onConfirm={selectedTime => handleSetTime(selectedTime)}
         onCancel={() => setOpenTime(false)}
