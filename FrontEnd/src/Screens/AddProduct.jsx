@@ -20,6 +20,11 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+import {
+  SelectList,
+  MultipleSelectList,
+} from 'react-native-dropdown-select-list';
+
 import { launchImageLibrary } from 'react-native-image-picker';
 
 const AddProduct = ({ navigation }) => {
@@ -27,33 +32,33 @@ const AddProduct = ({ navigation }) => {
   const [openProduct, setOpenProduct] = useState(false);
   const [productValue, setProductValue] = useState(null);
   const [productItems, setProductItems] = useState([
-    { label: 'Cleanser', value: 'cleanser' },
-    { label: 'Toner', value: 'toner' },
-    { label: 'Serum', value: 'serum' },
-    { label: 'Moisturizer', value: 'moisturizer' },
-    { label: 'Mask', value: 'mask' },
+    { key: 'cleanser', value: 'Cleanser' },
+    { key: 'toner', value: 'Toner' },
+    { key: 'serum', value: 'Serum' },
+    { key: 'moisturizer', value: 'Moisturizer' },
+    { key: 'mask', value: 'Mask' },
   ]);
 
   //Routine Type
   const [openRoutine, setOpenRoutine] = useState(false);
   const [routineValue, setRoutineValue] = useState(null);
   const [routineItems, setRoutineItems] = useState([
-    { label: 'Daily', value: 'daily' },
-    { label: 'Weekly', value: 'weekly' },
-    { label: 'Custom', value: 'custom' },
+    { key: 'daily', value: 'Daily' },
+    { key: 'weekly', value: 'Weekly' },
+    { key: 'custom', value: 'Custom' },
   ]);
 
   //Routine Day
   const [openRoutineDay, setOpenRoutineDay] = useState(false);
   const [routineValueDay, setRoutineValueDay] = useState([]);
   const [routineItemsDay, setRoutineItemsDay] = useState([
-    { label: 'Monday', value: 'monday' },
-    { label: 'Tuesday', value: 'tuesday' },
-    { label: 'Wednesday', value: 'Wednesday' },
-    { label: 'Thursday', value: 'thursday' },
-    { label: 'Friday', value: 'friday' },
-    { label: 'Saturday', value: 'saturday' },
-    { label: 'Sunday', value: 'sunday' },
+    { key: 'monday', value: 'Monday' },
+    { key: 'tuesday', value: 'Tuesday' },
+    { key: 'wednesday', value: 'Wednesday' },
+    { key: 'thursday', value: 'Thursday' },
+    { key: 'friday', value: 'Friday' },
+    { key: 'saturday', value: 'Saturday' },
+    { key: 'sunday', value: 'Sunday' },
   ]);
 
   // Custom date
@@ -64,8 +69,8 @@ const AddProduct = ({ navigation }) => {
   const [openTimeDay, setOpenTimeDay] = useState(false);
   const [timeDayValue, setTimeDayValue] = useState(null);
   const [timeDayItems, setTimeDayItems] = useState([
-    { label: 'Morning', value: 'morning' },
-    { label: 'Night', value: 'night' },
+    { key: 'morning', value: 'Morning' },
+    { key: 'night', value: 'Night' },
   ]);
 
   const [openDateOpened, setOpenDateOpened] = useState(false);
@@ -449,68 +454,57 @@ const AddProduct = ({ navigation }) => {
             {/* Product Type */}
             <View style={[styles.form, { zIndex: 100 }]}>
               <Text style={styles.formText}>Product Type</Text>
-              <DropDownPicker
-                open={openProduct}
-                value={productValue}
-                items={productItems}
-                setOpen={setOpenProduct}
-                setValue={setProductValue}
-                setItems={setProductItems}
-                disabled={isVerified}
+              <SelectList
+                setSelected={val => setProductValue(val)}
+                data={productItems}
+                save="key"
                 placeholder="Select product type"
-                placeholderStyle={{
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                  ...(isVerified ? styles.disabledField : {}),
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={[
-                  styles.dropdownPicker,
-                  isVerified && styles.disabledField,
-                ]}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 
             {/* Routine Type */}
             <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Routine Type</Text>
-              <DropDownPicker
-                open={openRoutine}
-                value={routineValue}
-                items={routineItems}
-                setOpen={setOpenRoutine}
-                setValue={handleRoutineChange(setRoutineValue)}
-                setItems={setRoutineItems}
+              <SelectList
+                setSelected={val => setRoutineValue(val)}
+                data={routineItems}
+                save="key"
                 placeholder="Select routine type"
-                placeholderStyle={{
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 
@@ -518,38 +512,34 @@ const AddProduct = ({ navigation }) => {
             {routineValue === 'weekly' && (
               <View style={[styles.form, { zIndex: 98 }]}>
                 <Text style={styles.formText}>Routine Day</Text>
-                <DropDownPicker
-                  multiple={true}
-                  min={0}
-                  max={7}
-                  open={openRoutineDay}
-                  value={routineValueDay}
-                  items={routineItemsDay}
-                  setOpen={setOpenRoutineDay}
-                  setValue={setRoutineValueDay}
-                  setItems={setRoutineItemsDay}
+                <MultipleSelectList
+                  label="Selected Days"
+                  setSelected={val => setRoutineValueDay(val)}
+                  data={routineItemsDay.map(item => ({
+                    key: item.value,
+                    value: item.label || item.value,
+                  }))}
+                  save="key"
                   placeholder="Select days"
-                  placeholderStyle={{
+                  boxStyles={{
+                    ...styles.dropdownPicker,
+                  }}
+                  inputStyles={{
                     color: '#E07C8E',
                     fontFamily: 'Poppins-Medium',
                     fontSize: 12,
                   }}
-                  textStyle={{
-                    fontFamily: 'Poppins-Medium',
+                  dropdownStyles={styles.dropdownStyle}
+                  dropdownTextStyles={{
                     color: '#E07C8E',
+                    fontFamily: 'Poppins-Medium',
                     fontSize: 12,
                   }}
-                  style={styles.dropdownPicker}
-                  dropDownContainerStyle={[
-                    styles.dropdownStyle,
-                    { maxHeight: 800 },
-                  ]}
-                  ArrowDownIconComponent={() => (
+                  arrowicon={
                     <Icon name="chevron-down" size={20} color="#E07C8E" />
-                  )}
-                  ArrowUpIconComponent={() => (
-                    <Icon name="chevron-up" size={20} color="#E07C8E" />
-                  )}
+                  }
+                  searchicon={<Icon name="search" size={16} color="#E07C8E" />}
+                  closeicon={<Icon name="close" size={16} color="#E07C8E" />}
                 />
               </View>
             )}
@@ -584,66 +574,59 @@ const AddProduct = ({ navigation }) => {
             {/* Time of Day */}
             <View style={[styles.form, { zIndex: 96 }]}>
               <Text style={styles.formText}>Time of Day</Text>
-              <DropDownPicker
-                open={openTimeDay}
-                value={timeDayValue}
-                items={timeDayItems}
-                setOpen={setOpenTimeDay}
-                setValue={setTimeDayValue}
-                setItems={setTimeDayItems}
+              <SelectList
+                setSelected={val => setTimeDayValue(val)}
+                data={timeDayItems}
+                save="key"
                 placeholder="Select time of day"
-                placeholderStyle={{
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 
             {/* Is Opened Dropdown */}
             <View style={[styles.form, { zIndex: 95 }]}>
               <Text style={styles.formText}>Product Opened?</Text>
-              <DropDownPicker
-                open={openIsOpened}
-                value={isOpened}
-                items={[
-                  { label: 'Yes', value: 'yes' },
-                  { label: 'No', value: 'no' },
+              <SelectList
+                setSelected={val => setIsOpened(val)}
+                data={[
+                  { key: 'yes', value: 'Yes' },
+                  { key: 'no', value: 'No' },
                 ]}
-                setOpen={setOpenIsOpened}
-                setValue={setIsOpened}
+                save="key"
                 placeholder="Select product status"
-                placeholderStyle={{
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 
