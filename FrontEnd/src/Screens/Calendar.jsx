@@ -89,20 +89,20 @@ const Calendar = ({ navigation }) => {
 
   const today = new Date();
   const monthNames = [
-    'Jan',
-    'Febr',
-    'Mar',
-    'Apr',
+    'January',
+    'February',
+    'March',
+    'April',
     'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
-  const monthYear = `${monthNames[today.getMonth()]}, ${today.getFullYear()}`;
+  const monthYear = `${monthNames[today.getMonth()]}`;
   const weekDays = getWeekDays();
 
   const toggleDone = async (id, type) => {
@@ -190,11 +190,11 @@ const Calendar = ({ navigation }) => {
       style={[styles.card, item.doneStatus && styles.cardDone]}
       onPress={() => toggleDone(item.id, type)}
     >
-      <Text style={styles.time}>
+      {/* <Text style={styles.time}>
         {safeDate(item.reminderTime, true)
           ? format(safeDate(item.reminderTime, true), 'HH:mm')
           : '-'}
-      </Text>
+      </Text> */}
       <View style={styles.infoBox}>
         <Image
           source={
@@ -275,12 +275,9 @@ const Calendar = ({ navigation }) => {
                 fontFamily: 'Poppins-Bold',
               }}
             >
-              Skincare Tracker
+              {monthYear}
             </Text>
-            <View style={styles.monthlyDate}>
-              <Icon name="calendar" size={15} color="#E07C8E" />
-              <Text style={styles.monthYearText}>{monthYear}</Text>
-            </View>
+            <Icon name="calendar" size={20} color="#E07C8E" />
           </View>
 
           {/* Date */}
@@ -341,10 +338,17 @@ const Calendar = ({ navigation }) => {
           </View>
 
           <Text style={styles.title}>{activeTab} Routine</Text>
-          <Text style={styles.progress}>
-            {currentData.filter(task => task.done).length}/{currentData.length}{' '}
-            Completed
-          </Text>
+
+          <View style={styles.progressContainer}>
+            <View style={styles.remindTimeContainer}>
+              <Icon name="clock-o" size={20} color="#E07C8E" />
+              <Text style={styles.remindTime}>07:00 AM</Text>
+            </View>
+            <Text style={styles.progress}>
+              {currentData.filter(task => task.done).length}/
+              {currentData.length} Completed
+            </Text>
+          </View>
 
           {currentData.length === 0 ? (
             <Text
@@ -484,6 +488,11 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: 'center',
   },
+  progressContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   progress: {
     alignSelf: 'flex-end',
     backgroundColor: '#FDE5EB',
@@ -495,10 +504,25 @@ const styles = StyleSheet.create({
     color: '#E06287',
     marginBottom: 15,
   },
+  remindTime: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    color: '#E06287',
+  },
+  remindTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    marginLeft: 10,
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    marginLeft: 10,
   },
   time: {
     marginRight: 8,

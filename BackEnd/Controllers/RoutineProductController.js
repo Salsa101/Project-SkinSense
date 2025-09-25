@@ -162,7 +162,6 @@ const toggleDone = async (req, res) => {
       },
       include: [{ model: Product }],
       order: [
-        ["reminderTime", "ASC"],
         ["productStep", "ASC"],
       ],
     });
@@ -216,7 +215,6 @@ const viewRoutineByTime = async (req, res) => {
       },
       include: [{ model: Product }],
       order: [
-        ["reminderTime", "ASC"],
         ["productStep", "ASC"],
       ],
     });
