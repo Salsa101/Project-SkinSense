@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   iconImage: {
     width: 40,
     height: 40,
-    marginRight: 8,
+    marginRight: 15,
     borderRadius: 20,
   },
   textLeft: { textAlign: 'left' },
