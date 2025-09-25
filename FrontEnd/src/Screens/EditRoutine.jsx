@@ -102,7 +102,7 @@ const EditRoutine = ({ navigation }) => {
         <Image
           source={
             item.Product?.productImage
-              ? { uri: `http://10.0.2.2:3000${item.Product.productImage}` }
+              ? { uri: `${api.defaults.baseURL}${item.Product.productImage}` }
               : require('../../assets/product-placeholder.jpg')
           }
           style={styles.productImage}

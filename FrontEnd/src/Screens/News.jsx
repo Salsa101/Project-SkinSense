@@ -166,7 +166,7 @@ const News = ({ navigation }) => {
                       <Image
                         source={
                           news.newsImage
-                            ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                            ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
                             : require('../../assets/category-admin.jpg')
                         }
                         style={styles.image}
@@ -228,7 +228,7 @@ const News = ({ navigation }) => {
                       <Image
                         source={
                           news.newsImage
-                            ? { uri: `http://10.0.2.2:3000/${news.newsImage}` }
+                            ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
                             : require('../../assets/category-admin.jpg')
                         }
                         style={styles.image}

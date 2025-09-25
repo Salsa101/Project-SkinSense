@@ -106,7 +106,7 @@ const NewsDetail = ({ route, navigation }) => {
 
       {/* Gambar utama */}
       <Image
-        source={{ uri: `http://10.0.2.2:3000/${news.newsImage}` }}
+        source={{ uri: `${api.defaults.baseURL}/${news.newsImage}` }}
         style={styles.mainImage}
       />
 

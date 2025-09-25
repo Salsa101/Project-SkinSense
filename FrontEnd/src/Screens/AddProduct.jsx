@@ -222,7 +222,7 @@ const AddProduct = ({ navigation }) => {
     setProductValue(product.productType);
 
     if (product.productImage) {
-      setImageUri(`http://10.0.2.2:3000${product.productImage}`);
+      setImageUri(`${api.defaults.baseURL}${product.productImage}`);
     } else {
       setImageUri(null);
     }
@@ -452,7 +452,10 @@ const AddProduct = ({ navigation }) => {
             </View>
 
             {/* Product Type */}
-            <View style={[styles.form, { zIndex: 100 }]}>
+            <View
+              style={[styles.form, { zIndex: 100 }]}
+              pointerEvents={isVerified ? 'none' : 'auto'}
+            >
               <Text style={styles.formText}>Product Type</Text>
               <SelectList
                 setSelected={val => setProductValue(val)}
@@ -477,6 +480,7 @@ const AddProduct = ({ navigation }) => {
                 arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
                 }
+                disabled={isVerified}
               />
             </View>
 
