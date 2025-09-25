@@ -59,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: true,
       },
+      isOpened: DataTypes.BOOLEAN,
     },
     {
       sequelize,

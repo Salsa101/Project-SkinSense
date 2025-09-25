@@ -120,10 +120,9 @@ const EditRoutine = ({ navigation }) => {
               : ''}
           </Text>
           <Text style={styles.exp}>
-            Opened at{' '}
             {safeDate(item.dateOpened)
-              ? format(safeDate(item.dateOpened), 'dd MMM yyyy')
-              : '-'}
+              ? `Opened at ${format(safeDate(item.dateOpened), 'dd MMM yyyy')}`
+              : 'Not Yet Opened'}
           </Text>
 
           <Text style={styles.exp}>

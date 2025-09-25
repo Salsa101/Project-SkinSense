@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -87,6 +87,11 @@ const AddProduct = ({ navigation }) => {
 
   const [isVerified, setIsVerified] = useState(false);
 
+  const [openIsOpened, setOpenIsOpened] = useState(null);
+  const [isOpened, setIsOpened] = useState(null);
+
+  const [shelfLifeMonths, setShelfLifeMonths] = useState(0);
+
   // pilih & preview image
   const handleUpload = () => {
     launchImageLibrary({ mediaType: 'photo' }, response => {
@@ -146,11 +151,14 @@ const AddProduct = ({ navigation }) => {
 
       // Data rutinitas
       payload.append('productStep', productStep);
-      payload.append('dateOpened', dateOpened.toISOString().split('T')[0]);
-      payload.append(
-        'expirationDate',
-        expirationDate.toISOString().split('T')[0],
-      );
+      payload.append('isOpened', isOpened);
+      if (isOpened === 'yes' && dateOpened) {
+        payload.append('dateOpened', dateOpened.toISOString());
+        payload.append('expirationDate', expirationDate.toISOString());
+      } else if (isOpened === 'no' && expirationDate) {
+        payload.append('expirationDate', expirationDate.toISOString());
+      }
+
       payload.append('reminderTime', time.toTimeString().split(' ')[0]);
       payload.append('routineType', routineValue);
       payload.append('timeOfDay', timeDayValue);
@@ -219,8 +227,52 @@ const AddProduct = ({ navigation }) => {
     setSearchResults([]);
     setSearchQuery(product.productName);
 
-    setIsVerified(product.isVerified); //isverified
+    setShelfLifeMonths(product.shelf_life_months || 0);
+
+    setIsVerified(product.isVerified);
   };
+
+  const shelfLifeDefaults = {
+    cleanser: 12,
+    sunscreen: 12,
+    toner: 12,
+    serum: 6,
+    moisturizer: 12,
+    mask: 3,
+  };
+
+  const calculateExpiration = (baseDate, months) => {
+    if (!months) return null;
+    const exp = new Date(baseDate);
+    exp.setMonth(exp.getMonth() + months);
+    return exp;
+  };
+
+  useEffect(() => {
+    if (productValue && !selectedProductId) {
+      setShelfLifeMonths(shelfLifeDefaults[productValue] || 6);
+    }
+  }, [productValue, selectedProductId]);
+
+  useEffect(() => {
+    if (!shelfLifeMonths) return;
+
+    if (isOpened === 'yes' && dateOpened) {
+      setExpirationDate(calculateExpiration(dateOpened, shelfLifeMonths));
+    } else if (isOpened === 'no') {
+      setExpirationDate(null);
+    }
+  }, [isOpened, dateOpened, shelfLifeMonths]);
+
+  useEffect(() => {
+    if (isOpened === 'yes') {
+      setDateOpened(null);
+      setExpirationDate(null);
+    } else if (isOpened === 'no') {
+      setDateOpened(null);
+      setExpirationDate(null);
+    }
+  }, [isOpened]);
 
   const validateTime = (time, timeDay) => {
     if (!time) return true;
@@ -562,56 +614,96 @@ const AddProduct = ({ navigation }) => {
               />
             </View>
 
-            {/* Date Opened */}
+            {/* Is Opened Dropdown */}
             <View style={[styles.form, { zIndex: 95 }]}>
-              <Text style={styles.formText}>Date Opened</Text>
-              <View
-                style={[
-                  styles.inputContainer,
-                  { paddingVertical: 13, paddingLeft: 20 },
+              <Text style={styles.formText}>Product Opened?</Text>
+              <DropDownPicker
+                open={openIsOpened}
+                value={isOpened}
+                items={[
+                  { label: 'Yes', value: 'yes' },
+                  { label: 'No', value: 'no' },
                 ]}
-              >
-                <Text style={styles.input}>
-                  {dateOpened
-                    ? dateOpened.toLocaleDateString()
-                    : 'Please select open date'}
-                </Text>
-
-                <TouchableOpacity onPress={() => setOpenDateOpened(true)}>
-                  <Icon
-                    name="calendar"
-                    size={20}
-                    color="#E07C8E"
-                    style={styles.icon}
-                  />
-                </TouchableOpacity>
-              </View>
+                setOpen={setOpenIsOpened}
+                setValue={setIsOpened}
+                placeholder="Select product status"
+                placeholderStyle={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                textStyle={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#E07C8E',
+                  fontSize: 12,
+                }}
+                style={styles.dropdownPicker}
+                dropDownContainerStyle={styles.dropdownStyle}
+                ArrowDownIconComponent={() => (
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
+                )}
+                ArrowUpIconComponent={() => (
+                  <Icon name="chevron-up" size={20} color="#E07C8E" />
+                )}
+              />
             </View>
+
+            {/* Date Opened */}
+            {isOpened === 'yes' && (
+              <View style={[styles.form, { zIndex: 94 }]}>
+                <Text style={styles.formText}>Date Opened</Text>
+                <View
+                  style={[
+                    styles.inputContainer,
+                    { paddingVertical: 13, paddingLeft: 20 },
+                  ]}
+                >
+                  <Text style={styles.input}>
+                    {dateOpened
+                      ? dateOpened.toLocaleDateString()
+                      : 'Please select open date'}
+                  </Text>
+
+                  <TouchableOpacity onPress={() => setOpenDateOpened(true)}>
+                    <Icon
+                      name="calendar"
+                      size={20}
+                      color="#E07C8E"
+                      style={styles.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
 
             {/* Expiration Date */}
             <View style={styles.form}>
               <Text style={styles.formText}>Expiration Date</Text>
-              <View
+              <TouchableOpacity
+                onPress={() => isOpened === 'no' && setOpenExpiration(true)}
+                activeOpacity={isOpened === 'no' ? 0.7 : 1}
                 style={[
                   styles.inputContainer,
                   { paddingVertical: 13, paddingLeft: 20 },
+                  isOpened === 'yes' && styles.disabledField, // disable kalau auto-calculated
                 ]}
+                disabled={isOpened === 'yes'}
               >
                 <Text style={styles.input}>
                   {expirationDate
                     ? expirationDate.toLocaleDateString()
-                    : 'Please select exp date'}
+                    : isOpened === 'no'
+                    ? 'Please select exp date'
+                    : 'Auto calculated'}
                 </Text>
 
-                <TouchableOpacity onPress={() => setOpenExpiration(true)}>
-                  <Icon
-                    name="calendar"
-                    size={20}
-                    color="#E07C8E"
-                    style={styles.icon}
-                  />
-                </TouchableOpacity>
-              </View>
+                <Icon
+                  name="calendar"
+                  size={20}
+                  color={'#E07C8E'}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.form}>

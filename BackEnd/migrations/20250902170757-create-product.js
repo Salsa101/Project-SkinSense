@@ -40,7 +40,10 @@ module.exports = {
       },
       isVerified: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false, // admin yang set true
+        defaultValue: false,
+      },
+      shelf_life_months: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
