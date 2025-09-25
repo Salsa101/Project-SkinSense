@@ -212,17 +212,26 @@ const SkinQuiz = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 20 },
+  container: { flex: 1, backgroundColor: '#FFF9F3', padding: 20 },
   scrollContent: { paddingBottom: 20 },
   header: {
     fontSize: 20,
-    fontWeight: '600',
+    fontFamily: 'Poppins-Bold',
     color: '#F49CA5',
     marginBottom: 10,
   },
-  question: { color: '#F49CA5', marginBottom: 5 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 5 },
-  desc: { color: '#AAA', marginBottom: 20 },
+  question: {
+    color: '#F49CA5',
+    marginBottom: 5,
+    fontFamily: 'Poppins-SemiBold',
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 5,
+    color: '#da8f8fff',
+  },
+  desc: { color: '#7e7e7eff', marginBottom: 20, fontFamily: 'Poppins-Regular' },
   option: {
     flexDirection: 'row',
     padding: 15,
@@ -242,8 +251,12 @@ const styles = StyleSheet.create({
     borderColor: '#DDD',
     marginRight: 15,
   },
-  optionTitle: { fontWeight: '600', marginBottom: 2, marginLeft: 10 },
-  optionDesc: { color: '#4b4b4bff', fontSize: 12, marginLeft: 10 },
+  optionTitle: { fontFamily: 'Poppins-Bold', marginBottom: 2 },
+  optionDesc: {
+    color: '#4b4b4bff',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+  },
   bottomButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',

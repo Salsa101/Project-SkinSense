@@ -130,7 +130,8 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.productTitle}>Product For You</Text>
             <Text style={styles.seeMore}>See more</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.productScrollContainer}>
             {/* Product 1 */}
             <View style={styles.productContainer}>
               <Image
@@ -171,8 +172,9 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </ScrollView>
           <View></View>
-        </View>
+          </View>
 
+        
         {/* Tips Section */}
         <View style={styles.tipsSection}>
           <View style={styles.tipsTitleContainer}>
@@ -198,6 +200,10 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+const stylesProductScrollContainer = {
+  paddingRight: 15,
+  paddingBottom: 20,
+};
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -321,6 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 15,
     marginRight: 15,
+    marginBottom: 20,
   },
   productImage: {
     width: '100%',
