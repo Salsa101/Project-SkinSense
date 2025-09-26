@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 
 import api from '../api';
+import Navbar from '../Components/Navbar';
 
 const Calendar = () => {
   const [selected, setSelected] = useState(
@@ -24,6 +25,7 @@ const Calendar = () => {
   const [nightTasks, setNightTasks] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [active, setActive] = useState('Calendar');
 
   // fetch data berdasarkan tanggal
   useEffect(() => {
@@ -126,7 +128,7 @@ const Calendar = () => {
       showTodayButton
       onDateChanged={date => setSelected(date)}
     >
-      <ScrollView>
+      <ScrollView style={{ marginBottom: 75 }}>
         <ExpandableCalendar
           firstDay={1}
           markedDates={markedDates}
@@ -209,6 +211,19 @@ const Calendar = () => {
           />
         </View>
       </ScrollView>
+
+      {/* Floating Bubble */}
+      <TouchableOpacity
+        style={styles.floatingBubble}
+        onPress={() => navigation.navigate('EditRoutine')}
+      >
+        <Icon name="pencil" size={30} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Navbar */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        <Navbar active={active} onPress={setActive} />
+      </View>
     </CalendarProvider>
   );
 };
