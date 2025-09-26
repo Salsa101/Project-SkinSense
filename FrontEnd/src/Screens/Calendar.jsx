@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   Image,
   ScrollView,
   ActivityIndicator,
@@ -12,11 +11,12 @@ import {
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
+import { intervalToDuration } from 'date-fns';
 
 import api from '../api';
 import Navbar from '../Components/Navbar';
 
-const Calendar = ({navigation}) => {
+const Calendar = ({ navigation }) => {
   const [selected, setSelected] = useState(
     new Date().toISOString().split('T')[0],
   );
@@ -27,7 +27,6 @@ const Calendar = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState('Calendar');
 
-  // fetch data berdasarkan tanggal
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,12 +67,30 @@ const Calendar = ({navigation}) => {
 
   const currentData = activeTab === 'Morning' ? morningTasks : nightTasks;
 
-  // mark selected date
   const markedDates = useMemo(() => {
     return {
       [selected]: { selected: true, selectedColor: '#ff69b4' },
     };
   }, [selected]);
+
+  function safeDate(value, isTimeOnly = false) {
+    if (!value) return null;
+
+    if (isTimeOnly) {
+      return new Date(`1970-01-01T${value}`);
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T00:00:00`);
+    }
+
+    if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+      const [day, month, year] = value.split('-');
+      return new Date(`${year}-${month}-${day}T00:00:00`);
+    }
+
+    return new Date(value);
+  }
 
   const renderCard = (item, type) => (
     <TouchableOpacity
@@ -101,6 +118,42 @@ const Calendar = ({navigation}) => {
           <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
             {item.Product?.productName}
           </Text>
+          {safeDate(item.expirationDate) ? (
+            new Date(item.expirationDate) <= new Date() ? (
+              <Text style={[styles.exp, { color: 'red' }]}>
+                Product Expired!
+              </Text>
+            ) : (
+              (() => {
+                const duration = intervalToDuration({
+                  start: new Date(),
+                  end: safeDate(item.expirationDate),
+                });
+
+                const totalMs =
+                  safeDate(item.expirationDate).getTime() -
+                  new Date().getTime();
+                const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+
+                if (totalDays <= 30) {
+                  return (
+                    <Text style={[styles.exp, { color: '#cf7f24ff' }]}>
+                      Expiring Soon! ({totalDays} d)
+                    </Text>
+                  );
+                }
+
+                const parts = [];
+                if (duration.years) parts.push(`${duration.years} yr`);
+                if (duration.months) parts.push(`${duration.months} mo`);
+                if (duration.days) parts.push(`${duration.days} d`);
+
+                return <Text style={styles.exp}>Exp in {parts.join(' ')}</Text>;
+              })()
+            )
+          ) : (
+            <Text style={styles.exp}>-</Text>
+          )}
         </View>
         <Icon
           name={item.doneStatus ? 'check-circle' : 'circle-o'}
@@ -149,24 +202,7 @@ const Calendar = ({navigation}) => {
           }}
         />
 
-        <View
-          style={{
-            padding: 15,
-            paddingLeft: 7,
-            margin: 16,
-            marginBottom: 20,
-            backgroundColor: '#FFF9F3',
-            borderRadius: 20,
-            shadowColor: '#AB8C8C',
-            shadowOffset: {
-              width: 0,
-              height: 4,
-            },
-            shadowOpacity: 0.5,
-            shadowRadius: 4,
-            elevation: 4,
-          }}
-        >
+        <View style={styles.routineWrapper}>
           {/* Toggle Morning/Night */}
           <View style={styles.toggleWrapper}>
             <TouchableOpacity
@@ -199,16 +235,17 @@ const Calendar = ({navigation}) => {
 
           <Text style={styles.title}>{activeTab} Routine</Text>
 
-          <FlatList
-            data={currentData}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => renderCard(item, activeTab)}
-            ListEmptyComponent={
+          <View>
+            {currentData.length > 0 ? (
+              currentData.map((item, index) => (
+                <View key={index}>{renderCard(item, activeTab)}</View>
+              ))
+            ) : (
               <Text style={{ textAlign: 'center', marginTop: 20 }}>
                 No data available
               </Text>
-            }
-          />
+            )}
+          </View>
         </View>
       </ScrollView>
 
@@ -415,6 +452,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
+  },
+  routineWrapper: {
+    padding: 15,
+    paddingLeft: 7,
+    margin: 16,
+    marginBottom: 20,
+    backgroundColor: '#FFF9F3',
+    borderRadius: 20,
+    shadowColor: '#AB8C8C',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
 });
 

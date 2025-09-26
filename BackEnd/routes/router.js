@@ -39,6 +39,12 @@ const {
   getQuestions,
   submitAnswers,
 } = require("../Controllers/QuizController");
+const {
+  addJournal,
+  getJournalDetail,
+  updateJournal,
+  deleteJournal,
+} = require("../Controllers/JournalController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -107,6 +113,22 @@ router.post(
   upload.single("facePhoto"),
   uploadFaceController
 );
+
+//Journal
+router.post(
+  "/journal/add",
+  validateToken,
+  upload.single("journal_image"),
+  addJournal
+);
+router.get("/journal/view/:id", validateToken, getJournalDetail);
+router.put(
+  "/journal/update/:id",
+  validateToken,
+  upload.single("journal_image"),
+  updateJournal
+);
+router.delete("/journal/delete/:id", validateToken, deleteJournal);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {
