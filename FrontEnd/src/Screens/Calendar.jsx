@@ -71,7 +71,7 @@ const Calendar = ({navigation}) => {
   // mark selected date
   const markedDates = useMemo(() => {
     return {
-      [selected]: { selected: true, selectedColor: '#ff69b4' },
+      [selected]: { selected: true, selectedColor: '#E07C8E' },
     };
   }, [selected]);
 
@@ -134,39 +134,50 @@ const Calendar = ({navigation}) => {
           markedDates={markedDates}
           onDayPress={day => setSelected(day.dateString)}
           theme={{
-            backgroundColor: '#fff0f5',
-            calendarBackground: '#fff0f5',
-            textSectionTitleColor: '#ff69b4',
-            selectedDayBackgroundColor: '#ff69b4',
+            backgroundColor: '#FFF9F3',
+            calendarBackground: '#FFF9F3',
+            textSectionTitleColor: '#E07C8E',
+            selectedDayBackgroundColor: '#E07C8E',
             selectedDayTextColor: '#fff',
-            todayTextColor: '#ff1493',
-            dayTextColor: '#222',
+            todayTextColor: '#E07C8E',
+            dayTextColor: '#915b5bff',
             textDisabledColor: '#ffc0cb',
-            dotColor: '#ff69b4',
+            dotColor: '#E07C8E',
             selectedDotColor: '#fff',
-            arrowColor: '#ff69b4',
-            monthTextColor: '#ff1493',
+            arrowColor: '#E07C8E',
+            monthTextColor: '#E07C8E',
           }}
         />
 
-        <View
-          style={{
-            padding: 15,
-            paddingLeft: 7,
-            margin: 16,
-            marginBottom: 20,
-            backgroundColor: '#FFF9F3',
-            borderRadius: 20,
-            shadowColor: '#AB8C8C',
-            shadowOffset: {
-              width: 0,
-              height: 4,
-            },
-            shadowOpacity: 0.5,
-            shadowRadius: 4,
-            elevation: 4,
-          }}
+        {/* Journal Section */}
+        <View style={styles.journalWrapper}>
+        <View style={styles.journalContainer}>
+        <View style={styles.journalContent}>
+         <View style={styles.journalTextContainer}>
+        <Text style={styles.journalTitle}>Journal</Text>
+        <Text style={styles.journalSubtitle}>
+          Add journal to track your skin progress
+        </Text>
+        <TouchableOpacity 
+          style={styles.journalButton}
+          onPress={() => navigation.navigate('Journal')}
         >
+          <Text style={styles.journalButtonText}>Add today's journal</Text>
+          <Icon name="arrow-right" size={12} color="#fff" style={{marginLeft: 25}} />
+        </TouchableOpacity>
+      </View>
+      <Image
+        source={require('../../assets/journal.png')}
+        style={styles.journalImage}
+        resizeMode="contain"
+      />
+    </View>
+  </View>
+</View>
+
+        
+          {/* Routine Section Container */}
+        <View style={styles.routineContainer}>
           {/* Toggle Morning/Night */}
           <View style={styles.toggleWrapper}>
             <TouchableOpacity
@@ -195,6 +206,7 @@ const Calendar = ({navigation}) => {
                 color={activeTab === 'Night' ? '#E07C8E' : '#DBABB3'}
               />
             </TouchableOpacity>
+          
           </View>
 
           <Text style={styles.title}>{activeTab} Routine</Text>
@@ -204,7 +216,8 @@ const Calendar = ({navigation}) => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => renderCard(item, activeTab)}
             ListEmptyComponent={
-              <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              <Text style={{ textAlign: 'center', 
+              marginTop: 20, fontFamily: 'Poppins-Medium', color: '#B67F89', fontSize: 11 }}>
                 No data available
               </Text>
             }
@@ -290,6 +303,84 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
     width: 40,
+  },
+  // style journal
+  journalWrapper: {
+  paddingHorizontal: 16,
+  marginBottom: 20,
+},
+  journalContainer: {
+    margin: 8,
+    marginTop: 20,
+    backgroundColor: '#FFF9F3',
+    borderRadius: 15,
+    shadowColor: '#AB8C8C',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  journalContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    paddingVertical: 12,
+  },
+  journalTextContainer: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  journalTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+    marginBottom: 4,
+  },
+  journalSubtitle: {
+    fontSize: 11,
+    fontFamily: 'Poppins-Regular',
+    color: '#B67F89',
+    marginBottom: 10,
+    lineHeight: 14,
+  },
+  journalButton: {
+    backgroundColor: '#E07C8E',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+  },
+  journalButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: 'Poppins-Medium',
+  },
+  journalImage: {
+    width: 135,
+    height: 125,
+  },
+  //style routine
+  routineContainer: {
+    padding: 15,
+    paddingLeft: 7,
+    margin: 16,
+    marginTop: 0,
+    marginBottom: 20,
+    backgroundColor: '#FFF9F3',
+    borderRadius: 20,
+    shadowColor: '#AB8C8C',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
   productImage: {
     width: 50,
