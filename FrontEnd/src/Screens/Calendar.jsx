@@ -223,7 +223,7 @@ const Calendar = ({ navigation }) => {
                   style={styles.journalButton}
                 >
                   <View style={styles.journalButtonContent}>
-                    <Text style={styles.journalButtonText}>
+                    <Text style={styles.journalButtonText1}>
                       Add today's journal
                     </Text>
                     <Icon name="long-arrow-right" size={12} color="#fff" />
@@ -238,6 +238,58 @@ const Calendar = ({ navigation }) => {
             />
           </View>
         </View>
+
+        {/* JOURNAL */}
+        <LinearGradient
+          colors={['#FFF9F3', '#F8D3D5', '#EDB3BC', '#E08898']}
+          start={{ x: 0.2, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.journalContainer}
+        >
+          <View style={styles.journalContent}>
+            <Image
+              source={require('../../assets/journal.png')}
+              style={styles.journalImage2}
+              resizeMode="contain"
+            />
+            <View style={styles.journalTextContainer}>
+              <View style={styles.journalButton1}>
+                <View style={styles.journalButtonContent1}>
+                  <Text style={styles.journalButtonText1}>
+                    Tue, 12 Jan 2025
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.journalTitle}>Journal</Text>
+              <Text style={styles.journalSubtitle}>
+                Add journal to track your skin progress
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AddJournal')}
+                activeOpacity={0.8}
+              >
+                {/* Bisa taruh icon atau teks */}
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                backgroundColor: '#FFF9F3',
+                borderRadius: 30,
+                padding: 7,
+                marginLeft: 20,
+                marginRight: 8,
+                shadowColor: 'rgba(95, 52, 52, 1)',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              }}
+            >
+              <Icon name="smile-o" size={25} color="#E07C8E" />
+            </View>
+          </View>
+        </LinearGradient>
 
         {/* Routine Section Container */}
         <View style={styles.routineContainer}>
@@ -368,7 +420,8 @@ const styles = StyleSheet.create({
   },
   // style journal
   journalContainer: {
-    padding: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     paddingLeft: 25,
     margin: 16,
     marginTop: 20,
@@ -430,6 +483,30 @@ const styles = StyleSheet.create({
   journalImage: {
     width: 135,
     height: 100,
+    marginRight: -10,
+  },
+  journalImage2: {
+    width: 135,
+    height: 100,
+    marginLeft: -20,
+  },
+  journalButton1: {
+    backgroundColor: '#E07C8E',
+    paddingVertical: 4,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  journalButtonContent1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  journalButtonText1: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: 'Poppins-Medium',
   },
   //style routine
   routineContainer: {
