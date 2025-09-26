@@ -22,6 +22,7 @@ import LandingPage from '../Screens/LandingPage';
 import SkinGuide from '../Screens/SkinGuide';
 import FaceScan1 from '../Screens/FaceScan1';
 import FaceScan2 from '../Screens/FaceScan2';
+import Testing from '../Screens/Testing';
 
 const Stack = createNativeStackNavigator();
 
@@ -150,6 +151,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="FaceScan2"
           component={FaceScan2}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Testing"
+          component={Testing}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

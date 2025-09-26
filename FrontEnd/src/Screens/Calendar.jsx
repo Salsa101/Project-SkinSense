@@ -1,123 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
+  FlatList,
   Image,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import Navbar from '../Components/Navbar';
+import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 
 import api from '../api';
 
-import { format, intervalToDuration } from 'date-fns';
-
-import { useCustomBackHandler } from '../Handler/CustomBackHandler';
-
-const Calendar = ({ navigation }) => {
-  const [active, setActive] = useState('Calendar');
+const Calendar = () => {
+  const [selected, setSelected] = useState(
+    new Date().toISOString().split('T')[0],
+  );
   const [activeTab, setActiveTab] = useState('Morning');
   const [morningTasks, setMorningTasks] = useState([]);
   const [nightTasks, setNightTasks] = useState([]);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [loading, setLoading] = useState(true);
 
-  //Handler Back to Home
-  useCustomBackHandler(() => {
-    navigation.navigate('Home');
-  });
-
+  // fetch data berdasarkan tanggal
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dateParam = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd
         const resMorning = await api.get(`/routine-products/view/morning`, {
-          params: { date: dateParam },
+          params: { date: selected },
         });
         const resNight = await api.get(`/routine-products/view/night`, {
-          params: { date: dateParam },
+          params: { date: selected },
         });
-
         setMorningTasks(resMorning.data);
         setNightTasks(resNight.data);
-      } catch (error) {
-        console.error('Error fetching routines:', error);
+      } catch (err) {
+        console.error('Fetch error:', err);
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchData();
-  }, [selectedDate]);
-
-  // Real Time Date
-  const getWeekDays = () => {
-    const today = new Date();
-    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-    const currentDay = today.getDay();
-    const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diffToMonday);
-
-    return Array.from({ length: 7 }).map((_, i) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-
-      return {
-        day: dayNames[i],
-        date: date.getDate(),
-        isToday: date.toDateString() === today.toDateString(),
-      };
-    });
-  };
-
-  const DateItem = ({ day, date, isToday, fullDate, onPress, isSelected }) => (
-    <TouchableOpacity
-      style={[
-        styles.date,
-        isToday && { backgroundColor: '#ED97A0' },
-        isSelected && { backgroundColor: '#FF7F7F' },
-      ]}
-      onPress={() => onPress(fullDate)}
-    >
-      <Text
-        style={{
-          fontFamily: isToday || isSelected ? 'Poppins-Bold' : 'Poppins-Medium',
-          color: 'white',
-        }}
-      >
-        {day}
-      </Text>
-      <Text
-        style={{
-          fontWeight: isToday || isSelected ? 'bold' : 'normal',
-          color: 'white',
-        }}
-      >
-        {date}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const today = new Date();
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  const monthYear = `${monthNames[today.getMonth()]}`;
-  const weekDays = getWeekDays();
+  }, [selected]);
 
   const toggleDone = async (id, type) => {
     try {
@@ -130,73 +57,21 @@ const Calendar = ({ navigation }) => {
         done: t.doneStatus,
       }));
 
-      const setter = type === 'Morning' ? setMorningTasks : setNightTasks;
-      setter(updatedTasks);
-    } catch (error) {
-      console.error('Failed to toggle done:', error);
+      if (type === 'Morning') setMorningTasks(updatedTasks);
+      else setNightTasks(updatedTasks);
+    } catch (err) {
+      console.error('Toggle error:', err);
     }
   };
 
   const currentData = activeTab === 'Morning' ? morningTasks : nightTasks;
 
-  const formatDuration = dur => {
-    const parts = [];
-    if (dur.years) parts.push(`${dur.years} yr`);
-    if (dur.months) parts.push(`${dur.months} mo`);
-    if (dur.days) parts.push(`${dur.days} d`);
-    return parts.join(' ');
-  };
-
-  function safeDate(value, isTimeOnly = false) {
-    if (!value) return null;
-
-    if (isTimeOnly) {
-      return new Date(`1970-01-01T${value}`);
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return new Date(`${value}T00:00:00`);
-    }
-
-    if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
-      const [day, month, year] = value.split('-');
-      return new Date(`${year}-${month}-${day}T00:00:00`);
-    }
-
-    return new Date(value);
-  }
-
-  // Function to handle tab change & reset
-  useEffect(() => {
-    const checkTime = async () => {
-      const hour = new Date().getHours();
-      let newTab = hour >= 6 && hour < 18 ? 'Morning' : 'Night';
-      setActiveTab(newTab);
-
-      try {
-        const res = await api.get(
-          `/routine-products/view/${newTab.toLowerCase()}`,
-        );
-        const tasks = res.data.map(t => ({
-          ...t,
-          done: t.done || false,
-        }));
-
-        if (newTab === 'Morning') {
-          setMorningTasks(tasks);
-        } else {
-          setNightTasks(tasks);
-        }
-      } catch (err) {
-        console.error('Failed to fetch tasks:', err);
-      }
+  // mark selected date
+  const markedDates = useMemo(() => {
+    return {
+      [selected]: { selected: true, selectedColor: '#ff69b4' },
     };
-
-    checkTime();
-    const interval = setInterval(checkTime, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
+  }, [selected]);
 
   const renderCard = (item, type) => (
     <TouchableOpacity
@@ -204,11 +79,6 @@ const Calendar = ({ navigation }) => {
       style={[styles.card, item.doneStatus && styles.cardDone]}
       onPress={() => toggleDone(item.id, type)}
     >
-      {/* <Text style={styles.time}>
-        {safeDate(item.reminderTime, true)
-          ? format(safeDate(item.reminderTime, true), 'HH:mm')
-          : '-'}
-      </Text> */}
       <View style={styles.infoBox}>
         <Image
           source={
@@ -229,42 +99,6 @@ const Calendar = ({ navigation }) => {
           <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
             {item.Product?.productName}
           </Text>
-          {safeDate(item.expirationDate) ? (
-            new Date(item.expirationDate) <= new Date() ? (
-              <Text style={[styles.exp, { color: 'red' }]}>
-                Product Expired!
-              </Text>
-            ) : (
-              (() => {
-                const duration = intervalToDuration({
-                  start: new Date(),
-                  end: safeDate(item.expirationDate),
-                });
-
-                const totalMs =
-                  safeDate(item.expirationDate).getTime() -
-                  new Date().getTime();
-                const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
-
-                if (totalDays <= 30) {
-                  return (
-                    <Text style={[styles.exp, { color: '#cf7f24ff' }]}>
-                      Expiring Soon! ({totalDays} d)
-                    </Text>
-                  );
-                }
-
-                const parts = [];
-                if (duration.years) parts.push(`${duration.years} yr`);
-                if (duration.months) parts.push(`${duration.months} mo`);
-                if (duration.days) parts.push(`${duration.days} d`);
-
-                return <Text style={styles.exp}>Exp in {parts.join(' ')}</Text>;
-              })()
-            )
-          ) : (
-            <Text style={styles.exp}>-</Text>
-          )}
         </View>
         <Icon
           name={item.doneStatus ? 'check-circle' : 'circle-o'}
@@ -276,49 +110,43 @@ const Calendar = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center' }}
+        size="large"
+        color="#DE576F"
+      />
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <ScrollView style={{ marginBottom: 75 }}>
-        {/* Header */}
-        <View style={styles.headerContainer}>
-          <View style={styles.headerText}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: '#E07C8E',
-                fontFamily: 'Poppins-Bold',
-              }}
-            >
-              {monthYear}
-            </Text>
-            <Icon name="calendar" size={20} color="#E07C8E" />
-          </View>
+    <CalendarProvider
+      date={selected}
+      showTodayButton
+      onDateChanged={date => setSelected(date)}
+    >
+      <ScrollView>
+        <ExpandableCalendar
+          firstDay={1}
+          markedDates={markedDates}
+          onDayPress={day => setSelected(day.dateString)}
+          theme={{
+            backgroundColor: '#fff0f5',
+            calendarBackground: '#fff0f5',
+            textSectionTitleColor: '#ff69b4',
+            selectedDayBackgroundColor: '#ff69b4',
+            selectedDayTextColor: '#fff',
+            todayTextColor: '#ff1493',
+            dayTextColor: '#222',
+            textDisabledColor: '#ffc0cb',
+            dotColor: '#ff69b4',
+            selectedDotColor: '#fff',
+            arrowColor: '#ff69b4',
+            monthTextColor: '#ff1493',
+          }}
+        />
 
-          {/* Date */}
-          <View style={styles.dateContainer}>
-            {weekDays.map((d, i) => {
-              const fullDate = new Date();
-              fullDate.setDate(d.date);
-
-              const isSelected =
-                selectedDate.toDateString() === fullDate.toDateString();
-
-              return (
-                <DateItem
-                  key={i}
-                  day={d.day}
-                  date={d.date}
-                  isToday={d.isToday}
-                  fullDate={fullDate}
-                  onPress={setSelectedDate}
-                  isSelected={isSelected} // kirim info selected
-                />
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Routine Panel */}
         <View
           style={{
             padding: 15,
@@ -337,7 +165,7 @@ const Calendar = ({ navigation }) => {
             elevation: 4,
           }}
         >
-          {/* Toggle */}
+          {/* Toggle Morning/Night */}
           <View style={styles.toggleWrapper}>
             <TouchableOpacity
               style={[
@@ -369,48 +197,19 @@ const Calendar = ({ navigation }) => {
 
           <Text style={styles.title}>{activeTab} Routine</Text>
 
-          <View style={styles.progressContainer}>
-            <View style={styles.remindTimeContainer}>
-              <Icon name="clock-o" size={20} color="#E07C8E" />
-              <Text style={styles.remindTime}>07:00 AM</Text>
-            </View>
-            <Text style={styles.progress}>
-              {currentData.filter(task => task.done).length}/
-              {currentData.length} Completed
-            </Text>
-          </View>
-
-          {currentData.length === 0 ? (
-            <Text
-              style={{
-                textAlign: 'center',
-                marginVertical: 30,
-                color: '#B67F89',
-                fontFamily: 'Poppins-Medium',
-                fontSize: 11,
-              }}
-            >
-              No data available
-            </Text>
-          ) : (
-            currentData.map(item => renderCard(item, activeTab))
-          )}
+          <FlatList
+            data={currentData}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => renderCard(item, activeTab)}
+            ListEmptyComponent={
+              <Text style={{ textAlign: 'center', marginTop: 20 }}>
+                No data available
+              </Text>
+            }
+          />
         </View>
       </ScrollView>
-
-      {/* Floating Bubble Edit */}
-      <TouchableOpacity
-        style={styles.floatingBubble}
-        onPress={() => navigation.navigate('EditRoutine')}
-      >
-        <Icon name="pencil" size={30} color="#fff" />
-      </TouchableOpacity>
-
-      {/* Navbar */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-        <Navbar active={active} onPress={setActive} />
-      </View>
-    </View>
+    </CalendarProvider>
   );
 };
 

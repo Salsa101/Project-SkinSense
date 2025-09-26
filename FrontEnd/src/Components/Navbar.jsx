@@ -12,7 +12,7 @@ const Navbar = (active, onPress) => {
     { name: 'News', icon: 'lightbulb-outline' },
     { name: 'LandingPage', icon: 'crop-free' },
     { name: 'Calendar', icon: 'calendar-today' },
-    { name: 'Journal', icon: 'menu-book' },
+    { name: 'Testing', icon: 'menu-book' },
   ];
 
   return (
