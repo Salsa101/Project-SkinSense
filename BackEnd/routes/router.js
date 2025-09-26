@@ -44,6 +44,8 @@ const {
   getJournalDetail,
   updateJournal,
   deleteJournal,
+  getJournalByDate,
+  getAllJournal,
 } = require("../Controllers/JournalController");
 const upload = require("../Middlewares/UploadImage");
 
@@ -115,6 +117,8 @@ router.post(
 );
 
 //Journal
+router.get("/journal/view", validateToken, getJournalByDate);
+router.get("/journal/all", validateToken, getAllJournal);
 router.post(
   "/journal/add",
   validateToken,

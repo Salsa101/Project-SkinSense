@@ -29,9 +29,34 @@ const Calendar = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState('Calendar');
 
+  const [journal, setJournal] = useState(null);
+  const [mood, setMood] = useState(null);
+
+  const [allJournals, setAllJournals] = useState([]);
+
+  const moodMap = ['cry', 'sad', 'neutral', 'happy', 'excited'];
+
+  const moodIcons = [
+    { lib: Icon1, name: 'sad-cry' }, // cry
+    { lib: Icon, name: 'frown-o' }, // sad
+    { lib: Icon, name: 'meh-o' }, // neutral
+    { lib: Icon, name: 'smile-o' }, // happy
+    { lib: Icon1, name: 'smile-beam' }, // excited
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const resJournal = await api.get('/journal/view', {
+          params: { date: selected },
+        });
+
+        setJournal(resJournal.data || null);
+
+        if (resJournal.data?.mood) {
+          setMood(resJournal.data.mood);
+        }
+
         const resMorning = await api.get(`/routine-products/view/morning`, {
           params: { date: selected },
         });
@@ -48,6 +73,45 @@ const Calendar = ({ navigation }) => {
     };
     fetchData();
   }, [selected]);
+
+  useEffect(() => {
+    const fetchAllJournals = async () => {
+      try {
+        const res = await api.get('/journal/all'); // endpoint untuk ambil semua journal
+        setAllJournals(res.data || []);
+      } catch (err) {
+        console.error('Fetch journals error:', err);
+      }
+    };
+
+    fetchAllJournals();
+  }, []);
+
+  const markedDates = useMemo(() => {
+    const marks = {};
+
+    allJournals.forEach(journal => {
+      const date = journal.journal_date.split('T')[0];
+      marks[date] = {
+        dots: [{ color: '#E07C8E' }],
+        ...(date === selected && {
+          selected: true,
+          selectedColor: '#E07C8E',
+          selectedTextColor: '#fff',
+        }),
+      };
+    });
+
+    if (!marks[selected]) {
+      marks[selected] = {
+        selected: true,
+        selectedColor: '#E07C8E',
+        selectedTextColor: '#fff',
+      };
+    }
+
+    return marks;
+  }, [allJournals, selected]);
 
   const toggleDone = async (id, type) => {
     try {
@@ -68,12 +132,6 @@ const Calendar = ({ navigation }) => {
   };
 
   const currentData = activeTab === 'Morning' ? morningTasks : nightTasks;
-
-  const markedDates = useMemo(() => {
-    return {
-      [selected]: { selected: true, selectedColor: '#E07C8E' },
-    };
-  }, [selected]);
 
   function safeDate(value, isTimeOnly = false) {
     if (!value) return null;
@@ -187,6 +245,7 @@ const Calendar = ({ navigation }) => {
         <ExpandableCalendar
           firstDay={1}
           markedDates={markedDates}
+          markingType="multi-dot"
           onDayPress={day => setSelected(day.dateString)}
           theme={{
             backgroundColor: '#FFF9F3',
@@ -204,92 +263,123 @@ const Calendar = ({ navigation }) => {
           }}
         />
 
-        {/* Journal Section */}
-        <View style={styles.journalContainer}>
-          <View style={styles.journalContent}>
-            <View style={styles.journalTextContainer}>
-              <Text style={styles.journalTitle}>Journal</Text>
-              <Text style={styles.journalSubtitle}>
-                Add journal to track your skin progress
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('AddJournal')}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={['#F8D3D4', '#ED97A0']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.journalButton}
+        {/* Journal Section OR JOURNAL */}
+        {!journal ? (
+          // Journal Section kalau BELUM ADA journal
+          <View style={styles.journalContainer}>
+            <View style={styles.journalContent}>
+              <View style={styles.journalTextContainer}>
+                <Text style={styles.journalTitle}>Journal</Text>
+                <Text style={styles.journalSubtitle}>
+                  Add journal to track your skin progress
+                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('AddJournal', { date: selected })
+                  }
+                  activeOpacity={0.8}
                 >
-                  <View style={styles.journalButtonContent}>
-                    <Text style={styles.journalButtonText1}>
-                      Add today's journal
-                    </Text>
-                    <Icon name="long-arrow-right" size={12} color="#fff" />
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
+                  <LinearGradient
+                    colors={['#F8D3D4', '#ED97A0']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.journalButton}
+                  >
+                    <View style={styles.journalButtonContent}>
+                      <Text style={styles.journalButtonText1}>
+                        Add today's journal
+                      </Text>
+                      <Icon name="long-arrow-right" size={12} color="#fff" />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+              <Image
+                source={require('../../assets/journal.png')}
+                style={styles.journalImage}
+                resizeMode="contain"
+              />
             </View>
-            <Image
-              source={require('../../assets/journal.png')}
-              style={styles.journalImage}
-              resizeMode="contain"
-            />
           </View>
-        </View>
+        ) : (
+          // JOURNAL kalau SUDAH ADA journal
+          <TouchableOpacity>
+            <LinearGradient
+              colors={['#FFF9F3', '#F8D3D5', '#EDB3BC', '#E08898']}
+              start={{ x: 0.2, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.journalContainer}
+            >
+              <View style={styles.journalContent}>
+                <Image
+                  source={
+                    journal?.journal_image
+                      ? {
+                          uri: `${api.defaults.baseURL}${journal.journal_image}`,
+                        }
+                      : require('../../assets/journal.png')
+                  }
+                  style={styles.journalImage2}
+                  resizeMode="contain"
+                />
 
-        {/* JOURNAL */}
-        <LinearGradient
-          colors={['#FFF9F3', '#F8D3D5', '#EDB3BC', '#E08898']}
-          start={{ x: 0.2, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.journalContainer}
-        >
-          <View style={styles.journalContent}>
-            <Image
-              source={require('../../assets/journal.png')}
-              style={styles.journalImage2}
-              resizeMode="contain"
-            />
-            <View style={styles.journalTextContainer}>
-              <View style={styles.journalButton1}>
-                <View style={styles.journalButtonContent1}>
-                  <Text style={styles.journalButtonText1}>
-                    Tue, 12 Jan 2025
+                <View style={styles.journalTextContainer}>
+                  <View style={styles.journalButton1}>
+                    <View style={styles.journalButtonContent1}>
+                      <Text style={styles.journalButtonText1}>
+                        {new Date(journal.journal_date).toDateString()}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={styles.journalTitle}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {journal.title}
+                  </Text>
+
+                  <Text
+                    style={styles.journalSubtitle}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {journal.description}
                   </Text>
                 </View>
-              </View>
-              <Text style={styles.journalTitle}>Journal</Text>
-              <Text style={styles.journalSubtitle}>
-                Add journal to track your skin progress
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('AddJournal')}
-                activeOpacity={0.8}
-              >
-                {/* Bisa taruh icon atau teks */}
-              </TouchableOpacity>
-            </View>
 
-            <View
-              style={{
-                backgroundColor: '#FFF9F3',
-                borderRadius: 30,
-                padding: 7,
-                marginLeft: 20,
-                marginRight: 8,
-                shadowColor: 'rgba(95, 52, 52, 1)',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-              }}
-            >
-              <Icon name="smile-o" size={25} color="#E07C8E" />
-            </View>
-          </View>
-        </LinearGradient>
+                <View
+                  style={{
+                    backgroundColor: '#FFF9F3',
+                    borderRadius: 30,
+                    padding: 7,
+                    marginLeft: 20,
+                    marginRight: 8,
+                    shadowColor: 'rgba(95, 52, 52, 1)',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                  }}
+                >
+                  {journal?.mood &&
+                    (() => {
+                      const moodValue = journal.mood;
+                      const moodIndex = moodMap.indexOf(moodValue);
+                      if (moodIndex !== -1) {
+                        const IconLib = moodIcons[moodIndex].lib;
+                        const iconName = moodIcons[moodIndex].name;
+                        return (
+                          <IconLib name={iconName} size={30} color="#ff69b4" />
+                        );
+                      }
+                      return null;
+                    })()}
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
 
         {/* Routine Section Container */}
         <View style={styles.routineContainer}>

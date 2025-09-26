@@ -24,6 +24,56 @@ const addJournal = async (req, res) => {
   }
 };
 
+const getJournalByDate = async (req, res) => {
+  try {
+    const userId = req.user.id; // dari validateToken
+    const { date } = req.query; // format: 'YYYY-MM-DD'
+
+    if (!date) {
+      return res.status(400).json({ message: "Date is required" });
+    }
+
+    const journal = await Journal.findOne({
+      where: {
+        userId,
+        journal_date: date, // sesuaikan nama field di database
+      },
+    });
+
+    if (!journal) {
+      return res.json(null); // kalau ga ada journal
+    }
+
+    res.json(journal);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAllJournal = async (req, res) => {
+  try {
+    const userId = req.user.id; // ambil dari token biar cuma journal user itu aja
+    const journals = await Journal.findAll({
+      where: { userId: userId },
+      attributes: [
+        "id",
+        "title",
+        "description",
+        "journal_image",
+        "mood",
+        "journal_date",
+      ],
+      order: [["journal_date", "DESC"]],
+    });
+
+    res.json(journals);
+  } catch (error) {
+    console.error("Error fetching journals:", error);
+    res.status(500).json({ message: "Failed to fetch journals" });
+  }
+};
+
 // 2. Get journal detail by id
 const getJournalDetail = async (req, res) => {
   try {
@@ -103,4 +153,6 @@ module.exports = {
   getJournalDetail,
   updateJournal,
   deleteJournal,
+  getJournalByDate,
+  getAllJournal,
 };

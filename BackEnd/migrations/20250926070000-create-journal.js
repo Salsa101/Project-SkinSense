@@ -32,7 +32,7 @@ module.exports = {
         allowNull: true,
       },
       mood: {
-        type: Sequelize.ENUM("angry", "sad", "neutral", "happy", "excited"),
+        type: Sequelize.ENUM("cry", "sad", "neutral", "happy", "excited"),
         allowNull: false,
       },
       journal_date: {

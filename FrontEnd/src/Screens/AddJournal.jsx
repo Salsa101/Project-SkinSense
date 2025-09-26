@@ -12,11 +12,20 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import { launchImageLibrary } from 'react-native-image-picker';
 
-const AddJournal = () => {
+import api from '../api';
+
+const AddJournal = ({ navigation, route }) => {
   const [title, setTitle] = useState('');
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState(null);
   const [image, setImage] = useState(null);
+
+  const { date } = route.params || {};
+  const [journalDate, setJournalDate] = useState(
+    date || new Date().toISOString().split('T')[0],
+  );
+
+  const moodMap = ['cry', 'sad', 'neutral', 'happy', 'excited'];
 
   const pickImage = () => {
     launchImageLibrary(
@@ -36,13 +45,52 @@ const AddJournal = () => {
     );
   };
 
-  const handleSave = () => {
-    console.log({
-      title,
-      entry,
-      mood,
-      image,
-    });
+  const handleSave = async () => {
+    if (!title || !entry) {
+      alert('Please fill in title and entry!');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', entry);
+    formData.append('mood', moodMap[mood]);
+    formData.append('journal_date', journalDate);
+
+    if (image) {
+      const uriParts = image.split('/');
+      const fileName = uriParts[uriParts.length - 1];
+      const fileType = fileName.split('.').pop();
+
+      formData.append('journal_image', {
+        uri: image,
+        name: fileName,
+        type: `image/${fileType}`,
+      });
+    }
+
+    try {
+      const response = await api.post('/journal/add', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: 'Bearer YOUR_TOKEN_IF_NEEDED',
+        },
+      });
+
+      if (response.status === 201) {
+        alert('Journal added successfully!');
+        setTitle('');
+        setEntry('');
+        setMood(null);
+        setImage(null);
+        navigation.navigate('Calendar');
+      } else {
+        alert('Failed to add journal: ' + response.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error adding journal: ' + err.message);
+    }
   };
 
   return (

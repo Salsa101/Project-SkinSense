@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       mood: {
-        type: DataTypes.ENUM("angry", "sad", "neutral", "happy", "excited"),
+        type: DataTypes.ENUM("cry", "sad", "neutral", "happy", "excited"),
         allowNull: false,
       },
       journal_date: {
