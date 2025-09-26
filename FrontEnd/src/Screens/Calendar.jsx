@@ -16,7 +16,7 @@ import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import api from '../api';
 import Navbar from '../Components/Navbar';
 
-const Calendar = () => {
+const Calendar = ({navigation}) => {
   const [selected, setSelected] = useState(
     new Date().toISOString().split('T')[0],
   );
