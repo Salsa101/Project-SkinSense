@@ -13,6 +13,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import { intervalToDuration } from 'date-fns';
 
+import LinearGradient from 'react-native-linear-gradient';
+
 import api from '../api';
 import Navbar from '../Components/Navbar';
 
@@ -211,18 +213,22 @@ const Calendar = ({ navigation }) => {
                 Add journal to track your skin progress
               </Text>
               <TouchableOpacity
-                style={styles.journalButton}
                 onPress={() => navigation.navigate('Testing')}
+                activeOpacity={0.8}
               >
-                <Text style={styles.journalButtonText}>
-                  Add today's journal
-                </Text>
-                <Icon
-                  name="arrow-right"
-                  size={12}
-                  color="#fff"
-                  style={{ marginLeft: 25 }}
-                />
+                <LinearGradient
+                  colors={['#F8D3D4', '#ED97A0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.journalButton}
+                >
+                  <View style={styles.journalButtonContent}>
+                    <Text style={styles.journalButtonText}>
+                      Add today's journal
+                    </Text>
+                    <Icon name="long-arrow-right" size={12} color="#fff" />
+                  </View>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
             <Image
@@ -363,7 +369,7 @@ const styles = StyleSheet.create({
   // style journal
   journalContainer: {
     padding: 15,
-    paddingLeft: 7,
+    paddingLeft: 25,
     margin: 16,
     marginTop: 20,
     marginBottom: 20,
@@ -382,15 +388,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 15,
     paddingVertical: 12,
   },
   journalTextContainer: {
     flex: 1,
-    paddingRight: 10,
     justifyContent: 'space-between',
   },
-
   journalTitle: {
     fontSize: 16,
     fontFamily: 'Poppins-Bold',
@@ -407,11 +410,17 @@ const styles = StyleSheet.create({
   journalButton: {
     backgroundColor: '#E07C8E',
     paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 15,
     borderRadius: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  journalButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
   },
   journalButtonText: {
     color: '#fff',
