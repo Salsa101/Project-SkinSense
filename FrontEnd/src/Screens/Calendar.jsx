@@ -22,7 +22,14 @@ const Calendar = ({ navigation }) => {
   const [selected, setSelected] = useState(
     new Date().toISOString().split('T')[0],
   );
-  const [activeTab, setActiveTab] = useState('Morning');
+
+  const initialTab = (() => {
+    const hours = new Date().getHours();
+    return hours >= 6 && hours < 18 ? 'Morning' : 'Night';
+  })();
+
+  const [activeTab, setActiveTab] = useState(initialTab);
+
   const [morningTasks, setMorningTasks] = useState([]);
   const [nightTasks, setNightTasks] = useState([]);
 
@@ -75,17 +82,19 @@ const Calendar = ({ navigation }) => {
   }, [selected]);
 
   useEffect(() => {
-    const fetchAllJournals = async () => {
+    const fetchJournalsByMonth = async () => {
       try {
-        const res = await api.get('/journal/all'); // endpoint untuk ambil semua journal
+        const res = await api.get('/journal/month', {
+          params: { month: selected.slice(0, 7) }, // "YYYY-MM"
+        });
         setAllJournals(res.data || []);
       } catch (err) {
         console.error('Fetch journals error:', err);
       }
     };
 
-    fetchAllJournals();
-  }, []);
+    fetchJournalsByMonth();
+  }, [selected]);
 
   const markedDates = useMemo(() => {
     const marks = {};
@@ -263,9 +272,9 @@ const Calendar = ({ navigation }) => {
           }}
         />
 
-        {/* Journal Section OR JOURNAL */}
+        {/* Journal Section */}
         {!journal ? (
-          // Journal Section kalau BELUM ADA journal
+          // Journal Null
           <View style={styles.journalContainer}>
             <View style={styles.journalContent}>
               <View style={styles.journalTextContainer}>
@@ -302,7 +311,7 @@ const Calendar = ({ navigation }) => {
             </View>
           </View>
         ) : (
-          // JOURNAL kalau SUDAH ADA journal
+          // JOURNAL VIEW
           <TouchableOpacity>
             <LinearGradient
               colors={['#FFF9F3', '#F8D3D5', '#EDB3BC', '#E08898']}
@@ -414,6 +423,17 @@ const Calendar = ({ navigation }) => {
           </View>
 
           <Text style={styles.title}>{activeTab} Routine</Text>
+
+          <View style={styles.progressContainer}>
+            <View style={styles.remindTimeContainer}>
+              <Icon name="clock-o" size={20} color="#E07C8E" />
+              <Text style={styles.remindTime}>07:00 AM</Text>
+            </View>
+            <Text style={styles.progress}>
+              {currentData.filter(task => task.done).length}/
+              {currentData.length} Completed
+            </Text>
+          </View>
 
           <View>
             {currentData.length > 0 ? (

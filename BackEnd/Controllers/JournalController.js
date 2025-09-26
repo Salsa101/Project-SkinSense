@@ -1,4 +1,5 @@
 const { Journal } = require("../models");
+const { Op } = require("sequelize");
 
 // 1. Add new journal
 const addJournal = async (req, res) => {
@@ -51,11 +52,25 @@ const getJournalByDate = async (req, res) => {
   }
 };
 
-const getAllJournal = async (req, res) => {
+const getJournalsByMonth = async (req, res) => {
   try {
-    const userId = req.user.id; // ambil dari token biar cuma journal user itu aja
+    const userId = req.user.id;
+    const { month } = req.query; // "YYYY-MM"
+
+    if (!month) {
+      return res.status(400).json({ message: "Month is required (YYYY-MM)" });
+    }
+
     const journals = await Journal.findAll({
-      where: { userId: userId },
+      where: {
+        userId,
+        journal_date: {
+          [Op.between]: [
+            new Date(`${month}-01`), // awal bulan
+            new Date(`${month}-31`), // akhir bulan (cukup 31, Date handle sendiri)
+          ],
+        },
+      },
       attributes: [
         "id",
         "title",
@@ -69,7 +84,7 @@ const getAllJournal = async (req, res) => {
 
     res.json(journals);
   } catch (error) {
-    console.error("Error fetching journals:", error);
+    console.error("Error fetching journals by month:", error);
     res.status(500).json({ message: "Failed to fetch journals" });
   }
 };
@@ -154,5 +169,5 @@ module.exports = {
   updateJournal,
   deleteJournal,
   getJournalByDate,
-  getAllJournal,
+  getJournalsByMonth,
 };
