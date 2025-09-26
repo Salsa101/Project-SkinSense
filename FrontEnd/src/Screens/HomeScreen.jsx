@@ -106,6 +106,7 @@ const HomeScreen = ({ navigation }) => {
           <Icon
             name="arrow-right"
             size={15}
+            marginRight={10}
             color="#DE576F"
             style={styles.compareIcon}
           />
@@ -127,7 +128,7 @@ const HomeScreen = ({ navigation }) => {
         {/* Product Section */}
         <View style={styles.productSection}>
           <View style={styles.productTitleContainer}>
-            <Text style={styles.productTitle}>Product For You</Text>
+            <Text style={styles.productTitle}>Products For You</Text>
             <Text style={styles.seeMore}>See more</Text>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}
@@ -224,10 +225,15 @@ const styles = StyleSheet.create({
   },
   faceImage: {
     display: 'flex',
+    marginTop: 2,
+    marginLeft: 9,
   },
   reminderContainer: {
     display: 'flex',
     backgroundColor: '#FFF0F3',
+    marginRight: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
     borderRadius: 17,
     boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
   },
@@ -284,7 +290,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
     marginBottom: 10,
     color: '#DE576F',
-    fontSize: 16,
+    fontSize: 19,
   },
   ingredientsContainer: {
     display: 'flex',
@@ -311,7 +317,7 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontFamily: 'Poppins-Bold',
-    fontSize: 18,
+    fontSize: 19,
     color: '#DE576F',
   },
   seeMore: {
@@ -375,7 +381,7 @@ const styles = StyleSheet.create({
   },
   tipsTitle: {
     fontFamily: 'Poppins-Bold',
-    fontSize: 18,
+    fontSize: 19,
     color: '#DE576F',
   },
   tipsName: {
@@ -402,9 +408,10 @@ const styles = StyleSheet.create({
     color: '#DE576F',
   },
   username: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: 'Poppins-Bold',
     color: '#DE576F',
+    paddingRight: 10,
   },
   skintypetext: {
     marginTop: 0,
