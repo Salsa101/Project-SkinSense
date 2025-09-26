@@ -213,7 +213,7 @@ const Calendar = ({ navigation }) => {
                 Add journal to track your skin progress
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Testing')}
+                onPress={() => navigation.navigate('AddJournal')}
                 activeOpacity={0.8}
               >
                 <LinearGradient

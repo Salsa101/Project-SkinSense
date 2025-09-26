@@ -189,8 +189,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#ff69b4',
-    borderRadius: 30,
-    padding: 10,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 18,
   },
   moodActive: {
     backgroundColor: '#ff69b4',
