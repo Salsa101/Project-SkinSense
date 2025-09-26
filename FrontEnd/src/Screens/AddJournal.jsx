@@ -85,7 +85,7 @@ const AddJournal = () => {
           >
             <Icon1
               name="sad-cry"
-              size={30}
+              size={28}
               color={mood === 0 ? '#fff' : '#ff69b4'}
             />
           </TouchableOpacity>
@@ -129,7 +129,7 @@ const AddJournal = () => {
           >
             <Icon1
               name="smile-beam"
-              size={30}
+              size={28}
               color={mood === 4 ? '#fff' : '#ff69b4'}
             />
           </TouchableOpacity>

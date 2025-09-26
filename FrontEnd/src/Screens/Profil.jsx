@@ -12,11 +12,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import { launchImageLibrary } from 'react-native-image-picker';
 
+import Navbar from '../Components/Navbar';
+
 const Testing = () => {
   const [title, setTitle] = useState('');
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState(null);
   const [image, setImage] = useState(null);
+
+  const [active, setActive] = useState('Profil');
 
   const pickImage = () => {
     launchImageLibrary(
@@ -139,6 +143,11 @@ const Testing = () => {
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
         <Text style={styles.saveText}>SAVE</Text>
       </TouchableOpacity>
+
+      {/* Navbar */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        <Navbar active={active} onPress={setActive} />
+      </View>
     </View>
   );
 };

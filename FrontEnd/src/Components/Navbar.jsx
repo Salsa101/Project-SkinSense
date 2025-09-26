@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon1 from 'react-native-vector-icons/FontAwesome6';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 const Navbar = (active, onPress) => {
@@ -8,11 +9,11 @@ const Navbar = (active, onPress) => {
   const route = useRoute();
 
   const items = [
-    { name: 'Home', icon: 'home' },
-    { name: 'News', icon: 'lightbulb-outline' },
-    { name: 'LandingPage', icon: 'crop-free' },
-    { name: 'Calendar', icon: 'calendar-today' },
-    { name: 'Testing', icon: 'menu-book' },
+    { name: 'Home', icon: 'home', type: 'Material' },
+    { name: 'News', icon: 'lightbulb-outline', type: 'Material' },
+    { name: 'LandingPage', icon: 'crop-free', type: 'Material' },
+    { name: 'Calendar', icon: 'calendar-today', type: 'Material' },
+    { name: 'Profil', icon: 'circle-user', type: 'FontAwesome6' },
   ];
 
   return (
@@ -33,11 +34,20 @@ const Navbar = (active, onPress) => {
               </View>
             ) : (
               <>
-                <Icon
-                  name={item.icon}
-                  size={28}
-                  color={isActive ? '#a05c5c' : '#aaa'}
-                />
+                {item.type === 'FontAwesome6' ? (
+                  <Icon1
+                    name={item.icon}
+                    size={28}
+                    color={isActive ? '#a05c5c' : '#aaa'}
+                  />
+                ) : (
+                  <Icon
+                    name={item.icon}
+                    size={28}
+                    color={isActive ? '#a05c5c' : '#aaa'}
+                  />
+                )}
+
                 <Text style={[styles.label, isActive && styles.activeLabel]}>
                   {item.name}
                 </Text>
