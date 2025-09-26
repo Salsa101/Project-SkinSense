@@ -123,7 +123,7 @@ const News = ({ navigation }) => {
               style={styles.bookmarkButton}
               onPress={() => navigation.navigate('BookmarkLists')}
             >
-              <Icon name="star" size={20} color="#fff" />
+              <Icon name="bookmark" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
 
@@ -274,7 +274,7 @@ const News = ({ navigation }) => {
           {newsList.filter(n => n.sourceType === 'skinsense').length === 0 &&
             newsList.filter(n => n.sourceType === 'others').length === 0 && (
               <Text
-                style={{ textAlign: 'center', marginTop: 20, color: '#555' }}
+                style={{ textAlign: 'center', marginTop: 20, color: '#B67F89', fontFamily: 'Poppins-Medium', fontSize: 12 }}
               >
                 No news on the list
               </Text>
