@@ -481,7 +481,7 @@ const Calendar = ({ navigation }) => {
                       ),
                       'HH:mm',
                     )
-                  : '--:--'}
+                  : 'Reminder'}
               </Text>
             </View>
             <Text style={styles.progress}>
