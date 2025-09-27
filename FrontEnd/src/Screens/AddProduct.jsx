@@ -462,6 +462,11 @@ const AddProduct = ({ navigation }) => {
                 data={productItems}
                 save="key"
                 placeholder="Select product type"
+                defaultOption={
+                  productValue
+                    ? productItems.find(item => item.key === productValue)
+                    : null
+                }
                 boxStyles={{
                   ...styles.dropdownPicker,
                   ...(isVerified ? styles.disabledField : {}),
