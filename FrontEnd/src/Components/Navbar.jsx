@@ -13,7 +13,7 @@ const Navbar = (active, onPress) => {
     { name: 'News', icon: 'lightbulb-outline', type: 'Material' },
     { name: 'LandingPage', icon: 'crop-free', type: 'Material' },
     { name: 'Calendar', icon: 'calendar-today', type: 'Material' },
-    { name: 'Profil', icon: 'circle-user', type: 'FontAwesome6' },
+    { name: 'Profile', icon: 'circle-user', type: 'FontAwesome6' },
   ];
 
   return (

@@ -7,28 +7,36 @@ const addJournal = async (req, res) => {
     const { title, description, mood, journal_date } = req.body;
     const userId = req.user.id;
 
+    const imageUrl = req.file
+      ? `/uploads/${req.file.filename}`
+      : req.body.journal_image || null;
+
     const journal = await Journal.create({
       title,
       description,
-      journal_image: req.file ? req.file.filename : null,
+      journal_image: imageUrl,
       mood,
       journal_date,
       userId,
     });
 
-    res.status(201).json({ message: "Journal created successfully", journal });
+    res.status(201).json({
+      message: "Journal created successfully",
+      journal,
+    });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ message: "Failed to create journal", error: err.message });
+    res.status(500).json({
+      message: "Failed to create journal",
+      error: err.message,
+    });
   }
 };
 
 const getJournalByDate = async (req, res) => {
   try {
-    const userId = req.user.id; // dari validateToken
-    const { date } = req.query; // format: 'YYYY-MM-DD'
+    const userId = req.user.id;
+    const { date } = req.query;
 
     if (!date) {
       return res.status(400).json({ message: "Date is required" });
@@ -37,12 +45,12 @@ const getJournalByDate = async (req, res) => {
     const journal = await Journal.findOne({
       where: {
         userId,
-        journal_date: date, // sesuaikan nama field di database
+        journal_date: date,
       },
     });
 
     if (!journal) {
-      return res.json(null); // kalau ga ada journal
+      return res.json(null);
     }
 
     res.json(journal);
@@ -55,7 +63,7 @@ const getJournalByDate = async (req, res) => {
 const getJournalsByMonth = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { month } = req.query; // "YYYY-MM"
+    const { month } = req.query;
 
     if (!month) {
       return res.status(400).json({ message: "Month is required (YYYY-MM)" });
@@ -65,10 +73,7 @@ const getJournalsByMonth = async (req, res) => {
       where: {
         userId,
         journal_date: {
-          [Op.between]: [
-            new Date(`${month}-01`), // awal bulan
-            new Date(`${month}-31`), // akhir bulan (cukup 31, Date handle sendiri)
-          ],
+          [Op.between]: [new Date(`${month}-01`), new Date(`${month}-31`)],
         },
       },
       attributes: [

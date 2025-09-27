@@ -18,7 +18,18 @@ import LinearGradient from 'react-native-linear-gradient';
 import api from '../api';
 import Navbar from '../Components/Navbar';
 
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
+
+import { Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+
 const Calendar = ({ navigation }) => {
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Home');
+  });
+
   const [selected, setSelected] = useState(
     new Date().toISOString().split('T')[0],
   );
@@ -312,7 +323,11 @@ const Calendar = ({ navigation }) => {
           </View>
         ) : (
           // JOURNAL VIEW
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('JournalDetail', { id: journal.id })
+            }
+          >
             <LinearGradient
               colors={['#FFF9F3', '#F8D3D5', '#EDB3BC', '#E08898']}
               start={{ x: 0.2, y: 0 }}
@@ -329,7 +344,7 @@ const Calendar = ({ navigation }) => {
                       : require('../../assets/journal.png')
                   }
                   style={styles.journalImage2}
-                  resizeMode="contain"
+                  resizeMode="cover"
                 />
 
                 <View style={styles.journalTextContainer}>
@@ -596,9 +611,11 @@ const styles = StyleSheet.create({
     marginRight: -10,
   },
   journalImage2: {
-    width: 135,
-    height: 100,
-    marginLeft: -20,
+    width: width * 0.25,
+    height: width * 0.25,
+    borderRadius: 10,
+    marginLeft: -5,
+    marginRight: 10,
   },
   journalButton1: {
     backgroundColor: '#E07C8E',

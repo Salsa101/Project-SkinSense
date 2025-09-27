@@ -13,9 +13,16 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Components/Navbar';
 import api from '../api';
 
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
+
 import { useFocusEffect } from '@react-navigation/native';
 
 const News = ({ navigation }) => {
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Home');
+  });
+
   const [active, setActive] = useState('News');
   const [bookmarked, setBookmarked] = useState({});
   const [newsList, setNewsList] = useState([]);
@@ -166,7 +173,9 @@ const News = ({ navigation }) => {
                       <Image
                         source={
                           news.newsImage
-                            ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
+                            ? {
+                                uri: `${api.defaults.baseURL}/${news.newsImage}`,
+                              }
                             : require('../../assets/category-admin.jpg')
                         }
                         style={styles.image}
@@ -228,7 +237,9 @@ const News = ({ navigation }) => {
                       <Image
                         source={
                           news.newsImage
-                            ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
+                            ? {
+                                uri: `${api.defaults.baseURL}/${news.newsImage}`,
+                              }
                             : require('../../assets/category-admin.jpg')
                         }
                         style={styles.image}
@@ -274,7 +285,13 @@ const News = ({ navigation }) => {
           {newsList.filter(n => n.sourceType === 'skinsense').length === 0 &&
             newsList.filter(n => n.sourceType === 'others').length === 0 && (
               <Text
-                style={{ textAlign: 'center', marginTop: 20, color: '#B67F89', fontFamily: 'Poppins-Medium', fontSize: 12 }}
+                style={{
+                  textAlign: 'center',
+                  marginTop: 20,
+                  color: '#B67F89',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
               >
                 No news on the list
               </Text>
@@ -291,9 +308,14 @@ const News = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 , backgroundColor: '#FFF9F3' },
+  container: { flex: 1, backgroundColor: '#FFF9F3' },
   newsContainer: { padding: 25 },
-  titlePage: { marginBottom: 20, fontSize: 20, fontFamily: 'Poppins-Bold', color: '#E07C8E' },
+  titlePage: {
+    marginBottom: 20,
+    fontSize: 20,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+  },
   card: {
     backgroundColor: '#fff',
     borderRadius: 20,

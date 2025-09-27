@@ -18,8 +18,10 @@ import 'dayjs/locale/id';
 dayjs.locale('id');
 
 import api from '../api';
+import Navbar from '../Components/Navbar';
 
 const ProfilePage = ({ navigation }) => {
+  const [active, setActive] = useState('Profile');
   const [username, setUsername] = useState('');
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
@@ -247,6 +249,11 @@ const ProfilePage = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Navbar */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        <Navbar active={active} onPress={setActive} />
+      </View>
     </KeyboardAwareScrollView>
   );
 };

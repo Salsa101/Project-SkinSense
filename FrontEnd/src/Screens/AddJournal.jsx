@@ -12,6 +12,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import { launchImageLibrary } from 'react-native-image-picker';
 
+import Icon2 from 'react-native-vector-icons/Ionicons';
+
 import api from '../api';
 
 const AddJournal = ({ navigation, route }) => {
@@ -96,7 +98,12 @@ const AddJournal = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        <Text style={styles.header}>New Journal</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Calendar')}>
+            <Icon2 name="arrow-back" size={24} color="#ff69b4" />
+          </TouchableOpacity>
+          <Text style={styles.header}>New Journal</Text>
+        </View>
 
         <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
           {image ? (
@@ -206,7 +213,7 @@ const styles = StyleSheet.create({
   },
   imageBox: {
     width: '100%',
-    height: 150,
+    height: 200,
     borderRadius: 12,
     backgroundColor: '#f2f2f2',
     alignItems: 'center',

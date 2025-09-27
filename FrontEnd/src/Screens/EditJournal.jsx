@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,28 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import { launchImageLibrary } from 'react-native-image-picker';
 
-const Testing = () => {
+import Icon2 from 'react-native-vector-icons/Ionicons';
+
+import api from '../api';
+
+const EditJournal = ({ navigation, route }) => {
   const [title, setTitle] = useState('');
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState(null);
   const [image, setImage] = useState(null);
+
+  const { date } = route.params || {};
+  const [journalDate, setJournalDate] = useState(
+    date || new Date().toISOString().split('T')[0],
+  );
+
+  const moodMap = ['cry', 'sad', 'neutral', 'happy', 'excited'];
 
   const pickImage = () => {
     launchImageLibrary(
@@ -36,19 +48,125 @@ const Testing = () => {
     );
   };
 
-  const handleSave = () => {
-    console.log({
-      title,
-      entry,
-      mood,
-      image,
-    });
+  useEffect(() => {
+    const fetchJournal = async () => {
+      try {
+        const { id } = route.params;
+        const res = await api.get(`/journal/view/${id}`);
+        const j = res.data;
+
+        setTitle(j.title);
+        setEntry(j.description);
+        setMood(moodMap.indexOf(j.mood));
+        setImage(
+          j.journal_image ? `${api.defaults.baseURL}${j.journal_image}` : null,
+        );
+        setJournalDate(j.journal_date);
+      } catch (err) {
+        console.error('Error fetching journal detail:', err);
+      }
+    };
+
+    if (route.params?.id) fetchJournal();
+  }, [route.params]);
+
+  const handleSave = async () => {
+    if (!title || !entry) {
+      alert('Please fill in title and entry!');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', entry);
+    formData.append('mood', moodMap[mood]);
+    formData.append('journal_date', journalDate);
+
+    if (image && !image.startsWith('http')) {
+      const uriParts = image.split('/');
+      const fileName = uriParts[uriParts.length - 1];
+      const fileType = fileName.split('.').pop();
+
+      formData.append('journal_image', {
+        uri: image,
+        name: fileName,
+        type: `image/${fileType}`,
+      });
+    }
+
+    try {
+      const { id } = route.params;
+      const response = await api.put(`/journal/update/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: 'Bearer YOUR_TOKEN_IF_NEEDED',
+        },
+      });
+
+      if (response.status === 200) {
+        alert('Journal updated successfully!');
+        navigation.navigate('JournalDetail', { id });
+      } else {
+        alert('Failed to update journal: ' + response.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating journal: ' + err.message);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this journal?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              const { id } = route.params; // ambil id dari params
+              const res = await api.delete(`/journal/delete/${id}`, {
+                headers: {
+                  Authorization: 'Bearer YOUR_TOKEN_IF_NEEDED',
+                },
+              });
+
+              if (res.status === 200) {
+                alert('Journal deleted successfully!');
+                navigation.navigate('Calendar');
+              } else {
+                alert('Failed to delete journal: ' + res.data.message);
+              }
+            } catch (err) {
+              console.error(err);
+              alert('Error deleting journal: ' + err.message);
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        <Text style={styles.header}>New Journal</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="arrow-left" size={20} color="#FF6F91" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Edit Journal</Text>
+          <TouchableOpacity style={styles.editBtn} onPress={handleDelete}>
+            <Text style={[styles.editText, { color: 'red' }]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
           {image ? (
@@ -85,7 +203,7 @@ const Testing = () => {
           >
             <Icon1
               name="sad-cry"
-              size={30}
+              size={28}
               color={mood === 0 ? '#fff' : '#ff69b4'}
             />
           </TouchableOpacity>
@@ -129,7 +247,7 @@ const Testing = () => {
           >
             <Icon1
               name="smile-beam"
-              size={30}
+              size={28}
               color={mood === 4 ? '#fff' : '#ff69b4'}
             />
           </TouchableOpacity>
@@ -158,7 +276,7 @@ const styles = StyleSheet.create({
   },
   imageBox: {
     width: '100%',
-    height: 150,
+    height: 200,
     borderRadius: 12,
     backgroundColor: '#f2f2f2',
     alignItems: 'center',
@@ -210,6 +328,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  headerRow: {
+    height: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  backBtn: { width: 40, alignItems: 'flex-start', justifyContent: 'center' },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#FF6F91',
+    fontWeight: '600',
+  },
+  editBtn: { width: 40, alignItems: 'flex-end' },
+  editText: { color: '#FF6F91', fontSize: 14 },
 });
 
-export default Testing;
+export default EditJournal;

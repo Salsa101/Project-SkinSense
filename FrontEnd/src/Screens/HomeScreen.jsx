@@ -73,12 +73,12 @@ const HomeScreen = ({ navigation }) => {
             </Text>
             <Text style={styles.skintypetext}>Dry Skin & Acne Prone</Text>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             <Image
               source={require('../../assets/profile-picture.png')}
               style={styles.profileImage}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Reminder */}
@@ -131,8 +131,11 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.productTitle}>Products For You</Text>
             <Text style={styles.seeMore}>See more</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.productScrollContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.productScrollContainer}
+          >
             {/* Product 1 */}
             <View style={styles.productContainer}>
               <Image
@@ -173,9 +176,8 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </ScrollView>
           <View></View>
-          </View>
+        </View>
 
-        
         {/* Tips Section */}
         <View style={styles.tipsSection}>
           <View style={styles.tipsTitleContainer}>

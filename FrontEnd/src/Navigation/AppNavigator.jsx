@@ -24,6 +24,8 @@ import FaceScan1 from '../Screens/FaceScan1';
 import FaceScan2 from '../Screens/FaceScan2';
 import Profil from '../Screens/Profil';
 import AddJournal from '../Screens/AddJournal';
+import JournalDetail from '../Screens/JournalDetail';
+import EditJournal from '../Screens/EditJournal';
 
 const Stack = createNativeStackNavigator();
 
@@ -157,6 +159,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="AddJournal"
           component={AddJournal}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="JournalDetail"
+          component={JournalDetail}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditJournal"
+          component={EditJournal}
           options={{ headerShown: false }}
         />
         <Stack.Screen
