@@ -23,29 +23,55 @@ const News = ({ navigation }) => {
     navigation.navigate('Home');
   });
 
+  const [page, setPage] = useState(1);
   const [active, setActive] = useState('News');
   const [bookmarked, setBookmarked] = useState({});
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
 
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const res = await api.get('/news', {
-          params: { search },
-        });
+  const fetchNews = async (reset = false) => {
+    try {
+      setLoading(true);
+      const res = await api.get('/news', {
+        params: { search, page, limit: 10 },
+      });
+
+      if (reset) {
         setNewsList(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+      } else {
+        setNewsList(prev => [...prev, ...res.data]);
       }
-    };
-    fetchNews();
+
+      if (res.data.length < 10) setHasMore(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      setPage(1);
+      setHasMore(true);
+      fetchNews(true);
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
   }, [search]);
+
+  const loadMore = () => {
+    if (!hasMore) return;
+    setPage(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    if (page > 1) fetchNews();
+  }, [page]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -154,148 +180,107 @@ const News = ({ navigation }) => {
             </View>
           </View>
 
-          {/* From SkinSense */}
-          {newsList.filter(n => n.sourceType === 'skinsense').length > 0 && (
-            <>
-              <Text style={styles.newsContainerTitle}>From SkinSense</Text>
-              {newsList
-                .filter(n => n.sourceType === 'skinsense')
-                .map(news => (
-                  <TouchableOpacity
-                    key={news.id}
-                    style={styles.card}
-                    onPress={() =>
-                      navigation.navigate('NewsDetail', { id: news.id })
-                    }
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.imageContainer}>
-                      <Image
-                        source={
-                          news.newsImage
-                            ? {
-                                uri: `${api.defaults.baseURL}/${news.newsImage}`,
-                              }
-                            : require('../../assets/category-admin.jpg')
-                        }
-                        style={styles.image}
-                      />
-                      <TouchableOpacity
-                        style={styles.bookmarkBtn}
-                        onPress={() => toggleBookmark(news.id)}
-                      >
-                        <Icon
-                          name={bookmarked[news.id] ? 'star' : 'star-o'}
-                          size={24}
-                          color="#E07C8E"
-                        />
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.content}>
-                      <Text style={styles.title}>{news.title}</Text>
-                      <View style={styles.categoryContainer}>
-                        {news.Categories?.map(category => (
-                          <TouchableOpacity
-                            key={category.id}
-                            style={styles.categoryBadge}
-                            onPress={() =>
-                              navigation.navigate('CategoryNews', {
-                                categoryId: category.id,
-                                categoryName: category.name,
-                              })
-                            }
-                          >
-                            <Text style={styles.categoryText}>
-                              {category.name}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-            </>
-          )}
-
-          {/* Others */}
-          {newsList.filter(n => n.sourceType === 'others').length > 0 && (
-            <>
-              <Text style={styles.newsContainerTitle}>Others</Text>
-              {newsList
-                .filter(n => n.sourceType === 'others')
-                .map(news => (
-                  <TouchableOpacity
-                    key={news.id}
-                    style={styles.card}
-                    onPress={() =>
-                      navigation.navigate('NewsDetail', { id: news.id })
-                    }
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.imageContainer}>
-                      <Image
-                        source={
-                          news.newsImage
-                            ? {
-                                uri: `${api.defaults.baseURL}/${news.newsImage}`,
-                              }
-                            : require('../../assets/category-admin.jpg')
-                        }
-                        style={styles.image}
-                      />
-                      <TouchableOpacity
-                        style={styles.bookmarkBtn}
-                        onPress={() => toggleBookmark(news.id)}
-                      >
-                        <Icon
-                          name={bookmarked[news.id] ? 'star' : 'star-o'}
-                          size={24}
-                          color="#E07C8E"
-                        />
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.content}>
-                      <Text style={styles.title}>{news.title}</Text>
-                      <View style={styles.categoryContainer}>
-                        {news.Categories?.map(category => (
-                          <TouchableOpacity
-                            key={category.id}
-                            style={styles.categoryBadge}
-                            onPress={() =>
-                              navigation.navigate('CategoryNews', {
-                                categoryId: category.id,
-                                categoryName: category.name,
-                              })
-                            }
-                          >
-                            <Text style={styles.categoryText}>
-                              {category.name}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-            </>
-          )}
-
-          {newsList.filter(n => n.sourceType === 'skinsense').length === 0 &&
-            newsList.filter(n => n.sourceType === 'others').length === 0 && (
-              <Text
-                style={{
-                  textAlign: 'center',
-                  marginTop: 20,
-                  color: '#B67F89',
-                  fontFamily: 'Poppins-Medium',
-                  fontSize: 12,
-                }}
+          {newsList.length > 0 ? (
+            newsList.map(news => (
+              <TouchableOpacity
+                key={news.id}
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('NewsDetail', { id: news.id })
+                }
+                activeOpacity={0.8}
               >
-                No news on the list
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={
+                      news.newsImage
+                        ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
+                        : require('../../assets/category-admin.jpg')
+                    }
+                    style={styles.image}
+                  />
+                  <TouchableOpacity
+                    style={styles.bookmarkBtn}
+                    onPress={() => toggleBookmark(news.id)}
+                  >
+                    <Icon
+                      name={bookmarked[news.id] ? 'star' : 'star-o'}
+                      size={24}
+                      color="#E07C8E"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.content}>
+                  <Text style={styles.title}>{news.title}</Text>
+                  <View style={styles.categoryContainer}>
+                    {news.Categories?.map(category => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.categoryBadge}
+                        onPress={() =>
+                          navigation.navigate('CategoryNews', {
+                            categoryId: category.id,
+                            categoryName: category.name,
+                          })
+                        }
+                      >
+                        <Text style={styles.categoryText}>{category.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text
+              style={{
+                textAlign: 'center',
+                marginTop: 20,
+                color: '#B67F89',
+                fontFamily: 'Poppins-Medium',
+                fontSize: 12,
+              }}
+            >
+              No news on the list
+            </Text>
+          )}
+
+          {hasMore && !loading && (
+            <TouchableOpacity
+              style={[
+                styles.loadMoreBtn,
+                {
+                  alignSelf: 'center',
+                  backgroundColor: '#E07C8E',
+                  paddingHorizontal: 20,
+                  paddingVertical: 8,
+                  borderRadius: 25,
+                  marginVertical: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+              ]}
+              onPress={loadMore}
+            >
+              <Icon
+                name="angle-down"
+                size={20}
+                color="#fff"
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={[
+                  styles.loadMoreText,
+                  { color: '#fff', fontWeight: '600', textAlign: 'center' },
+                ]}
+              >
+                Load More
               </Text>
-            )}
+            </TouchableOpacity>
+          )}
+
+          {loading && <ActivityIndicator size="small" color="#E07C8E" />}
         </View>
       </ScrollView>
 

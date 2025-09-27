@@ -63,8 +63,11 @@ function News() {
     <div>
       <Navbar />
       <div className="container mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>News</h2>
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h2>News</h2>
+            <p>Don't forget to add category first!</p>
+          </div>
           <a href="/admin/news/add" className="btn btn-outline-primary">
             + Add News
           </a>
@@ -104,7 +107,6 @@ function News() {
               <th>Image</th>
               <th>Title</th>
               <th>Category</th>
-              <th>Source Type</th>
               <th>Active</th>
               <th>Created At</th>
               <th>Action</th>
@@ -135,7 +137,6 @@ function News() {
                     ? n.Categories.map((c) => c.name).join(", ")
                     : "Unknown"}
                 </td>
-                <td>{n.sourceType}</td>
                 <td>
                   <div className="form-check form-switch">
                     <input

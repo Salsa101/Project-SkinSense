@@ -79,7 +79,7 @@ const CategoryNews = ({ route, navigation }) => {
     <View style={styles.container}>
       <ScrollView style={{ marginBottom: 75 }}>
         <View style={styles.newsContainer}>
-          <Text style={styles.titlePage}>Category {categoryName}</Text>
+          <Text style={styles.titlePage}>{categoryName}</Text>
 
           {newsList.map(news => (
             <View key={news.id} style={styles.card}>

@@ -3,14 +3,13 @@ const { Op } = require("sequelize");
 
 const getNews = async (req, res) => {
   try {
-    const { search, category } = req.query;
+    const { search, category, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
 
     const where = {};
     if (search) {
-      // kalau search, abaikan filter isActive
       where.title = { [Op.iLike]: `%${search}%` };
     } else {
-      // kalau bukan search, tampilkan hanya yang active
       where.isActive = true;
     }
 
@@ -32,10 +31,12 @@ const getNews = async (req, res) => {
         "title",
         "content",
         "newsImage",
-        "sourceType",
         "isActive",
         "createdAt",
       ],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
     res.json(news);
@@ -118,10 +119,21 @@ const listBookmarks = async (req, res) => {
         {
           model: News,
           include: [
-            { model: Category, attributes: ['id', 'name'], through: { attributes: [] } },
+            {
+              model: Category,
+              attributes: ["id", "name"],
+              through: { attributes: [] },
+            },
           ],
-          attributes: ['id', 'title', 'content', 'newsImage', 'sourceType', 'isActive', 'createdAt'],
-          through: { attributes: [] }, // supaya data pivot Bookmark tidak muncul
+          attributes: [
+            "id",
+            "title",
+            "content",
+            "newsImage",
+            "isActive",
+            "createdAt",
+          ],
+          through: { attributes: [] },
         },
       ],
     });
@@ -129,10 +141,9 @@ const listBookmarks = async (req, res) => {
     res.json(user ? user.News : []);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
-
 
 const getCategory = async (req, res) => {
   try {

@@ -13,7 +13,6 @@ function EditNews() {
     title: "",
     content: "",
     categoryIds: [],
-    sourceType: "",
   });
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -38,7 +37,6 @@ function EditNews() {
           title: res.data.title,
           content: res.data.content,
           categoryIds: res.data.Categories?.map((c) => c.id) || [],
-          sourceType: (res.data.sourceType || "").toLowerCase(),
         });
       } catch (err) {
         console.error(err);
@@ -73,7 +71,6 @@ function EditNews() {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("content", form.content);
-    formData.append("sourceType", form.sourceType);
     form.categoryIds.forEach((id) => formData.append("categoryIds[]", id));
     if (file) formData.append("newsImage", file);
 
@@ -134,21 +131,6 @@ function EditNews() {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Source Type</label>
-          <select
-            name="sourceType"
-            className="form-select"
-            value={form.sourceType}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Pilih Source --</option>
-            <option value="skinsense">SkinSense</option>
-            <option value="others">Others</option>
-          </select>
         </div>
 
         <div className="mb-3">
