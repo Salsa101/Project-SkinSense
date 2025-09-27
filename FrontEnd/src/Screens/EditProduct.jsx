@@ -128,9 +128,6 @@ const EditProduct = ({ route, navigation }) => {
           } else if (p.isOpened === true) {
             setExpirationDate(null); // nanti auto calculated via useEffect
           }
-          setTime(
-            p.reminderTime ? new Date(`1970-01-01T${p.reminderTime}`) : null,
-          );
 
           if (p.Product.productImage) {
             setImageUri(`${api.defaults.baseURL}${p.Product.productImage}`);
@@ -183,12 +180,6 @@ const EditProduct = ({ route, navigation }) => {
       } else if (isOpened === 'no' && expirationDate) {
         payload.append('expirationDate', expirationDate.toISOString());
       }
-      if (time) {
-        // hanya jam-menit
-        const hours = time.getHours().toString().padStart(2, '0');
-        const minutes = time.getMinutes().toString().padStart(2, '0');
-        payload.append('reminderTime', `${hours}:${minutes}`);
-      }
 
       const res = await api.put(`/routine-products/${id}`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -225,18 +216,18 @@ const EditProduct = ({ route, navigation }) => {
     return true;
   };
 
-  const handleSetTime = selectedTime => {
-    if (!validateTime(selectedTime, timeDayValue)) {
-      Alert.alert(
-        'Invalid Time',
-        `Reminder time doesn't match with ${timeDayValue} schedule`,
-      );
-      setOpenTime(false);
-      return;
-    }
-    setTime(selectedTime);
-    setOpenTime(false); // <- tutup modal kalau valid juga
-  };
+  // const handleSetTime = selectedTime => {
+  //   if (!validateTime(selectedTime, timeDayValue)) {
+  //     Alert.alert(
+  //       'Invalid Time',
+  //       `Reminder time doesn't match with ${timeDayValue} schedule`,
+  //     );
+  //     setOpenTime(false);
+  //     return;
+  //   }
+  //   setTime(selectedTime);
+  //   setOpenTime(false); // <- tutup modal kalau valid juga
+  // };
 
   const shelfLifeDefaults = {
     cleanser: 12,
@@ -627,34 +618,6 @@ const EditProduct = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.form}>
-              <Text style={styles.formText}>Reminder Time</Text>
-              <View
-                style={[
-                  styles.inputContainer,
-                  { paddingVertical: 13, paddingLeft: 20 },
-                ]}
-              >
-                <Text style={styles.input}>
-                  {time
-                    ? time.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                    : 'Please select reminder time'}
-                </Text>
-
-                <TouchableOpacity onPress={() => setOpenTime(true)}>
-                  <Icon2
-                    name="access-time"
-                    size={20}
-                    color="#E07C8E"
-                    style={styles.icon}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
             <TouchableOpacity style={styles.saveBtn} onPress={handleUpdate}>
               <Text style={styles.saveBtnText}>Update</Text>
             </TouchableOpacity>
@@ -699,13 +662,13 @@ const EditProduct = ({ route, navigation }) => {
         onCancel={() => setOpenExpiration(false)}
       />
 
-      <DateTimePickerModal
+      {/* <DateTimePickerModal
         isVisible={openTime}
         mode="time"
         date={time || new Date()}
         onConfirm={selectedTime => handleSetTime(selectedTime)}
         onCancel={() => setOpenTime(false)}
-      />
+      /> */}
     </View>
   );
 };

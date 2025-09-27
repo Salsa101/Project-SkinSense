@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       });
       RoutineProduct.belongsTo(models.User, { foreignKey: "userId" });
+      RoutineProduct.belongsTo(models.ReminderTime, {
+        foreignKey: "timeOfDay",
+        targetKey: "timeOfDay",
+        as: "reminder",
+      });
     }
   }
 
@@ -22,11 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("morning", "night"),
         allowNull: false,
       },
-      reminderTime: {
-        type: DataTypes.TIME,
-      },
       notificationFrequency: {
-        type: DataTypes.STRING, // contoh: "every 2 days"
+        type: DataTypes.STRING,
       },
       dayOfWeek: {
         type: DataTypes.JSONB,

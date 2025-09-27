@@ -33,9 +33,6 @@ module.exports = {
         type: Sequelize.ENUM("morning", "night"),
         allowNull: false,
       },
-      reminderTime: {
-        type: Sequelize.TIME,
-      },
       notificationFrequency: {
         type: Sequelize.STRING,
       },

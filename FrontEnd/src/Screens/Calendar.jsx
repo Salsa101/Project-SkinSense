@@ -11,7 +11,7 @@ import {
 import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
-import { intervalToDuration } from 'date-fns';
+import { parse, format, intervalToDuration } from 'date-fns';
 
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -171,6 +171,24 @@ const Calendar = ({ navigation }) => {
 
     return new Date(value);
   }
+
+  const [reminders, setReminders] = useState({ morning: null, night: null });
+
+  useEffect(() => {
+    const fetchReminders = async () => {
+      try {
+        const res = await api.get('/reminder-times/view');
+        const data = res.data || [];
+        const morning = data.find(r => r.timeOfDay === 'morning');
+        const night = data.find(r => r.timeOfDay === 'night');
+        setReminders({ morning, night });
+      } catch (err) {
+        console.error('Failed to fetch reminders:', err);
+      }
+    };
+
+    fetchReminders();
+  }, []);
 
   const renderCard = (item, type) => (
     <TouchableOpacity
@@ -442,7 +460,29 @@ const Calendar = ({ navigation }) => {
           <View style={styles.progressContainer}>
             <View style={styles.remindTimeContainer}>
               <Icon name="clock-o" size={20} color="#E07C8E" />
-              <Text style={styles.remindTime}>07:00 AM</Text>
+              <Text style={styles.remindTime}>
+                {activeTab === 'Morning'
+                  ? reminders.morning?.reminderTime
+                    ? format(
+                        parse(
+                          reminders.morning.reminderTime,
+                          'HH:mm:ss',
+                          new Date(),
+                        ),
+                        'HH:mm',
+                      )
+                    : '--:--'
+                  : reminders.night?.reminderTime
+                  ? format(
+                      parse(
+                        reminders.night.reminderTime,
+                        'HH:mm:ss',
+                        new Date(),
+                      ),
+                      'HH:mm',
+                    )
+                  : '--:--'}
+              </Text>
             </View>
             <Text style={styles.progress}>
               {currentData.filter(task => task.done).length}/

@@ -47,6 +47,12 @@ const {
   getJournalByDate,
   getJournalsByMonth,
 } = require("../Controllers/JournalController");
+const {
+  createReminderTime,
+  getAllReminderTimes,
+  updateReminderTime,
+  toggleReminder,
+} = require("../Controllers/ReminderTimeController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -133,6 +139,16 @@ router.put(
   updateJournal
 );
 router.delete("/journal/delete/:id", validateToken, deleteJournal);
+
+//ReminderTimeRoutine
+router.post("/reminder-times/add", validateToken, createReminderTime);
+router.get("/reminder-times/view", validateToken, getAllReminderTimes);
+router.patch("/reminder-times/:timeOfDay", validateToken, updateReminderTime);
+router.patch(
+  "/reminder-times/:timeOfDay/toggle",
+  validateToken,
+  toggleReminder
+);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {

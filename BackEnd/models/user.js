@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "newsId",
       });
       User.hasMany(models.Journal, { foreignKey: "userId" });
+      User.hasMany(models.ReminderTime, { foreignKey: "userId" });
     }
   }
   User.init(

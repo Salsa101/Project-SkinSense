@@ -26,7 +26,6 @@ const addProductToRoutine = async (req, res) => {
       isOpened,
       routineType,
       timeOfDay,
-      reminderTime,
       dayOfWeek,
       customDate,
     } = req.body;
@@ -87,7 +86,6 @@ const addProductToRoutine = async (req, res) => {
         productId: finalProductId,
         dateOpened,
         expirationDate,
-        reminderTime,
         dayOfWeek: dayOfWeekArray,
         customDate,
         isOpened,
@@ -107,7 +105,6 @@ const addProductToRoutine = async (req, res) => {
       expirationDate,
       routineType,
       timeOfDay,
-      reminderTime,
       dayOfWeek: dayOfWeekArray,
       customDate,
       isOpened,
@@ -274,7 +271,6 @@ const updateRoutineProduct = async (req, res) => {
       timeOfDay: req.body.timeOfDay || routine.timeOfDay,
       dateOpened: req.body.dateOpened || routine.dateOpened,
       expirationDate: req.body.expirationDate || routine.expirationDate,
-      reminderTime: req.body.reminderTime || routine.reminderTime,
       isOpened: req.body.isOpened || routine.isOpened,
     });
 

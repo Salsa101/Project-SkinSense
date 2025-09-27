@@ -15,11 +15,18 @@ import { format, intervalToDuration } from 'date-fns';
 import api from '../api';
 import { useCustomBackHandler } from '../Handler/CustomBackHandler';
 
+import ReminderTimePicker from '../Components/ReminderTime';
+
 const EditRoutine = ({ navigation }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
   const [activeRoutineTab, setActiveRoutineTab] = useState('Daily');
   const [routineData, setRoutineData] = useState([]);
+
+  const [reminderTimes, setReminderTimes] = useState({
+    morning: null,
+    night: null,
+  });
 
   //Handler Back to Home
   useCustomBackHandler(() => {
@@ -96,6 +103,45 @@ const EditRoutine = ({ navigation }) => {
     );
   };
 
+  const fetchReminderTimes = async () => {
+    try {
+      const res = await api.get('/reminder-times/view');
+      const mapped = {};
+      res.data.forEach(r => {
+        mapped[r.timeOfDay] = r;
+      });
+
+      setReminderTimes(mapped);
+
+      // Auto-create missing reminders
+      const missing = ['morning', 'night'].filter(time => !mapped[time]);
+      if (missing.length > 0) {
+        await Promise.all(
+          missing.map(time =>
+            api.post('/reminder-times/add', {
+              timeOfDay: time,
+              reminderTime: '', // kosongkan
+            }),
+          ),
+        );
+
+        // Fetch lagi setelah semua selesai
+        const res2 = await api.get('/reminder-times/view');
+        const mapped2 = {};
+        res2.data.forEach(r => {
+          mapped2[r.timeOfDay] = r;
+        });
+        setReminderTimes(mapped2);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReminderTimes();
+  }, []);
+
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
       <View style={styles.infoBox}>
@@ -151,13 +197,6 @@ const EditRoutine = ({ navigation }) => {
                 : ''}
             </Text>
           )}
-
-          <Text style={styles.exp}>
-            Reminder at{' '}
-            {safeDate(item.reminderTime, true)
-              ? format(safeDate(item.reminderTime, true), 'HH:mm')
-              : '-'}
-          </Text>
         </View>
         <View style={{ marginLeft: 'auto', gap: 10, marginRight: 10 }}>
           <TouchableOpacity
@@ -289,6 +328,22 @@ const EditRoutine = ({ navigation }) => {
             <Text style={styles.progress}>+ Add Product</Text>
           </TouchableOpacity>
 
+          {/* Reminder Picker */}
+          {activeTab === 'Morning' && (
+            <ReminderTimePicker
+              timeOfDay="morning"
+              reminder={reminderTimes.morning}
+              fetchReminders={fetchReminderTimes}
+            />
+          )}
+          {activeTab === 'Night' && (
+            <ReminderTimePicker
+              timeOfDay="night"
+              reminder={reminderTimes.night}
+              fetchReminders={fetchReminderTimes}
+            />
+          )}
+
           {currentData.length === 0 ? (
             <Text
               style={{
@@ -356,7 +411,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: 65,
-    height: 120,
+    height: 105,
     borderRadius: 5,
     backgroundColor: '#000000ff',
     marginRight: 10,
