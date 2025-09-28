@@ -72,7 +72,7 @@ const NewsDetail = ({ route, navigation }) => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#d6336c" />
+        <ActivityIndicator size="large" color="#E07C8E" />
       </View>
     );
   }
@@ -97,7 +97,7 @@ const NewsDetail = ({ route, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => toggleBookmark(news.id)}>
           <Icon
-            name={bookmarked[news.id] ? 'star' : 'star-outline'}
+            name={bookmarked[news.id] ? 'bookmark' : 'bookmark-outline'}
             size={30}
             color="#E07C8E"
           />
@@ -140,7 +140,7 @@ const NewsDetail = ({ route, navigation }) => {
             h1: {
               fontSize: 24,
               fontWeight: 'bold',
-              color: '#d6336c',
+              color: '#E07C8E',
               marginBottom: 10,
             },
             h2: {
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#d6336c',
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
     marginBottom: 10,
   },
   tags: {
@@ -224,10 +224,12 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: '#d6336c',
+    fontFamily: 'Poppins-SemiBold',
+    color: '#E07C8E',
   },
   paragraph: {
     fontSize: 14,
+    fontFamily: 'Poppins-Regular',
     color: '#333',
     marginBottom: 12,
     lineHeight: 20,

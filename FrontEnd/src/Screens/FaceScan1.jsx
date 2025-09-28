@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     textAlign: 'center',
     color: '#d67c7c',
     marginTop: 20,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     color: '#d67c7c',
     marginBottom: 10,
   },
@@ -113,12 +113,13 @@ const styles = StyleSheet.create({
   },
   cardSubText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     color: '#d67c7c',
     marginBottom: 5,
   },
   cardText: {
     fontSize: 14,
+    fontFamily: 'Poppins-Regular',
     color: '#444',
     marginBottom: 10,
     lineHeight: 20,
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 16,
   },
   warning: {
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     marginLeft: 5,
+    fontFamily: 'Poppins-Regular',
   },
 });
 

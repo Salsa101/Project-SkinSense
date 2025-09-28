@@ -496,7 +496,7 @@ const Calendar = ({ navigation }) => {
                 <View key={index}>{renderCard(item, activeTab)}</View>
               ))
             ) : (
-              <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              <Text style={{ textAlign: 'center', marginTop: 20,fontFamily: 'Poppins-Regular', color: '#915b5bff' }}>
                 No data available
               </Text>
             )}
