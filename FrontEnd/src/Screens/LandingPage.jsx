@@ -63,12 +63,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     color: '#fff',
-    marginBottom: 10,
+    marginBottom: 5,
     fontFamily: 'Poppins-Bold',
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#fff',
     marginBottom: 10,
     fontFamily: 'Poppins-SemiBold',
@@ -78,7 +77,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
     marginBottom: 60,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Bold',
   },
   button: {
     width: '100%',
@@ -90,7 +89,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#f28cab',
     fontFamily: 'Poppins-SemiBold',
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'center',
   },
 });
