@@ -471,7 +471,7 @@ const Calendar = ({ navigation }) => {
                         ),
                         'HH:mm',
                       )
-                    : '--:--'
+                    : 'Reminder'
                   : reminders.night?.reminderTime
                   ? format(
                       parse(

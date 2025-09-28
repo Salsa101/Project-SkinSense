@@ -26,6 +26,8 @@ import Profil from '../Screens/Profil';
 import AddJournal from '../Screens/AddJournal';
 import JournalDetail from '../Screens/JournalDetail';
 import EditJournal from '../Screens/EditJournal';
+import StepRoutine from '../Screens/StepRoutine';
+import SkincareGuide from '../Screens/SkincareGuide';
 
 const Stack = createNativeStackNavigator();
 
@@ -174,6 +176,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Profil"
           component={Profil}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="StepRoutine"
+          component={StepRoutine}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SkincareGuide"
+          component={SkincareGuide}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

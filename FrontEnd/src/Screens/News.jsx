@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   TextInput,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Components/Navbar';
@@ -32,6 +33,18 @@ const News = ({ navigation }) => {
 
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      setPage(1);
+      setHasMore(true);
+      await fetchNews(true); // reset news list
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const fetchNews = async (reset = false) => {
     try {
@@ -132,7 +145,16 @@ const News = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ marginBottom: 75 }}>
+      <ScrollView
+        style={{ marginBottom: 75 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#E07C8E']}
+          />
+        }
+      >
         <View style={styles.newsContainer}>
           <Text style={styles.titlePage}>Skincare Tips</Text>
           <View style={styles.searchContainer}>
@@ -159,6 +181,42 @@ const News = ({ navigation }) => {
               <Icon name="bookmark" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
+
+          {/* Banner Section */}
+          <TouchableOpacity
+            style={styles.bannerContainer}
+            onPress={() => navigation.navigate('StepRoutine')}
+            activeOpacity={0.8}
+          >
+            <Image
+              source={require('../../assets/step-routine.jpg')}
+              style={styles.bannerImage}
+            />
+            <View style={styles.bannerOverlay} />
+
+            {/* Image wajah kiri atas */}
+            <View style={styles.bannerTopLeft}>
+              <Image
+                source={require('../../assets/woman.png')} // ganti sesuai file image kamu
+                style={styles.bannerUserImage}
+              />
+            </View>
+
+            {/* Teks bawah */}
+            <View style={styles.bannerTextWrapper}>
+              <Text style={styles.bannerText}>Check Your Routine</Text>
+              <Text style={styles.bannerDesc}>
+                Learn more about how to do{'\n'}skincare properly
+              </Text>
+            </View>
+
+            {/* Icon panah kanan bawah dalam bulatan */}
+            <View style={styles.bannerBottomRight}>
+              <View style={styles.circleIcon}>
+                <Icon name="arrow-right" size={16} color="#ffffffff" />
+              </View>
+            </View>
+          </TouchableOpacity>
 
           {/* Category News */}
           <View style={{ marginBottom: 10 }}>
@@ -359,6 +417,71 @@ const styles = StyleSheet.create({
   newsContainerTitle: {
     marginBottom: 10,
     marginTop: 10,
+  },
+  bannerContainer: {
+    position: 'relative',
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: 20,
+    elevation: 5,
+  },
+  bannerImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 15,
+  },
+  bannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  bannerText: {
+    position: 'absolute',
+    bottom: 15,
+    left: 15,
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+  },
+  bannerTextWrapper: {
+    position: 'absolute',
+    bottom: 15,
+    left: 15,
+    right: 15,
+  },
+  bannerText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 4,
+  },
+  bannerDesc: {
+    color: '#f5f5f5',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+  },
+  bannerTopLeft: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+  },
+  bannerBottomRight: {
+    position: 'absolute',
+    bottom: 15,
+    right: 15,
+  },
+
+  circleIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  bannerUserImage: {
+    width: 26,
+    height: 26,
   },
 });
 
