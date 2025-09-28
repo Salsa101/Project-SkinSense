@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: '#da8f8fff',
   },
-  desc: { color: '#7e7e7eff', marginBottom: 20, fontFamily: 'Poppins-Regular' },
+  desc: { color: '#E68390', marginBottom: 20, fontFamily: 'Poppins-Regular' },
   option: {
     flexDirection: 'row',
     padding: 15,
@@ -251,9 +251,9 @@ const styles = StyleSheet.create({
     borderColor: '#DDD',
     marginRight: 15,
   },
-  optionTitle: { fontFamily: 'Poppins-Bold', marginBottom: 2 },
+  optionTitle: { fontFamily: 'Poppins-Bold', marginBottom: 2, color: '#E68390' },
   optionDesc: {
-    color: '#4b4b4bff',
+    color: '#E68390',
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
   },
@@ -292,6 +292,11 @@ const styles = StyleSheet.create({
     height: 40,
     marginRight: 15,
     borderRadius: 20,
+    color: '#E68390',
+  },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  optionLeft: { justifyContent: 'flex-start' },
+  optionCenter: { justifyContent: 'center'
   },
   textLeft: { textAlign: 'left' },
   textCenter: { textAlign: 'center' },
