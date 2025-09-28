@@ -100,7 +100,7 @@ const AddJournal = ({ navigation, route }) => {
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => navigation.navigate('Calendar')}>
-            <Icon2 name="arrow-back" size={24} color="#ff69b4" />
+            <Icon2 name="arrow-back" size={24} color="#E07C8E" />
           </TouchableOpacity>
           <Text style={styles.header}>New Journal</Text>
         </View>
@@ -141,7 +141,7 @@ const AddJournal = ({ navigation, route }) => {
             <Icon1
               name="sad-cry"
               size={28}
-              color={mood === 0 ? '#fff' : '#ff69b4'}
+              color={mood === 0 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -152,7 +152,7 @@ const AddJournal = ({ navigation, route }) => {
             <Icon
               name="frown-o"
               size={30}
-              color={mood === 1 ? '#fff' : '#ff69b4'}
+              color={mood === 1 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -163,7 +163,7 @@ const AddJournal = ({ navigation, route }) => {
             <Icon
               name="meh-o"
               size={30}
-              color={mood === 2 ? '#fff' : '#ff69b4'}
+              color={mood === 2 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -174,7 +174,7 @@ const AddJournal = ({ navigation, route }) => {
             <Icon
               name="smile-o"
               size={30}
-              color={mood === 3 ? '#fff' : '#ff69b4'}
+              color={mood === 3 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -185,7 +185,7 @@ const AddJournal = ({ navigation, route }) => {
             <Icon1
               name="smile-beam"
               size={28}
-              color={mood === 4 ? '#fff' : '#ff69b4'}
+              color={mood === 4 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
         </View>
@@ -207,9 +207,11 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ff69b4',
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+    marginTop: 10,
     marginBottom: 15,
+    marginLeft: 10,
   },
   imageBox: {
     width: '100%',
@@ -227,12 +229,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: 'Poppins-Medium',
     color: '#333',
     marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ff69b4',
+    borderColor: '#E07C8E',
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
@@ -243,13 +246,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ff69b4',
+    borderColor: '#E07C8E',
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 18,
   },
   moodActive: {
-    backgroundColor: '#ff69b4',
+    backgroundColor: '#E07C8E',
     borderRadius: 80,
     paddingVertical: 2,
     paddingHorizontal: 4,
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 16,
   },
 });
