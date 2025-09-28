@@ -14,6 +14,8 @@ import api from '../api';
 import { Dimensions } from 'react-native';
 import RenderHTML from 'react-native-render-html';
 
+import LinearGradient from 'react-native-linear-gradient';
+
 const { width } = Dimensions.get('window');
 
 const NewsDetail = ({ route, navigation }) => {
@@ -110,9 +112,16 @@ const NewsDetail = ({ route, navigation }) => {
         style={styles.mainImage}
       />
 
-      <View style={styles.contentBox}>
+      {/* Konten berita */}
+    <LinearGradient
+      colors={['#F7EBE1', '#FFFFFF']}
+      start={{x:0,y:0}} end={{x:0,y:1}}
+      locations={[0, 0.54]} 
+      style={styles.contentBox}
+    >
         {/* Judul */}
         <Text style={styles.title}>{news.title}</Text>
+        
 
         {/* Tags dari kategori */}
         <View style={styles.tags}>
@@ -137,21 +146,30 @@ const NewsDetail = ({ route, navigation }) => {
           contentWidth={width}
           source={{ html: news.content }}
           tagsStyles={{
+            div: {
+               fontFamily: 'Poppins-Regular',
+                },
+            body: {
+               fontFamily: 'Poppins-Regular',
+              },
             h1: {
               fontSize: 24,
-              fontWeight: 'bold',
+              fontFamily: 'Poppins-Bold',
               color: '#E07C8E',
               marginBottom: 10,
             },
             h2: {
               fontSize: 20,
-              fontWeight: '600',
+              fontFamily: 'Poppins-Bold',
+              color: '#E07C8E',
+              marginBottom: 8,
               color: '#333',
               marginTop: 15,
               marginBottom: 8,
             },
             p: {
               fontSize: 14,
+              fontFamily: 'Poppins-Regular',
               color: '#333',
               lineHeight: 22,
               marginBottom: 10,
@@ -162,13 +180,15 @@ const NewsDetail = ({ route, navigation }) => {
             },
             li: {
               fontSize: 14,
+              fontFamily: 'Poppins-Regular',
               color: '#444',
               marginBottom: 5,
             },
           }}
         />
-      </View>
+      </LinearGradient>
     </ScrollView>
+      
   );
 };
 
@@ -196,7 +216,6 @@ const styles = StyleSheet.create({
     height: 220,
   },
   contentBox: {
-    backgroundColor: '#dbdbdbff',
     marginTop: -20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 0,
@@ -235,5 +254,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
 
 export default NewsDetail;

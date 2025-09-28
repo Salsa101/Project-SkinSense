@@ -71,7 +71,7 @@ const BookmarkLists = ({ route, navigation }) => {
 
           {newsList.length === 0 ? (
             <View style={{ padding: 20, alignItems: 'center' }}>
-              <Text style={{ color: '#aaa', fontSize: 16 }}>
+              <Text style={{ color: '#aaa', fontSize: 16, fontFamily: 'Poppins-Regular' }}>
                 No bookmarks on list
               </Text>
             </View>

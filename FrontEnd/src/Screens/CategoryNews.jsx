@@ -97,7 +97,7 @@ const CategoryNews = ({ route, navigation }) => {
                   onPress={() => toggleBookmark(news.id)}
                 >
                   <Icon
-                    name={bookmarked[news.id] ? 'star' : 'star-o'}
+                    name={bookmarked[news.id] ? 'bookmark' : 'bookmark-o'}
                     size={20}
                     color="#E07C8E"
                   />
@@ -120,9 +120,9 @@ const CategoryNews = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1 , backgroundColor: '#FFF9F3'},
   newsContainer: { padding: 25 },
-  titlePage: { marginBottom: 20, fontSize: 18, fontWeight: '600' },
+  titlePage: { marginBottom: 20, fontSize: 18, fontFamily: 'Poppins-Bold', color: '#E07C8E' },
   card: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   content: { padding: 12, backgroundColor: '#FFEFF1' },
-  title: { fontSize: 14, fontWeight: '600', color: '#E07C8E' },
+  title: { fontSize: 14, fontFamily: 'Poppins-Bold', color: '#E07C8E' },
 });
 
 export default CategoryNews;
