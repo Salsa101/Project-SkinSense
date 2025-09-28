@@ -63,7 +63,10 @@ const SkincareGuide = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
         <Icon name="arrow-left" size={24} color="#d94c64" />
       </TouchableOpacity>
 
