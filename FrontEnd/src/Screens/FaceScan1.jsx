@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
-    color: '#444',
+    color: '#E68390',
     marginBottom: 10,
     lineHeight: 20,
   },

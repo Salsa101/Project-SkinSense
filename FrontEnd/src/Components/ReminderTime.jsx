@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 15,
     marginBottom: 10,
-    backgroundColor: '#efcceeff',
+    backgroundColor: '#F8D3D5',
     borderRadius: 10,
     shadowColor: '#AB8C8C',
     shadowOffset: { width: 0, height: 4 },
