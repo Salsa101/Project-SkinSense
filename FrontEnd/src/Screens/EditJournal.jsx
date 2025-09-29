@@ -160,11 +160,11 @@ const EditJournal = ({ navigation, route }) => {
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="arrow-left" size={20} color="#FF6F91" />
+            <Icon name="arrow-left" size={20} color="#E07C8E" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Journal</Text>
           <TouchableOpacity style={styles.editBtn} onPress={handleDelete}>
-            <Text style={[styles.editText, { color: 'red' }]}>Delete</Text>
+            <Text style={[styles.editText, { color: '#E07C8E', fontFamily: 'Poppins-Semi-Bold', fontSize: 12 }]}>Delete</Text>
           </TouchableOpacity>
         </View>
 
@@ -204,7 +204,7 @@ const EditJournal = ({ navigation, route }) => {
             <Icon1
               name="sad-cry"
               size={28}
-              color={mood === 0 ? '#fff' : '#ff69b4'}
+              color={mood === 0 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -215,7 +215,7 @@ const EditJournal = ({ navigation, route }) => {
             <Icon
               name="frown-o"
               size={30}
-              color={mood === 1 ? '#fff' : '#ff69b4'}
+              color={mood === 1 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -226,7 +226,7 @@ const EditJournal = ({ navigation, route }) => {
             <Icon
               name="meh-o"
               size={30}
-              color={mood === 2 ? '#fff' : '#ff69b4'}
+              color={mood === 2 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -237,7 +237,7 @@ const EditJournal = ({ navigation, route }) => {
             <Icon
               name="smile-o"
               size={30}
-              color={mood === 3 ? '#fff' : '#ff69b4'}
+              color={mood === 3 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
 
@@ -248,7 +248,7 @@ const EditJournal = ({ navigation, route }) => {
             <Icon1
               name="smile-beam"
               size={28}
-              color={mood === 4 ? '#fff' : '#ff69b4'}
+              color={mood === 4 ? '#fff' : '#E07C8E'}
             />
           </TouchableOpacity>
         </View>
@@ -270,8 +270,8 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ff69b4',
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
     marginBottom: 15,
   },
   imageBox: {
@@ -290,12 +290,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: '#333',
+    color: '#B67F89',
+    fontFamily: 'Poppins-Medium',
     marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ff69b4',
+    borderColor: '#E07C8E',
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
@@ -306,13 +307,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ff69b4',
+    borderColor: '#E07C8E',
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 18,
   },
   moodActive: {
-    backgroundColor: '#ff69b4',
+    backgroundColor: '#E07C8E',
     borderRadius: 80,
     paddingVertical: 2,
     paddingHorizontal: 4,
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 16,
   },
   headerRow: {
@@ -340,11 +341,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 20,
-    color: '#FF6F91',
-    fontWeight: '600',
+    color: '#E07C8E',
+    fontFamily: 'Poppins-Bold',
   },
   editBtn: { width: 40, alignItems: 'flex-end' },
-  editText: { color: '#FF6F91', fontSize: 14 },
+  editText: { color: '#E07C8E', fontSize: 14 },
 });
 
 export default EditJournal;

@@ -184,7 +184,7 @@ const JournalDetail = ({ route, navigation }) => {
 export default JournalDetail;
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F2EFED' },
+  safe: { flex: 1, backgroundColor: '#FCF7F2' },
   container: { flex: 1, paddingHorizontal: 16 },
   headerRow: {
     height: 56,

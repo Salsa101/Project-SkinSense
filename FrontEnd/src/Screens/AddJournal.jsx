@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
-    color: '#333',
+    color: '#B67F89',
     marginBottom: 5,
   },
   input: {
