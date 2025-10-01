@@ -412,7 +412,7 @@ const Calendar = ({ navigation }) => {
                         const IconLib = moodIcons[moodIndex].lib;
                         const iconName = moodIcons[moodIndex].name;
                         return (
-                          <IconLib name={iconName} size={30} color="#ff69b4" />
+                          <IconLib name={iconName} size={30} color="#E07C8E" />
                         );
                       }
                       return null;

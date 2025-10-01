@@ -50,7 +50,7 @@ const JournalDetail = ({ route, navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6F91" />
+        <ActivityIndicator size="large" color="#E07C8E" />
       </View>
     );
   }
@@ -72,7 +72,7 @@ const JournalDetail = ({ route, navigation }) => {
             style={styles.backBtn}
             onPress={() => navigation.navigate('Calendar')}
           >
-            <Icon name="arrow-left" size={20} color="#FF6F91" />
+            <Icon name="arrow-left" size={20} color="#E07C8E" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Journal</Text>
           <TouchableOpacity
@@ -123,7 +123,7 @@ const JournalDetail = ({ route, navigation }) => {
                       <Icon4
                         name={moodData.name}
                         size={16}
-                        color="#ff69b4"
+                        color="#E07C8E"
                         style={{ marginRight: 6 }}
                       />
                     );
@@ -184,8 +184,8 @@ const JournalDetail = ({ route, navigation }) => {
 export default JournalDetail;
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FCF7F2' },
-  container: { flex: 1, paddingHorizontal: 16 },
+  safe: { flex: 1, backgroundColor: '#FFF9F3' },
+  container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#FFF9F3' },
   headerRow: {
     height: 56,
     flexDirection: 'row',
@@ -197,12 +197,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 20,
-    color: '#FF6F91',
-    fontWeight: '600',
+    marginTop: 15,
+    fontSize: 18,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-Bold',
   },
   editBtn: { width: 40, alignItems: 'flex-end' },
-  editText: { color: '#FF6F91', fontSize: 14 },
+  editText: { color: '#E07C8E', fontSize: 14, fontFamily: 'Poppins-Medium' , marginRight: 10, marginTop: 15},
   scrollContent: { paddingBottom: 16 },
   card: {
     backgroundColor: '#fff',
@@ -225,16 +226,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   metaText: { marginLeft: 10 },
-  dateText: { color: '#666', fontSize: 12 },
-  moodText: { color: '#FF9FB3', fontSize: 12, marginTop: 2 },
+  dateText: { color: '#B67F89', fontSize: 12, fontFamily: 'Poppins-Regular' },
+  moodText: { color: '#FF9FB3', fontSize: 12, marginTop: 2, fontFamily: 'Poppins-Medium' },
   divider: { height: 1, backgroundColor: '#F0E3E6', marginVertical: 12 },
   title: {
     fontSize: 18,
-    color: '#E84D6A',
-    fontWeight: '700',
+    color: '#E07C8E',
+    fontFamily: 'Poppins-SemiBold',
     marginBottom: 12,
   },
   image: { width: '100%', height: 200, borderRadius: 10, marginBottom: 12 },
-  bodyText: { color: '#D54A61', fontSize: 14, lineHeight: 20 },
+  bodyText: { color: '#B67F89', fontSize: 14, lineHeight: 20, fontFamily: 'Poppins-Regular' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
