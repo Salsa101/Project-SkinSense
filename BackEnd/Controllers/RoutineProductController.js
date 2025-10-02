@@ -1,5 +1,7 @@
 const { RoutineProduct, Product } = require("../models");
 const { Op } = require("sequelize");
+const fs = require("fs");
+const path = require("path");
 
 const shelfLifeDefaults = {
   cleanser: 12,
@@ -43,7 +45,7 @@ const addProductToRoutine = async (req, res) => {
     }
 
     const imageUrl = req.file
-      ? `/uploads/${req.file.filename}`
+      ? `/uploads/${req.user.id}/products/${req.file.filename}`
       : productImage || null;
 
     let finalProductId = productId;
@@ -283,7 +285,20 @@ const updateRoutineProduct = async (req, res) => {
       };
 
       if (req.file) {
-        updateData.productImage = `/uploads/${req.file.filename}`;
+        // hapus file lama kalau ada
+        if (routine.Product.productImage) {
+          const oldPath = path.join(
+            __dirname,
+            "..",
+            routine.Product.productImage
+          );
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+          }
+        }
+
+        // set file baru
+        updateData.productImage = `/uploads/${req.user.id}/products/${req.file.filename}`;
       }
 
       await routine.Product.update(updateData);
@@ -376,7 +391,7 @@ const uploadProduct = async (req, res) => {
     }
 
     const { productName, productBrand, productType } = req.body;
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = `/uploads/${req.user.id}/products/${req.file.filename}`;
 
     const product = await Product.create({
       productName,

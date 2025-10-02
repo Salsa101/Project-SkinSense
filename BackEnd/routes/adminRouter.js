@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 
 const { validateToken } = require("../Middlewares/AuthMiddleware");
 const { validateLogin } = require("../Middlewares/Validator");
@@ -30,16 +32,7 @@ const {
 } = require("../Controllers/AdminController");
 
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
-
-// setup multer (upload ke folder /uploads)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + "-" + file.originalname;
-    cb(null, unique);
-  },
-});
-const upload = multer({ storage });
+const upload = require("../Middlewares/UploadImage");
 
 //Auth Admin
 router.get("/check-auth", validateToken, (req, res) => {
@@ -52,18 +45,18 @@ router.post("/logout", adminLogoutController);
 router.get("/products", validateToken, isAdmin, getAllProducts);
 router.post(
   "/add-product",
-  upload.single("productImage"),
   validateToken,
   isAdmin,
+  upload("products").single("productImage"),
   addProduct
 );
 router.delete("/delete-product", validateToken, isAdmin, deleteAdminProduct);
 router.get("/products/:id", validateToken, isAdmin, getProductById);
 router.put(
   "/products/update/:id",
-  upload.single("productImage"),
   validateToken,
   isAdmin,
+  upload("products").single("productImage"),
   updateProduct
 );
 router.put("/products/:id/verify", validateToken, isAdmin, verifiedProduct);
@@ -72,17 +65,17 @@ router.put("/products/:id/verify", validateToken, isAdmin, verifiedProduct);
 router.get("/news", validateToken, isAdmin, getNews);
 router.post(
   "/news/add",
-  upload.single("newsImage"),
   validateToken,
   isAdmin,
+  upload("news").single("newsImage"),
   addNews
 );
 router.get("/news/:id", validateToken, isAdmin, getNewsDetail);
 router.put(
   "/news/edit/:id",
-  upload.single("newsImage"),
   validateToken,
   isAdmin,
+  upload("news").single("newsImage"),
   editNews
 );
 router.delete("/news/delete/:id", validateToken, isAdmin, deleteNews);

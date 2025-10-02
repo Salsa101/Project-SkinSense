@@ -119,7 +119,7 @@ function News() {
                 <td>
                   {n.newsImage ? (
                     <img
-                      src={`http://localhost:3000/${n.newsImage}`}
+                      src={`http://localhost:3000${n.newsImage}`}
                       alt={n.title}
                       style={{
                         width: "100px",

@@ -4,6 +4,26 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config/config");
 const { validationResult } = require("express-validator");
+const fs = require("fs");
+const path = require("path");
+
+const deleteFile = (filePath) => {
+  try {
+    if (!filePath) return;
+
+    // bikin full path dari root project
+    const absolutePath = path.join(__dirname, "..", filePath);
+
+    if (fs.existsSync(absolutePath)) {
+      fs.unlinkSync(absolutePath);
+      console.log("File dihapus:", absolutePath);
+    } else {
+      console.log("File tidak ditemukan:", absolutePath);
+    }
+  } catch (err) {
+    console.error("Gagal hapus file:", err);
+  }
+};
 
 // ========== Auth Page ==========
 
@@ -85,8 +105,10 @@ const addProduct = async (req, res) => {
       productName,
       productBrand,
       productType,
-      productImage: req.file ? `/uploads/${req.file.filename}` : null,
-      userId: req.user.id, // ambil dari token
+      productImage: req.file
+        ? `/uploads/${req.user.id}/products/${req.file.filename}`
+        : null,
+      userId: req.user.id,
     });
 
     res.json(newProduct);
@@ -109,6 +131,8 @@ const deleteAdminProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Produk tidak ditemukan" });
     }
+
+    deleteFile(product.productImage);
 
     // hapus produk
     await product.destroy();
@@ -145,16 +169,22 @@ const updateProduct = async (req, res) => {
     const { id } = req.params;
     const { productName, productBrand, productType } = req.body;
 
-    const data = { productName, productBrand, productType };
+    const product = await Product.findByPk(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    if (productName) product.productName = productName;
+    if (productBrand) product.productBrand = productBrand;
+    if (productType) product.productType = productType;
+
     if (req.file) {
-      data.productImage = `/uploads/${req.file.filename}`;
+      // hapus file lama
+      deleteFile(product.productImage);
+      product.productImage = `/uploads/${req.user.id}/products/${req.file.filename}`;
     }
 
-    const [updated] = await Product.update(data, { where: { id } });
+    await product.save();
 
-    if (!updated) return res.status(404).json({ message: "Product not found" });
-
-    res.json({ message: "Product updated successfully" });
+    res.json({ message: "Product updated successfully", product });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -216,7 +246,9 @@ const addNews = async (req, res) => {
     let { title, content, categoryIds, isActive } = req.body;
     if (isActive === undefined) isActive = true; // fallback default
 
-    const newsImage = req.file ? req.file.path : null;
+    const newsImage = req.file
+      ? `/uploads/${req.user.id}/news/${req.file.filename}`
+      : null;
 
     if (!title || !content || !categoryIds)
       return res.status(400).json({ message: "All fields are required" });
@@ -230,6 +262,7 @@ const addNews = async (req, res) => {
       content,
       newsImage,
       isActive,
+      userId: req.user.id,
     });
 
     await news.setCategories(categoryIds);
@@ -271,15 +304,19 @@ const editNews = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, categoryIds, isActive } = req.body;
-    const newsImage = req.file ? req.file.path : null;
 
     const news = await News.findByPk(id);
     if (!news) return res.status(404).json({ message: "News not found" });
 
     if (title) news.title = title;
     if (content) news.content = content;
-    if (newsImage) news.newsImage = newsImage;
     if (typeof isActive !== "undefined") news.isActive = isActive;
+
+    if (req.file) {
+      // hapus gambar lama
+      deleteFile(news.newsImage);
+      news.newsImage = `/uploads/${req.user.id}/news/${req.file.filename}`;
+    }
 
     await news.save();
 
@@ -308,6 +345,8 @@ const deleteNews = async (req, res) => {
 
     const news = await News.findByPk(id);
     if (!news) return res.status(404).json({ message: "News not found" });
+
+    deleteFile(news.newsImage);
 
     await news.destroy();
 

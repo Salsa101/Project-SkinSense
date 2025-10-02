@@ -1,5 +1,17 @@
 const { Journal } = require("../models");
 const { Op } = require("sequelize");
+const fs = require("fs");
+const path = require("path");
+
+const deleteFile = (filePath) => {
+  try {
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    console.error("Gagal hapus file:", err);
+  }
+};
 
 // 1. Add new journal
 const addJournal = async (req, res) => {
@@ -8,7 +20,7 @@ const addJournal = async (req, res) => {
     const userId = req.user.id;
 
     const imageUrl = req.file
-      ? `/uploads/${req.file.filename}`
+      ? `/uploads/${userId}/journals/${req.file.filename}`
       : req.body.journal_image || null;
 
     const journal = await Journal.create({
@@ -129,10 +141,26 @@ const updateJournal = async (req, res) => {
       return res.status(404).json({ message: "Journal not found" });
     }
 
+    let imageUrl = journal.journal_image;
+
+    if (req.file) {
+      // hapus file lama
+      if (journal.journal_image) {
+        const oldPath = path.join(
+          __dirname,
+          "..",
+          journal.journal_image.replace("/uploads", "uploads")
+        );
+        deleteFile(oldPath);
+      }
+
+      imageUrl = `/uploads/${req.user.id}/journals/${req.file.filename}`;
+    }
+
     await journal.update({
       title,
       description,
-      journal_image: req.file ? req.file.filename : journal.journal_image,
+      journal_image: imageUrl,
       mood,
       journal_date,
     });
@@ -156,6 +184,16 @@ const deleteJournal = async (req, res) => {
 
     if (!journal) {
       return res.status(404).json({ message: "Journal not found" });
+    }
+
+    // hapus file image
+    if (journal.journal_image) {
+      const filePath = path.join(
+        __dirname,
+        "..",
+        journal.journal_image.replace("/uploads", "uploads")
+      );
+      deleteFile(filePath);
     }
 
     await journal.destroy();
