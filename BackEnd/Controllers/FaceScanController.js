@@ -1,47 +1,142 @@
-// const { exec } = require("child_process");
+const { spawn } = require("child_process");
+const path = require("path");
+const fs = require("fs");
+const { Scan } = require("../models");
 
-// const uploadFaceController = async (req, res) => {
-//   try {
-//     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+const runAI = (userId, filename) => {
+  return new Promise((resolve, reject) => {
+    const inputPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "AiMod",
+      "content",
+      "datacontent",
+      "test",
+      "images",
+      userId,
+      filename
+    );
 
-//     console.log("Face photo saved at:", req.file.path);
+    const outputPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "AiMod",
+      "content",
+      "datacontent",
+      "result",
+      userId,
+      `${userId}_${filename.replace(/\.[^/.]+$/, "")}_output.jpg`
+    );
 
-//     // Panggil Python AI
-//     exec(`python3 ai_process.py ${req.file.path}`, (err, stdout, stderr) => {
-//       if (err) {
-//         console.error("Python AI error:", err);
-//         return res.status(500).json({ error: "AI processing failed" });
-//       }
-//       console.log("Python AI output:", stdout);
-//       res.json({ message: "Photo uploaded and processed", result: stdout });
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Something went wrong" });
-//   }
-// };
+    const py = spawn("python", [
+      path.join(__dirname, "..", "..", "AiMod", "predict.py"),
+      userId,
+      inputPath,
+      outputPath,
+    ]);
 
-// module.exports = {
-//   uploadFaceController,
-// };
+    let resultData = "";
+    py.stdout.on("data", (data) => {
+      resultData += data.toString();
+    });
+
+    py.stderr.on("data", (data) => {
+      console.error("Python error:", data.toString());
+    });
+
+    py.on("close", () => {
+      const lastLine = resultData.trim().split("\n").pop();
+      const [numAcne, severity] = lastLine.split("|");
+      resolve({ numAcne, severity, outputPath });
+    });
+  });
+};
 
 const uploadFaceController = async (req, res) => {
+  const userId = req.user.id;
+  const filename = req.file.filename;
+
+  const srcPath = req.file.path;
+
+  const destDir = path.join(
+    __dirname,
+    "..",
+    "..",
+    "AiMod",
+    "content",
+    "datacontent",
+    "test",
+    "images",
+    userId.toString()
+  );
+  const destPath = path.join(destDir, filename);
+
   try {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    fs.mkdirSync(destDir, { recursive: true });
 
-    console.log("Face photo saved at:", req.file.path);
+    fs.renameSync(srcPath, destPath);
 
-    // Hanya upload dulu, Python AI nanti
-    res.json({
-      message: "Photo uploaded successfully",
-      filePath: req.file.path,
+    const aiResult = await runAI(userId.toString(), filename);
+
+    const uploadsDir = path.join(
+      __dirname,
+      "..",
+      "uploads",
+      userId.toString(),
+      "faces"
+    );
+    fs.mkdirSync(uploadsDir, { recursive: true });
+
+    const finalPath = path.join(uploadsDir, path.basename(aiResult.outputPath));
+    fs.copyFileSync(aiResult.outputPath, finalPath);
+
+    const acneCount = parseInt(aiResult.numAcne, 10);
+    // Save to DB
+    const newScan = await Scan.create({
+      userId: userId,
+      imagePath: `/uploads/${userId}/faces/${path.basename(finalPath)}`,
+      skinType: "unknown",
+      severity: aiResult.severity,
+      acneCount: isNaN(acneCount) ? 0 : acneCount,
+      score: null,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Something went wrong" });
+
+    res.json({
+      message: "Upload sukses & AI jalan, data tersimpan di DB",
+      scan: newScan,
+    });
+  } catch (err) {
+    console.error("UploadFace error:", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
-module.exports = {
-  uploadFaceController,
+const getFaceResultController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const scans = await Scan.findAll({
+      where: { userId },
+      order: [["createdAt", "DESC"]],
+      attributes: [
+        "id",
+        "imagePath",
+        "skinType",
+        "severity",
+        "acneCount",
+        "score",
+        "createdAt",
+        "updatedAt",
+      ],
+    });
+
+    res.json({ scans });
+  } catch (err) {
+    console.error("GetScans error:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
+module.exports = { uploadFaceController, getFaceResultController };

@@ -128,7 +128,7 @@ router.post(
   upload("faces").single("facePhoto"),
   uploadFaceController
 );
-router.get("/face-result/:userId/:filename", getFaceResultController);
+router.get("/scans", validateToken, getFaceResultController);
 
 //Journal
 router.get("/journal/view", validateToken, getJournalByDate);

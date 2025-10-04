@@ -100,18 +100,18 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Compare Button */}
-        {/* <TouchableOpacity style={styles.compareButton}> */}
-        <View style={styles.compareButtonContent}>
-          <Text style={styles.compareButtonText}>Compare Your Skin</Text>
-          <Icon
-            name="arrow-right"
-            size={15}
-            marginRight={10}
-            color="#DE576F"
-            style={styles.compareIcon}
-          />
-        </View>
-        {/* </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => navigation.navigate('CompareScan')}>
+          <View style={styles.compareButtonContent}>
+            <Text style={styles.compareButtonText}>Compare Your Skin</Text>
+            <Icon
+              name="arrow-right"
+              size={15}
+              marginRight={10}
+              color="#DE576F"
+              style={styles.compareIcon}
+            />
+          </View>
+        </TouchableOpacity>
 
         {/* Ingredients Section */}
         <View style={styles.ingredientsSection}>

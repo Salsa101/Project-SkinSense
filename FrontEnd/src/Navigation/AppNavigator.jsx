@@ -28,6 +28,7 @@ import JournalDetail from '../Screens/JournalDetail';
 import EditJournal from '../Screens/EditJournal';
 import StepRoutine from '../Screens/StepRoutine';
 import SkincareGuide from '../Screens/SkincareGuide';
+import CompareScan from '../Screens/CompareScan';
 
 const Stack = createNativeStackNavigator();
 
@@ -186,6 +187,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="SkincareGuide"
           component={SkincareGuide}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CompareScan"
+          component={CompareScan}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
