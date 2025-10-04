@@ -30,7 +30,7 @@ function Analytics() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await api.get("/admin/analytics");
+        const res = await api.get(`/admin/analytics?filter=${filter}`);
 
         // User Growth
         setUserGrowthData(res.data.userGrowth);
@@ -49,9 +49,9 @@ function Analytics() {
         }));
         setTopRankingData(productsFormatted);
 
-        // Top Face Scan
+        // Face Scan Activity
         const faceScanFormatted = res.data.faceScanActivity.map((f) => ({
-          month: f.month,
+          month: f.period, // backend sekarang pakai field 'period'
           count: f.count,
         }));
         setFaceScanData(faceScanFormatted);
@@ -59,8 +59,9 @@ function Analytics() {
         console.error("Failed to fetch analytics:", err);
       }
     };
+
     fetchAnalytics();
-  }, []);
+  }, [filter]); // <-- re-fetch tiap filter berubah
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -80,6 +81,7 @@ function Analytics() {
               <option value="daily">Per Hari</option>
               <option value="weekly">Per Minggu</option>
               <option value="monthly">Per Bulan</option>
+              <option value="yearly">Per Tahun</option>
             </select>
           </div>
 
@@ -92,7 +94,7 @@ function Analytics() {
                   <LineChart data={userGrowthData}>
                     <Line type="monotone" dataKey="users" stroke="#cb5cc4ff" />
                     <CartesianGrid stroke="#ccc" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="period" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -121,7 +123,7 @@ function Analytics() {
             {/* Ranking Chart */}
             <div className="col-md-6 mb-4">
               <div className="card shadow-sm p-3">
-                <h5>Top 5 Produk Favorit</h5>
+                <h5>Top 5 Most Used Products</h5>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={topRankingData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />

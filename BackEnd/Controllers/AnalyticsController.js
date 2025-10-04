@@ -11,45 +11,68 @@ const { Op, fn, col, literal } = require("sequelize");
 
 const getAnalytics = async (req, res) => {
   try {
-    // 1. User Growth per month
+    const { filter = "monthly", year } = req.query;
+
+    // Tentukan format EXTRACT sesuai filter
+    let dateFormat, monthNames;
+    switch (filter) {
+      case "daily":
+        dateFormat = `EXTRACT(DAY FROM "createdAt")`;
+        break;
+      case "weekly":
+        dateFormat = `EXTRACT(WEEK FROM "createdAt")`;
+        break;
+      case "monthly":
+        dateFormat = `EXTRACT(MONTH FROM "createdAt")`;
+        monthNames = [
+          "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+          "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+        ];
+        break;
+      case "yearly":
+        dateFormat = `EXTRACT(YEAR FROM "createdAt")`;
+        break;
+      default:
+        // fallback ke monthly
+        dateFormat = `EXTRACT(MONTH FROM "createdAt")`;
+        monthNames = [
+          "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+          "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+        ];
+        break;
+    }
+
+    // Where clause optional filter tahun
+    const whereClause = {};
+    if (year) {
+      const start = new Date(`${year}-01-01`);
+      const end = new Date(`${year}-12-31`);
+      whereClause.createdAt = { [Op.between]: [start, end] };
+    }
+
+    // 1. User Growth
     const users = await User.findAll({
       attributes: [
-        [sequelize.literal(`EXTRACT(MONTH FROM "createdAt")`), "monthNumber"],
-        [sequelize.fn("COUNT", sequelize.col("id")), "users"],
+        [literal(dateFormat), "period"],
+        [fn("COUNT", col("id")), "users"],
       ],
-      group: [sequelize.literal(`EXTRACT(MONTH FROM "createdAt")`)],
-      subQuery: false,
+      where: whereClause,
+      group: [literal(dateFormat)],
       raw: true,
     });
 
-    // Map angka bulan ke nama bulan
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "Mei",
-      "Jun",
-      "Jul",
-      "Agu",
-      "Sep",
-      "Okt",
-      "Nov",
-      "Des",
-    ];
-    const usersWithMonthName = users.map((u) => ({
-      month: monthNames[parseInt(u.monthNumber) - 1],
+    const usersFormatted = users.map(u => ({
+      period: (filter === "monthly" || filter === "weekly") && monthNames
+        ? monthNames[parseInt(u.period) - 1]
+        : u.period,
       users: u.users,
     }));
 
-    // 2. Top 5 News Users Bookmark and Categories
+    // 2. Top 5 News (Bookmark + Category)
     const topNews = await News.findAll({
       attributes: [
         "title",
-        [
-          sequelize.fn("COUNT", sequelize.col("Users->Bookmark.userId")),
-          "count",
-        ],
+        [fn("COUNT", col("Users->Bookmark.userId")), "count"],
       ],
       include: [
         {
@@ -63,8 +86,9 @@ const getAnalytics = async (req, res) => {
           through: { attributes: [] },
         },
       ],
+      where: whereClause,
       group: ["News.id", "Categories.id"],
-      order: [[sequelize.literal("count"), "DESC"]],
+      order: [[literal("count"), "DESC"]],
       limit: 5,
       subQuery: false,
     });
@@ -73,43 +97,45 @@ const getAnalytics = async (req, res) => {
     const topProducts = await Product.findAll({
       attributes: [
         "productName",
-        [sequelize.fn("COUNT", sequelize.col("RoutineProducts.id")), "count"],
+        [fn("COUNT", col("RoutineProducts.id")), "count"],
       ],
       include: [
-        {
-          association: "RoutineProducts",
-          attributes: [],
-        },
+        { association: "RoutineProducts", attributes: [] },
       ],
+      where: whereClause,
       group: ["Product.id"],
-      order: [[sequelize.literal("count"), "DESC"]],
+      order: [[literal("count"), "DESC"]],
       limit: 5,
-      subQuery: false,
       raw: true,
+      subQuery: false,
     });
 
-    //Scan
-    const faceScans = await Scan.findAll({
+    // 4. Face Scans Activity
+    const scans = await Scan.findAll({
       attributes: [
-        [literal(`EXTRACT(MONTH FROM "createdAt")`), "monthNumber"],
+        [literal(dateFormat), "period"],
         [fn("COUNT", col("id")), "count"],
       ],
-      group: [literal(`EXTRACT(MONTH FROM "createdAt")`)],
-      subQuery: false,
+      where: whereClause,
+      group: [literal(dateFormat)],
       raw: true,
+      subQuery: false,
     });
 
-    const faceScanWithMonth = faceScans.map((f) => ({
-      month: monthNames[parseInt(f.monthNumber) - 1],
-      count: f.count,
+    const scansFormatted = scans.map(s => ({
+      period: (filter === "monthly" || filter === "weekly") && monthNames
+        ? monthNames[parseInt(s.period) - 1]
+        : s.period,
+      count: s.count,
     }));
 
     res.json({
-      userGrowth: usersWithMonthName,
+      userGrowth: usersFormatted,
       topNewsBookmark: topNews,
-      topProducts: topProducts,
-      faceScanActivity: faceScanWithMonth,
+      topProducts,
+      faceScanActivity: scansFormatted,
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch analytics" });
