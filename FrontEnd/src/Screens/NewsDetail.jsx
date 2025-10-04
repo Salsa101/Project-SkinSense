@@ -107,22 +107,24 @@ const NewsDetail = ({ route, navigation }) => {
       </View>
 
       {/* Gambar utama */}
-      <Image
-        source={{ uri: `${api.defaults.baseURL}/${news.newsImage}` }}
-        style={styles.mainImage}
-      />
+      <View>
+        <Image
+          source={{ uri: `${api.defaults.baseURL}${news.newsImage}` }}
+          style={styles.mainImage}
+        />
+        <View style={styles.overlay} />
+      </View>
 
       {/* Konten berita */}
-    <LinearGradient
-      colors={['#F7EBE1', '#FFFFFF']}
-      start={{x:0,y:0}} end={{x:0,y:1}}
-      locations={[0, 0.54]} 
-      style={styles.contentBox}
-    >
+      <LinearGradient
+        colors={['#F7EBE1', '#FFFFFF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        locations={[0, 0.54]}
+        style={styles.contentBox}
+      >
         {/* Judul */}
         <Text style={styles.title}>{news.title}</Text>
-        
-
         {/* Tags dari kategori */}
         <View style={styles.tags}>
           {news.Categories?.map(category => (
@@ -147,11 +149,11 @@ const NewsDetail = ({ route, navigation }) => {
           source={{ html: news.content }}
           tagsStyles={{
             div: {
-               fontFamily: 'Poppins-Regular',
-                },
+              fontFamily: 'Poppins-Regular',
+            },
             body: {
-               fontFamily: 'Poppins-Regular',
-              },
+              fontFamily: 'Poppins-Regular',
+            },
             h1: {
               fontSize: 24,
               fontFamily: 'Poppins-Bold',
@@ -188,7 +190,6 @@ const NewsDetail = ({ route, navigation }) => {
         />
       </LinearGradient>
     </ScrollView>
-      
   );
 };
 
@@ -253,7 +254,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     lineHeight: 20,
   },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
 });
-
 
 export default NewsDetail;

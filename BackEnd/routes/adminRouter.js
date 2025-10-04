@@ -30,6 +30,12 @@ const {
   isActiveCategory,
   toggleNewsActive,
 } = require("../Controllers/AdminController");
+const {
+  getUserGrowth,
+  getTopNewsBookmark,
+  getTopProducts,
+  getAnalytics,
+} = require("../Controllers/AnalyticsController");
 
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
 const upload = require("../Middlewares/UploadImage");
@@ -93,5 +99,8 @@ router.put(
   isAdmin,
   isActiveCategory
 );
+
+//Analytics Route
+router.get("/analytics", validateToken, isAdmin, getAnalytics);
 
 module.exports = router;

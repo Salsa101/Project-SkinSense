@@ -77,11 +77,25 @@ const Navbar = () => {
             <li className="nav-item">
               <a
                 className={`nav-link ${
-                  location.pathname.startsWith("/admin/categories") ? "active" : ""
+                  location.pathname.startsWith("/admin/categories")
+                    ? "active"
+                    : ""
                 }`}
                 href="/admin/categories"
               >
                 Category
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className={`nav-link ${
+                  location.pathname.startsWith("/admin/analytics")
+                    ? "active"
+                    : ""
+                }`}
+                href="/admin/analytics"
+              >
+                Analytics
               </a>
             </li>
           </ul>

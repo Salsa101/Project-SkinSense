@@ -71,18 +71,30 @@ const BookmarkLists = ({ route, navigation }) => {
 
           {newsList.length === 0 ? (
             <View style={{ padding: 20, alignItems: 'center' }}>
-              <Text style={{ color: '#aaa', fontSize: 16, fontFamily: 'Poppins-Regular' }}>
+              <Text
+                style={{
+                  color: '#aaa',
+                  fontSize: 16,
+                  fontFamily: 'Poppins-Regular',
+                }}
+              >
                 No bookmarks on list
               </Text>
             </View>
           ) : (
             newsList.map(news => (
-              <View key={news.id} style={styles.card}>
+              <TouchableOpacity
+                key={news.id}
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('NewsDetail', { id: news.id })
+                }
+              >
                 <View style={styles.imageContainer}>
                   <Image
                     source={
                       news.newsImage
-                        ? { uri: `${api.defaults.baseURL}/${news.newsImage}` }
+                        ? { uri: `${api.defaults.baseURL}${news.newsImage}` }
                         : require('../../assets/category-admin.jpg')
                     }
                     style={styles.image}
@@ -118,7 +130,7 @@ const BookmarkLists = ({ route, navigation }) => {
                     ))}
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>
@@ -130,7 +142,12 @@ const BookmarkLists = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF9F3' },
   newsContainer: { padding: 25 },
-  titlePage: { marginBottom: 20, fontSize: 18, fontFamily: 'Poppins-Bold', color: '#E07C8E' },
+  titlePage: {
+    marginBottom: 20,
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+  },
   card: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -150,7 +167,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   content: { padding: 12, backgroundColor: '#FFEFF1' },
-  title: { fontSize: 14, fontFamily: 'Poppins-Bold', color: '#E07C8E', marginTop: 0, marginBottom: 8 },
+  title: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+    marginTop: 0,
+    marginBottom: 8,
+  },
   categoryContainer: { flexDirection: 'row', gap: 8 },
   categoryBadge: {
     backgroundColor: '#fff',
@@ -160,7 +183,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F4B4C0',
   },
-  categoryText: { fontSize: 12, color: '#E07C8E', fontFamily: 'Poppins-SemiBold' },
+  categoryText: {
+    fontSize: 12,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-SemiBold',
+  },
 });
 
 export default BookmarkLists;

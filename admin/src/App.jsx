@@ -11,6 +11,7 @@ import Categories from "./Pages/Categories";
 import AddCategory from "./Pages/AddCategory";
 import EditCategory from "./Pages/EditCategory";
 import EditNews from "./Pages/EditNews";
+import Analytics from "./Pages/Analytics";
 
 function App() {
   return (
@@ -94,6 +95,14 @@ function App() {
           element={
             <ProtectedRoute>
               <EditCategory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute>
+              <Analytics />
             </ProtectedRoute>
           }
         />
