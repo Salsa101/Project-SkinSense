@@ -18,7 +18,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const dummyScanData = {
   '2025-10-12': [
@@ -86,8 +86,37 @@ const CompareScan = ({ navigation }) => {
   };
 
   const openBottomSheet = item => {
-    setCurrentItem(item);
-    sheetRef.current?.snapToIndex(2); // buka sheet ke posisi tengah (50%)
+    setCurrentItem({
+      ...item,
+      imageUri: require('../../assets/banner-profile.png'),
+      skinType: item.condition,
+      score: item.score,
+      acneCount: 5,
+      severity: 'Medium',
+      ingredientsForYou: [
+        'Centella Asiatica',
+        'Jojoba Oil',
+        'Ceramide NP',
+        'Hyaluronic Acid',
+      ],
+      avoidIngredients: ['Alcohol', 'Fragrance', 'Coconut Oil', 'AHA/BHA'],
+      products: [
+        {
+          name: 'Hydrating Serum',
+          image: require('../../assets/banner-profile.png'),
+        },
+        {
+          name: 'Hydrating Serum',
+          image: require('../../assets/banner-profile.png'),
+        },
+        {
+          name: 'Hydrating Serum',
+          image: require('../../assets/banner-profile.png'),
+        },
+      ],
+    });
+
+    sheetRef.current?.snapToIndex(2); // buka sheet
   };
 
   return (
@@ -224,43 +253,317 @@ const CompareScan = ({ navigation }) => {
         {/* Bottom Sheet */}
         <BottomSheet
           ref={sheetRef}
-          index={-1} // tertutup awalnya
+          index={-1}
           snapPoints={snapPoints}
           enablePanDownToClose={true}
           backdropComponent={props => (
             <BottomSheetBackdrop
               {...props}
-              disappearsOnIndex={-1} // hilang saat sheet tertutup
-              appearsOnIndex={0} // muncul saat sheet terbuka
-              pressBehavior="close" // klik overlay = tutup sheet
-              opacity={0.5} // transparansi overlay
-              enableTouchThrough={false} // mencegah klik diteruskan ke bawah
+              disappearsOnIndex={-1}
+              appearsOnIndex={0}
+              pressBehavior="close"
+              opacity={0.5}
+              enableTouchThrough={false}
             />
           )}
           backgroundStyle={{ backgroundColor: 'white', borderRadius: 16 }}
         >
-          <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
+          <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
             {currentItem ? (
               <>
+                {/* Header */}
                 <Text
-                  style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 16 }}
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    textAlign: 'center',
+                    marginBottom: 16,
+                    color: '#E07C8E',
+                  }}
                 >
                   Scan Detail -{' '}
                   {formatDateTime(selectedDates[0], currentItem.time)}
                 </Text>
+
+                {/* Image */}
                 <View style={{ alignItems: 'center', marginBottom: 16 }}>
                   <Image
-                    source={{ uri: 'https://your-image-link-or-state' }}
-                    style={{ width: 150, height: 150, borderRadius: 8 }}
+                    source={currentItem.imageUri}
+                    style={{
+                      width: SCREEN_WIDTH - 40,
+                      height: SCREEN_WIDTH - 40,
+                      borderRadius: 15,
+                    }}
                   />
                 </View>
-                <Text>Skin Type: Dry Skin, Acne Prone</Text>
-                <Text>Score: {currentItem.score}/100</Text>
-                <Text>Acne Spotted: 5 Acne Spotted</Text>
-                <Text>Severity: Medium</Text>
+
+                {/* Scan Info */}
+                <View style={{ marginBottom: 16 }}>
+                  {/* Row 1: Skin Type & Score */}
+                  <View
+                    style={{ flexDirection: 'row', marginBottom: 8, gap: 12 }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                        Skin Type :
+                      </Text>
+                      <Text
+                        style={{
+                          backgroundColor: '#FDE2E4',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        {currentItem.skinType}
+                      </Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                        Score :
+                      </Text>
+                      <Text
+                        style={{
+                          backgroundColor: '#FDE2E4',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        {currentItem.score}/100
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Row 2: Acne Spotted & Severity */}
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                        Acne Spotted :
+                      </Text>
+                      <Text
+                        style={{
+                          backgroundColor: '#FDE2E4',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        {currentItem.acneCount} Acne Spotted
+                      </Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                        Severity :
+                      </Text>
+                      <Text
+                        style={{
+                          backgroundColor: '#FDE2E4',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        {currentItem.severity}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: '#E07C8E',
+                    width: '100%',
+                    marginTop: 10,
+                    marginBottom: 20,
+                  }}
+                />
+
+                {/* Timeline Sections */}
+                <View style={{ marginBottom: 16, paddingLeft: 5 }}>
+                  {/* Ingredients For You */}
+                  <View style={{ flexDirection: 'row' }}>
+                    {/* Line & Dot */}
+                    <View style={{ width: 20, alignItems: 'center' }}>
+                      <View
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: 6,
+                          backgroundColor: '#E07C8E',
+                        }}
+                      />
+                      <View
+                        style={{
+                          flex: 1,
+                          width: 2,
+                          backgroundColor: '#E07C8E',
+                          marginTop: 2,
+                        }}
+                      />
+                    </View>
+
+                    {/* Konten */}
+                    <View
+                      style={{ flex: 1, paddingLeft: 12, marginBottom: 16 }}
+                    >
+                      <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                        Ingredients For You
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          flexWrap: 'wrap',
+                          gap: 8,
+                        }}
+                      >
+                        {currentItem.ingredientsForYou.map((item, idx) => (
+                          <Text
+                            key={idx}
+                            style={{
+                              backgroundColor: '#FFF0F2',
+                              color: '#E07C8E',
+                              padding: 6,
+                              borderRadius: 6,
+                            }}
+                          >
+                            ✔ {item}
+                          </Text>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* What to Avoid */}
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ width: 20, alignItems: 'center' }}>
+                      <View
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: 6,
+                          backgroundColor: '#E07C8E',
+                        }}
+                      />
+                      <View
+                        style={{
+                          flex: 1,
+                          width: 2,
+                          backgroundColor: '#E07C8E',
+                          marginTop: 2,
+                        }}
+                      />
+                    </View>
+
+                    <View
+                      style={{ flex: 1, paddingLeft: 12, marginBottom: 16 }}
+                    >
+                      <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                        What to Avoid
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          flexWrap: 'wrap',
+                          gap: 8,
+                        }}
+                      >
+                        {currentItem.avoidIngredients.map((item, idx) => (
+                          <Text
+                            key={idx}
+                            style={{
+                              backgroundColor: '#FFEAEA',
+                              color: '#E07C8E',
+                              padding: 6,
+                              borderRadius: 6,
+                            }}
+                          >
+                            ✖ {item}
+                          </Text>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Products For You */}
+                  <View style={{ flexDirection: 'row', marginBottom: 24 }}>
+                    <View style={{ width: 20, alignItems: 'center' }}>
+                      <View
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: 6,
+                          backgroundColor: '#E07C8E',
+                        }}
+                      />
+                    </View>
+
+                    <View style={{ flex: 1, paddingLeft: 12 }}>
+                      <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                        Products For You
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        {currentItem.products.map((product, idx) => (
+                          <View
+                            key={idx}
+                            style={{
+                              alignItems: 'center',
+                              width: 80,
+                              backgroundColor: '#c7c7c7ff',
+                              padding: 10,
+                              borderRadius: 8,
+                            }}
+                          >
+                            <Image
+                              source={product.image}
+                              style={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: 8,
+                                marginBottom: 4,
+                              }}
+                            />
+                            <Text style={{ fontSize: 12, textAlign: 'center' }}>
+                              {product.name}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Compare Button */}
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: '#E07C8E',
+                    paddingVertical: 12,
+                    borderRadius: 30,
+                    alignItems: 'center',
+                    marginBottom: 10,
+                  }}
+                  onPress={() => {
+                    toggleSelectItem(currentItem);
+                    sheetRef.current?.close();
+                  }}
+                >
+                  <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                    Compare
+                  </Text>
+                </TouchableOpacity>
               </>
             ) : (
-              <Text>Pilih scan dulu</Text>
+              <Text style={{ textAlign: 'center', marginTop: 16 }}>
+                Pilih scan dulu
+              </Text>
             )}
           </BottomSheetScrollView>
         </BottomSheet>
