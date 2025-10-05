@@ -24,15 +24,15 @@ const addProductToRoutine = async (req, res) => {
       productImage,
       productStep,
       dateOpened,
-      expirationDate,
       isOpened,
       routineType,
       timeOfDay,
       dayOfWeek,
       customDate,
+      paoMonths,
+      hasPao,
     } = req.body;
 
-    // parsing dayOfWeek
     let dayOfWeekArray = [];
     if (dayOfWeek) {
       try {
@@ -45,40 +45,62 @@ const addProductToRoutine = async (req, res) => {
     }
 
     const imageUrl = req.file
-      ? `/uploads/${req.user.id}/products/${req.file.filename}`
+      ? `/uploads/${userId}/products/${req.file.filename}`
       : productImage || null;
 
     let finalProductId = productId;
+    let existingProduct = null;
+    let newProduct = null;
 
     if (!finalProductId) {
-      // input manual → cek apakah produk dengan data sama sudah ada
       if (!productName || !productBrand || !productType) {
         return res
           .status(400)
           .json({ message: "Data produk tidak lengkap untuk input manual." });
       }
 
-      let existingProduct = await Product.findOne({
+      existingProduct = await Product.findOne({
         where: { productName, productBrand, productType },
       });
 
       if (existingProduct) {
         finalProductId = existingProduct.id;
       } else {
-        const newProduct = await Product.create({
+        newProduct = await Product.create({
           userId,
           productName,
           productBrand,
           productType,
           productImage: imageUrl,
-          isVerified: false, // default
+          isVerified: false,
           shelf_life_months: shelfLifeDefaults[productType] || 6,
         });
         finalProductId = newProduct.id;
       }
     }
 
-    // cek apakah routine product dengan step yg sama sudah ada
+    const parsedHasPao =
+      typeof hasPao === "string"
+        ? hasPao === "true" || hasPao === "yes"
+        : !!hasPao;
+
+    const finalPaoMonths = parsedHasPao
+      ? parseInt(paoMonths) || 6
+      : existingProduct?.shelf_life_months ||
+        newProduct?.shelf_life_months ||
+        shelfLifeDefaults[productType] ||
+        6;
+
+    let expirationDate = null;
+    if (isOpened === "yes" && dateOpened) {
+      const baseDate = new Date(dateOpened);
+      expirationDate = new Date(
+        baseDate.setMonth(baseDate.getMonth() + finalPaoMonths)
+      );
+    } else if (isOpened === "no" && req.body.expirationDate) {
+      expirationDate = new Date(req.body.expirationDate);
+    }
+
     let existingStep = await RoutineProduct.findOne({
       where: { userId, routineType, timeOfDay, productStep },
     });
@@ -91,6 +113,8 @@ const addProductToRoutine = async (req, res) => {
         dayOfWeek: dayOfWeekArray,
         customDate,
         isOpened,
+        hasPao: parsedHasPao,
+        paoMonths: finalPaoMonths,
       });
       return res.status(200).json({
         message: `Step ${productStep} di ${routineType} ${timeOfDay} berhasil diupdate.`,
@@ -98,7 +122,6 @@ const addProductToRoutine = async (req, res) => {
       });
     }
 
-    // kalau belum ada → create baru
     const routineProduct = await RoutineProduct.create({
       userId,
       productId: finalProductId,
@@ -110,6 +133,8 @@ const addProductToRoutine = async (req, res) => {
       dayOfWeek: dayOfWeekArray,
       customDate,
       isOpened,
+      hasPao: parsedHasPao,
+      paoMonths: finalPaoMonths,
     });
 
     res.status(201).json(routineProduct);
@@ -207,7 +232,7 @@ const viewRoutineByTime = async (req, res) => {
 
           {
             routineType: "custom",
-            customDate: { [Op.between]: [startOfDay, endOfDay] },
+            customDate: todayDate,
           },
         ],
       },
@@ -264,16 +289,34 @@ const updateRoutineProduct = async (req, res) => {
     });
     if (!routine) return res.status(404).json({ message: "Not found" });
 
+    let dayOfWeek = routine.dayOfWeek;
+    if (req.body.dayOfWeek) {
+      const parsed = JSON.parse(req.body.dayOfWeek);
+      dayOfWeek = Array.isArray(parsed) ? parsed : [];
+    }
+
+    let customDate = routine.customDate;
+    if (req.body.customDate && req.body.customDate !== "null") {
+      customDate = req.body.customDate;
+    } else {
+      customDate = null;
+    }
+
     // update RoutineProduct (selalu boleh diubah)
     await routine.update({
       productStep: req.body.productStep || routine.productStep,
       routineType: req.body.routineType || routine.routineType,
-      routineDay: req.body.routineDay || routine.routineDay,
-      customDate: req.body.customDate || routine.customDate,
+      dayOfWeek: dayOfWeek,
+      customDate,
       timeOfDay: req.body.timeOfDay || routine.timeOfDay,
       dateOpened: req.body.dateOpened || routine.dateOpened,
       expirationDate: req.body.expirationDate || routine.expirationDate,
       isOpened: req.body.isOpened || routine.isOpened,
+      hasPao: req.body.hasPao ?? routine.hasPao,
+      paoMonths:
+        req.body.paoMonths !== undefined
+          ? parseInt(req.body.paoMonths, 10)
+          : routine.paoMonths,
     });
 
     // cek verifikasi sebelum update Product

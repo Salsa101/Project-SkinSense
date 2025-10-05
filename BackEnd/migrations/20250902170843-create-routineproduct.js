@@ -70,6 +70,14 @@ module.exports = {
       isOpened: {
         type: Sequelize.BOOLEAN,
       },
+      hasPao: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      paoMonths: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

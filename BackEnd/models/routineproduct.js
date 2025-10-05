@@ -62,6 +62,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       isOpened: DataTypes.BOOLEAN,
+      hasPao: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      paoMonths: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       sequelize,

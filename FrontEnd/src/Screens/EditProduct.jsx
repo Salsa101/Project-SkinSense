@@ -12,6 +12,11 @@ import {
 import api from '../api';
 import { launchImageLibrary } from 'react-native-image-picker';
 
+import {
+  SelectList,
+  MultipleSelectList,
+} from 'react-native-dropdown-select-list';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
@@ -21,7 +26,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const EditProduct = ({ route, navigation }) => {
-  const { id } = route.params; // id product dikirim saat navigate
+  const { id } = route.params;
   const [productName, setProductName] = useState('');
   const [productBrand, setProductBrand] = useState('');
   const [productStep, setProductStep] = useState('');
@@ -32,20 +37,20 @@ const EditProduct = ({ route, navigation }) => {
   const [openProduct, setOpenProduct] = useState(false);
   const [productValue, setProductValue] = useState(null);
   const [productItems, setProductItems] = useState([
-    { label: 'Cleanser', value: 'cleanser' },
-    { label: 'Toner', value: 'toner' },
-    { label: 'Serum', value: 'serum' },
-    { label: 'Moisturizer', value: 'moisturizer' },
-    { label: 'Mask', value: 'mask' },
+    { key: 'cleanser', value: 'Cleanser' },
+    { key: 'toner', value: 'Toner' },
+    { key: 'serum', value: 'Serum' },
+    { key: 'moisturizer', value: 'Moisturizer' },
+    { key: 'mask', value: 'Mask' },
   ]);
 
   //Routine Type
   const [openRoutine, setOpenRoutine] = useState(false);
   const [routineValue, setRoutineValue] = useState(null);
   const [routineItems, setRoutineItems] = useState([
-    { label: 'Daily', value: 'daily' },
-    { label: 'Weekly', value: 'weekly' },
-    { label: 'Custom', value: 'custom' },
+    { key: 'daily', value: 'Daily' },
+    { key: 'weekly', value: 'Weekly' },
+    { key: 'custom', value: 'Custom' },
   ]);
 
   //Routine Day
@@ -69,8 +74,8 @@ const EditProduct = ({ route, navigation }) => {
   const [openTimeDay, setOpenTimeDay] = useState(false);
   const [timeDayValue, setTimeDayValue] = useState(null);
   const [timeDayItems, setTimeDayItems] = useState([
-    { label: 'Morning', value: 'morning' },
-    { label: 'Night', value: 'night' },
+    { key: 'morning', value: 'Morning' },
+    { key: 'night', value: 'Night' },
   ]);
 
   const [openDateOpened, setOpenDateOpened] = useState(false);
@@ -87,6 +92,9 @@ const EditProduct = ({ route, navigation }) => {
   const [isOpened, setIsOpened] = useState(null); // yes | no
 
   const [shelfLifeMonths, setShelfLifeMonths] = useState(0);
+
+  const [hasPAO, setHasPAO] = useState(null);
+  const [paoMonths, setPaoMonths] = useState('');
 
   const handleRoutineChange = callback => value => {
     setRoutineValue(value);
@@ -118,7 +126,7 @@ const EditProduct = ({ route, navigation }) => {
           setIsOpened(p.isOpened ? 'yes' : 'no');
           setProductValue(p.Product.productType || null);
           setRoutineValue(p.routineType || null);
-          setRoutineValueDay(p.routineDay || []);
+          // setRoutineValueDay(p.routineDay || []);
           setCustomDate(p.customDate ? new Date(p.customDate) : null);
           setTimeDayValue(p.timeOfDay || null);
           setRoutineValueDay(p.dayOfWeek || null);
@@ -127,6 +135,16 @@ const EditProduct = ({ route, navigation }) => {
             setExpirationDate(new Date(p.expirationDate));
           } else if (p.isOpened === true) {
             setExpirationDate(null); // nanti auto calculated via useEffect
+          }
+
+          // PAO info
+          // PAO info dari database
+          if (p.hasPao) {
+            setHasPAO('yes');
+            setPaoMonths(p.paoMonths?.toString() || '');
+          } else {
+            setHasPAO('no');
+            setPaoMonths('');
           }
 
           if (p.Product.productImage) {
@@ -170,8 +188,16 @@ const EditProduct = ({ route, navigation }) => {
 
       // kolom RoutineProduct
       payload.append('routineType', routineValue);
-      payload.append('routineDay', JSON.stringify(routineValueDay)); // array harus di-serialize
-      if (customDate) payload.append('customDate', customDate.toISOString());
+      if (routineValue === 'weekly') {
+        payload.append('dayOfWeek', JSON.stringify(routineValueDay));
+      } else {
+        payload.append('dayOfWeek', '[]');
+      }
+      if (routineValue === 'custom' && customDate) {
+        payload.append('customDate', customDate.toISOString());
+      } else {
+        payload.append('customDate', 'null');
+      }
       if (timeDayValue) payload.append('timeOfDay', timeDayValue);
       payload.append('isOpened', isOpened);
       if (isOpened === 'yes' && dateOpened) {
@@ -179,6 +205,15 @@ const EditProduct = ({ route, navigation }) => {
         payload.append('expirationDate', expirationDate.toISOString());
       } else if (isOpened === 'no' && expirationDate) {
         payload.append('expirationDate', expirationDate.toISOString());
+      }
+
+      payload.append('hasPao', hasPAO === 'yes');
+
+      // PAO
+      if (hasPAO === 'yes') {
+        payload.append('paoMonths', paoMonths);
+      } else {
+        payload.append('paoMonths', 0); // kalau no
       }
 
       const res = await api.put(`/routine-products/${id}`, payload, {
@@ -216,19 +251,6 @@ const EditProduct = ({ route, navigation }) => {
     return true;
   };
 
-  // const handleSetTime = selectedTime => {
-  //   if (!validateTime(selectedTime, timeDayValue)) {
-  //     Alert.alert(
-  //       'Invalid Time',
-  //       `Reminder time doesn't match with ${timeDayValue} schedule`,
-  //     );
-  //     setOpenTime(false);
-  //     return;
-  //   }
-  //   setTime(selectedTime);
-  //   setOpenTime(false); // <- tutup modal kalau valid juga
-  // };
-
   const shelfLifeDefaults = {
     cleanser: 12,
     sunscreen: 12,
@@ -252,16 +274,34 @@ const EditProduct = ({ route, navigation }) => {
   }, [productValue]);
 
   useEffect(() => {
-    if (!shelfLifeMonths) return;
+    if (!dateOpened) return;
+
+    let monthsToAdd = 0;
 
     if (isOpened === 'yes') {
-      if (dateOpened) {
-        setExpirationDate(calculateExpiration(dateOpened, shelfLifeMonths));
+      // pakai PAO kalau ada, kalau nggak pakai shelfLife
+      monthsToAdd =
+        hasPAO === 'yes' ? parseInt(paoMonths) || 0 : shelfLifeMonths;
+
+      if (monthsToAdd > 0) {
+        setExpirationDate(calculateExpiration(dateOpened, monthsToAdd));
+      } else {
+        setExpirationDate(null);
+      }
+    } else if (isOpened === 'no') {
+      // produk belum dibuka, bisa pakai shelfLife dari hari ini
+      if (shelfLifeMonths > 0) {
+        setExpirationDate(calculateExpiration(new Date(), shelfLifeMonths));
       } else {
         setExpirationDate(null);
       }
     }
-  }, [isOpened, dateOpened, shelfLifeMonths]);
+  }, [isOpened, dateOpened, shelfLifeMonths, hasPAO, paoMonths]);
+
+  console.log(
+    'Default Option:',
+    routineItemsDay.filter(item => routineValueDay.includes(item.key)),
+  );
 
   return (
     <View style={styles.container}>
@@ -360,70 +400,72 @@ const EditProduct = ({ route, navigation }) => {
             </View>
 
             {/* Product Type */}
-            <View style={[styles.form, { zIndex: 100 }]}>
+            <View
+              style={[styles.form, { zIndex: 100 }]}
+              pointerEvents={isVerified ? 'none' : 'auto'}
+            >
               <Text style={styles.formText}>Product Type</Text>
-              <DropDownPicker
-                open={openProduct}
-                value={productValue}
-                items={productItems}
-                setOpen={setOpenProduct}
-                setValue={setProductValue}
-                setItems={setProductItems}
-                disabled={isVerified}
+              <SelectList
+                setSelected={val => setProductValue(val)}
+                data={productItems}
+                save="key"
                 placeholder="Select product type"
-                placeholderStyle={{
+                defaultOption={
+                  productValue
+                    ? productItems.find(item => item.key === productValue)
+                    : null
+                }
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                  ...(isVerified ? styles.disabledField : {}),
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={[
-                  styles.dropdownPicker,
-                  isVerified && styles.disabledField,
-                ]}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
+                disabled={isVerified}
               />
             </View>
 
             {/* Routine Type */}
             <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Routine Type</Text>
-              <DropDownPicker
-                open={openRoutine}
-                value={routineValue}
-                items={routineItems}
-                setOpen={setOpenRoutine}
-                setValue={handleRoutineChange(setRoutineValue)}
-                setItems={setRoutineItems}
+              <SelectList
+                setSelected={val => setRoutineValue(val)}
+                data={routineItems}
+                save="key"
                 placeholder="Select routine type"
-                placeholderStyle={{
+                value={routineValue}
+                defaultOption={routineItems.find(
+                  item => item.key === routineValue,
+                )}
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 
@@ -495,68 +537,126 @@ const EditProduct = ({ route, navigation }) => {
             )}
 
             {/* Time of Day */}
-            <View style={[styles.form, { zIndex: 97 }]}>
+            <View style={[styles.form, { zIndex: 96 }]}>
               <Text style={styles.formText}>Time of Day</Text>
-              <DropDownPicker
-                open={openTimeDay}
-                value={timeDayValue}
-                items={timeDayItems}
-                setOpen={setOpenTimeDay}
-                setValue={setTimeDayValue}
-                setItems={setTimeDayItems}
+              <SelectList
+                setSelected={val => setTimeDayValue(val)}
+                data={timeDayItems}
+                save="key"
                 placeholder="Select time of day"
-                placeholderStyle={{
+                value={timeDayValue}
+                defaultOption={timeDayItems.find(
+                  item => item.key === timeDayValue,
+                )}
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
+
+            {/* PAO Info Dropdown */}
+            <View style={[styles.form, { zIndex: 96 }]}>
+              <Text style={styles.formText}>Does product have PAO info?</Text>
+              <SelectList
+                setSelected={val => setHasPAO(val)}
+                data={[
+                  { key: 'yes', value: 'Yes' },
+                  { key: 'no', value: 'No' },
+                ]}
+                save="key"
+                placeholder="Select option"
+                defaultOption={
+                  hasPAO
+                    ? { key: hasPAO, value: hasPAO === 'yes' ? 'Yes' : 'No' }
+                    : null
+                }
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                arrowicon={
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
+                }
+              />
+            </View>
+
+            {/* PAO Months Input - hanya muncul kalau hasPAO === 'yes' */}
+            {hasPAO === 'yes' && (
+              <View style={[styles.form, { zIndex: 95 }]}>
+                <Text style={styles.formText}>PAO (months)</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter PAO in months"
+                    placeholderTextColor="#E07C8E"
+                    keyboardType="numeric"
+                    value={paoMonths}
+                    onChangeText={text => {
+                      const number = text.replace(/[^0-9]/g, '');
+                      setPaoMonths(number);
+                    }}
+                  />
+                </View>
+              </View>
+            )}
 
             {/* Is Opened Dropdown */}
             <View style={[styles.form, { zIndex: 95 }]}>
               <Text style={styles.formText}>Product Opened?</Text>
-              <DropDownPicker
-                open={openIsOpened}
-                value={isOpened}
-                items={[
-                  { label: 'Yes', value: 'yes' },
-                  { label: 'No', value: 'no' },
+              <SelectList
+                setSelected={val => setIsOpened(val)}
+                data={[
+                  { key: 'yes', value: 'Yes' },
+                  { key: 'no', value: 'No' },
                 ]}
-                setOpen={setOpenIsOpened}
-                setValue={setIsOpened}
+                save="key"
                 placeholder="Select product status"
-                placeholderStyle={{
+                value={isOpened}
+                defaultOption={[
+                  { key: 'yes', value: 'Yes' },
+                  { key: 'no', value: 'No' },
+                ].find(item => item.key === isOpened)}
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                textStyle={{
-                  fontFamily: 'Poppins-Medium',
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
                   color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
                   fontSize: 12,
                 }}
-                style={styles.dropdownPicker}
-                dropDownContainerStyle={styles.dropdownStyle}
-                ArrowDownIconComponent={() => (
+                arrowicon={
                   <Icon name="chevron-down" size={20} color="#E07C8E" />
-                )}
-                ArrowUpIconComponent={() => (
-                  <Icon name="chevron-up" size={20} color="#E07C8E" />
-                )}
+                }
               />
             </View>
 

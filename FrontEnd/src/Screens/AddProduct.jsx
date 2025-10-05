@@ -29,7 +29,6 @@ import { launchImageLibrary } from 'react-native-image-picker';
 
 const AddProduct = ({ navigation }) => {
   // Product Type
-  const [openProduct, setOpenProduct] = useState(false);
   const [productValue, setProductValue] = useState(null);
   const [productItems, setProductItems] = useState([
     { key: 'cleanser', value: 'Cleanser' },
@@ -40,7 +39,6 @@ const AddProduct = ({ navigation }) => {
   ]);
 
   //Routine Type
-  const [openRoutine, setOpenRoutine] = useState(false);
   const [routineValue, setRoutineValue] = useState(null);
   const [routineItems, setRoutineItems] = useState([
     { key: 'daily', value: 'Daily' },
@@ -49,7 +47,6 @@ const AddProduct = ({ navigation }) => {
   ]);
 
   //Routine Day
-  const [openRoutineDay, setOpenRoutineDay] = useState(false);
   const [routineValueDay, setRoutineValueDay] = useState([]);
   const [routineItemsDay, setRoutineItemsDay] = useState([
     { key: 'monday', value: 'Monday' },
@@ -66,7 +63,6 @@ const AddProduct = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   //Time of Day
-  const [openTimeDay, setOpenTimeDay] = useState(false);
   const [timeDayValue, setTimeDayValue] = useState(null);
   const [timeDayItems, setTimeDayItems] = useState([
     { key: 'morning', value: 'Morning' },
@@ -78,9 +74,6 @@ const AddProduct = ({ navigation }) => {
   const [dateOpened, setDateOpened] = useState(null);
   const [expirationDate, setExpirationDate] = useState(null);
 
-  const [openTime, setOpenTime] = useState(false);
-  const [time, setTime] = useState(null);
-
   const [productName, setProductName] = useState('');
   const [productBrand, setProductBrand] = useState('');
 
@@ -91,10 +84,12 @@ const AddProduct = ({ navigation }) => {
 
   const [isVerified, setIsVerified] = useState(false);
 
-  const [openIsOpened, setOpenIsOpened] = useState(null);
   const [isOpened, setIsOpened] = useState(null);
 
   const [shelfLifeMonths, setShelfLifeMonths] = useState(0);
+
+  const [hasPAO, setHasPAO] = useState(null);
+  const [paoMonths, setPaoMonths] = useState('');
 
   // pilih & preview image
   const handleUpload = () => {
@@ -109,21 +104,6 @@ const AddProduct = ({ navigation }) => {
         });
       }
     });
-  };
-
-  const handleRoutineChange = callback => value => {
-    setRoutineValue(value);
-
-    if (value === 'weekly') {
-      setCustomDate(null);
-    } else if (value === 'custom') {
-      setRoutineValueDay([]);
-    } else {
-      setRoutineValueDay([]);
-      setCustomDate(null);
-    }
-
-    if (callback) callback(value);
   };
 
   const handleSave = async () => {
@@ -174,6 +154,16 @@ const AddProduct = ({ navigation }) => {
 
       if (customDate instanceof Date && !isNaN(customDate)) {
         payload.append('customDate', customDate.toISOString().split('T')[0]);
+      }
+
+      // PAO
+      if (hasPAO) {
+        payload.append('hasPao', hasPAO === 'yes');
+        if (hasPAO === 'yes') {
+          payload.append('paoMonths', paoMonths);
+        } else {
+          payload.append('paoMonths', shelfLifeMonths);
+        }
       }
 
       const res = await api.post('/add-routine-products', payload, {
@@ -257,14 +247,13 @@ const AddProduct = ({ navigation }) => {
   }, [productValue, selectedProductId]);
 
   useEffect(() => {
-    if (!shelfLifeMonths) return;
-
     if (isOpened === 'yes' && dateOpened) {
-      setExpirationDate(calculateExpiration(dateOpened, shelfLifeMonths));
+      const months = hasPAO === 'yes' ? Number(paoMonths) : shelfLifeMonths;
+      setExpirationDate(calculateExpiration(dateOpened, months));
     } else if (isOpened === 'no') {
-      setExpirationDate(null);
+      setExpirationDate(calculateExpiration(new Date(), shelfLifeMonths));
     }
-  }, [isOpened, dateOpened, shelfLifeMonths]);
+  }, [isOpened, dateOpened, shelfLifeMonths, paoMonths, hasPAO]);
 
   useEffect(() => {
     if (isOpened === 'yes') {
@@ -275,37 +264,6 @@ const AddProduct = ({ navigation }) => {
       setExpirationDate(null);
     }
   }, [isOpened]);
-
-  const validateTime = (time, timeDay) => {
-    if (!time) return true;
-
-    const hour = time.getHours();
-
-    if (timeDay === 'morning') {
-      // 05:00 - 11:59
-      return hour >= 5 && hour < 12;
-    }
-
-    if (timeDay === 'night') {
-      // 18:00 - 23:59
-      return hour >= 18 && hour < 24;
-    }
-
-    return true;
-  };
-
-  // const handleSetTime = selectedTime => {
-  //   if (!validateTime(selectedTime, timeDayValue)) {
-  //     Alert.alert(
-  //       'Invalid Time',
-  //       `Reminder time doesn't match with ${timeDayValue} schedule`,
-  //     );
-  //     setOpenTime(false); // <- tutup modal walau invalid
-  //     return;
-  //   }
-  //   setTime(selectedTime);
-  //   setOpenTime(false); // <- tutup modal kalau valid juga
-  // };
 
   return (
     <View style={styles.container}>
@@ -491,7 +449,17 @@ const AddProduct = ({ navigation }) => {
             <View style={[styles.form, { zIndex: 99 }]}>
               <Text style={styles.formText}>Routine Type</Text>
               <SelectList
-                setSelected={val => setRoutineValue(val)}
+                setSelected={val => {
+                  setRoutineValue(val);
+
+                  if (val !== 'custom') {
+                    setCustomDate(null);
+                  }
+
+                  if (val !== 'weekly') {
+                    setRoutineValueDay([]);
+                  }
+                }}
                 data={routineItems}
                 save="key"
                 placeholder="Select routine type"
@@ -605,6 +573,57 @@ const AddProduct = ({ navigation }) => {
                 }
               />
             </View>
+
+            {/* PAO Info Dropdown */}
+            <View style={[styles.form, { zIndex: 96 }]}>
+              <Text style={styles.formText}>Does product have PAO info?</Text>
+              <SelectList
+                setSelected={val => setHasPAO(val)}
+                data={[
+                  { key: 'yes', value: 'Yes' },
+                  { key: 'no', value: 'No' },
+                ]}
+                save="key"
+                placeholder="Select option"
+                boxStyles={{
+                  ...styles.dropdownPicker,
+                }}
+                inputStyles={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                dropdownStyles={styles.dropdownStyle}
+                dropdownTextStyles={{
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Medium',
+                  fontSize: 12,
+                }}
+                arrowicon={
+                  <Icon name="chevron-down" size={20} color="#E07C8E" />
+                }
+              />
+            </View>
+
+            {/* PAO Months Input - hanya muncul kalau hasPAO === 'yes' */}
+            {hasPAO === 'yes' && (
+              <View style={[styles.form, { zIndex: 95 }]}>
+                <Text style={styles.formText}>PAO (months)</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter PAO in months"
+                    placeholderTextColor="#E07C8E"
+                    keyboardType="numeric"
+                    value={paoMonths}
+                    onChangeText={text => {
+                      const number = text.replace(/[^0-9]/g, '');
+                      setPaoMonths(number);
+                    }}
+                  />
+                </View>
+              </View>
+            )}
 
             {/* Is Opened Dropdown */}
             <View style={[styles.form, { zIndex: 95 }]}>
@@ -738,14 +757,6 @@ const AddProduct = ({ navigation }) => {
         }}
         onCancel={() => setOpenExpiration(false)}
       />
-
-      {/* <DateTimePickerModal
-        isVisible={openTime}
-        mode="time"
-        date={time || new Date()}
-        onConfirm={selectedTime => handleSetTime(selectedTime)}
-        onCancel={() => setOpenTime(false)}
-      /> */}
     </View>
   );
 };
