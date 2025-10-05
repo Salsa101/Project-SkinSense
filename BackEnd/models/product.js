@@ -10,6 +10,18 @@ module.exports = (sequelize, DataTypes) => {
         as: "RoutineProducts",
       });
       Product.belongsTo(models.User, { foreignKey: "userId", as: "user" });
+
+      Product.belongsToMany(models.Ingredient, {
+        through: models.ProductIngredient,
+        foreignKey: "product_id",
+        otherKey: "ingredients_id",
+      });
+
+      Product.belongsToMany(models.ResultScan, {
+        through: models.ResultScanProduct,
+        foreignKey: "product_id",
+        otherKey: "resultScan_id",
+      });
     }
   }
 

@@ -1,7 +1,7 @@
 const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
-const { Scan } = require("../models");
+const { ResultScan } = require("../models");
 
 const runAI = (userId, filename) => {
   return new Promise((resolve, reject) => {
@@ -94,7 +94,7 @@ const uploadFaceController = async (req, res) => {
 
     const acneCount = parseInt(aiResult.numAcne, 10);
     // Save to DB
-    const newScan = await Scan.create({
+    const newScan = await ResultScan.create({
       userId: userId,
       imagePath: `/uploads/${userId}/faces/${path.basename(finalPath)}`,
       skinType: "unknown",

@@ -10,7 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       User.hasMany(models.Product, {
         foreignKey: "userId",
-        as: "products", // nama alias supaya mudah di include
+        as: "products",
+      });
+      User.hasMany(models.ResultScan, {
+        foreignKey: "userId",
+        as: "resultScans",
       });
       User.belongsToMany(models.News, {
         through: models.Bookmark,

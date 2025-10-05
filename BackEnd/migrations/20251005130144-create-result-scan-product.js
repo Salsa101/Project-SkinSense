@@ -2,39 +2,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Scans", {
+    await queryInterface.createTable("ResultScanProducts", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
+      resultScan_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "Users", key: "id" },
+        references: { model: "ResultScans", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      imagePath: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      skinType: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      severity: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      acneCount: {
+      product_id: {
         type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      score: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        references: { model: "Products", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,
@@ -47,6 +34,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Scans");
+    await queryInterface.dropTable("ResultScanProducts");
   },
 };
