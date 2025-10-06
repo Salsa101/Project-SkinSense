@@ -37,13 +37,13 @@ const Navbar = (active, onPress) => {
                 {item.type === 'FontAwesome6' ? (
                   <Icon1
                     name={item.icon}
-                    size={28}
+                    size={24}
                     color={isActive ? '#a05c5c' : '#aaa'}
                   />
                 ) : (
                   <Icon
                     name={item.icon}
-                    size={28}
+                    size={24}
                     color={isActive ? '#a05c5c' : '#aaa'}
                   />
                 )}
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f9f4f0',
     paddingTop: 8,
-    paddingBottom: 15,
+    paddingBottom: 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },

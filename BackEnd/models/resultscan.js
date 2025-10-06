@@ -18,12 +18,18 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "resultScan_id",
         otherKey: "product_id",
       });
+
+      ResultScan.belongsTo(models.QuizUserAnswer, {
+        foreignKey: "quizId",
+        as: "quiz",
+      });
     }
   }
 
   ResultScan.init(
     {
       userId: DataTypes.INTEGER,
+      quizId: DataTypes.INTEGER,
       imagePath: DataTypes.STRING,
       skinType: DataTypes.STRING,
       severity: DataTypes.STRING,

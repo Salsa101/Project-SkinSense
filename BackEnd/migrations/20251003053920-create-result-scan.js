@@ -16,6 +16,13 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
+      quizId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: { model: "QuizUserAnswers", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
       imagePath: {
         type: Sequelize.STRING,
         allowNull: false,

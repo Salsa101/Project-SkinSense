@@ -1,7 +1,7 @@
 const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
-const { ResultScan } = require("../models");
+const { ResultScan, QuizUserAnswer, QuizOption } = require("../models");
 
 const runAI = (userId, filename) => {
   return new Promise((resolve, reject) => {
@@ -93,14 +93,34 @@ const uploadFaceController = async (req, res) => {
     fs.copyFileSync(aiResult.outputPath, finalPath);
 
     const acneCount = parseInt(aiResult.numAcne, 10);
+
+    const skinAnswer = await QuizUserAnswer.findOne({
+      where: { userId, quizQuestionId: 1 },
+      include: [
+        {
+          model: QuizOption,
+          as: "quizOption",
+          attributes: ["title"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    const skinType = skinAnswer ? skinAnswer.quizOption.title : "Unknown";
+
+    const lastQuiz = await QuizUserAnswer.findOne({
+      where: { userId },
+      order: [["createdAt", "DESC"]],
+    });
+
     // Save to DB
     const newScan = await ResultScan.create({
       userId: userId,
+      quizId: lastQuiz ? lastQuiz.id : null,
       imagePath: `/uploads/${userId}/faces/${path.basename(finalPath)}`,
-      skinType: "unknown",
+      skinType: skinType,
       severity: aiResult.severity,
       acneCount: isNaN(acneCount) ? 0 : acneCount,
-      score: null,
     });
 
     res.json({
@@ -117,7 +137,7 @@ const getFaceResultController = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const scans = await Scan.findAll({
+    const scans = await ResultScan.findAll({
       where: { userId },
       order: [["createdAt", "DESC"]],
       attributes: [
@@ -126,7 +146,6 @@ const getFaceResultController = async (req, res) => {
         "skinType",
         "severity",
         "acneCount",
-        "score",
         "createdAt",
         "updatedAt",
       ],

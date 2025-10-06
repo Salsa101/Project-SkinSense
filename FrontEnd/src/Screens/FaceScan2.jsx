@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,12 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  ScrollView,
   ActivityIndicator,
+  Dimensions,
+  Modal,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Camera,
   useCameraDevice,
@@ -18,16 +22,28 @@ import { Worklets } from 'react-native-worklets-core';
 import Icon from 'react-native-vector-icons/Ionicons';
 import api from '../api';
 
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
+
+import ImageViewer from 'react-native-image-zoom-viewer';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
 const BRIGHTNESS_LOW = 50;
 const BRIGHTNESS_HIGH = 200;
 
-const FaceScan2 = () => {
+const FaceScan2 = ({ navigation }) => {
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Home');
+  });
+
   const device = useCameraDevice('front');
   const [hasPermission, setHasPermission] = useState(false);
   const [faceAligned, setFaceAligned] = useState(false);
-  const [facePhoto, setFacePhoto] = useState(null);
   const [brightness, setBrightness] = useState(null);
   const [scanning, setScanning] = useState(false);
+
+  const [visible, setVisible] = useState(false);
 
   const [cameraActive, setCameraActive] = useState(true);
 
@@ -144,6 +160,13 @@ const FaceScan2 = () => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setAiResult(null);
+      setCameraActive(true);
+    }, []),
+  );
+
   const fetchScans = async () => {
     try {
       const res = await api.get(`/scans`);
@@ -158,8 +181,10 @@ const FaceScan2 = () => {
   };
 
   useEffect(() => {
-    fetchScans();
-  }, []);
+    if (!aiResult && !cameraActive) {
+      fetchScans();
+    }
+  }, [aiResult, cameraActive]);
 
   useEffect(() => {
     console.log('aiResult updated:', aiResult);
@@ -175,43 +200,420 @@ const FaceScan2 = () => {
   return (
     <SafeAreaView style={styles.container}>
       {aiResult ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'black',
-          }}
-        >
-          <Image
-            source={{ uri: `${api.defaults.baseURL}${aiResult.imagePath}` }}
-            style={{ width: 200, height: 200 }}
-            onError={e => console.log('❌ Image load error:', e.nativeEvent)}
-            onLoad={() => console.log('✅ Image loaded successfully')}
-          />
-
-          <Text style={{ color: 'white', marginTop: 10 }}>
-            Jumlah jerawat: {aiResult.acneCount}
-          </Text>
-          <Text style={{ color: 'white' }}>
-            Tingkat keparahan: {aiResult.severity}
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => {
-              setAiResult(null);
-              setCameraActive(true);
-            }}
+        <ScrollView style={{ flex: 1, backgroundColor: 'white', padding: 20 }}>
+          {/* Header */}
+          <View
             style={{
-              marginTop: 20,
-              padding: 10,
-              backgroundColor: '#ff6680',
-              borderRadius: 8,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
             }}
           >
-            <Text style={{ color: 'white' }}>Scan Ulang</Text>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                fontSize: 20,
+                color: '#E07C8E',
+              }}
+            >
+              Scan Result
+            </Text>
+
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: '#E07C8E',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 8,
+              }}
+              onPress={() => {
+                setAiResult(null);
+                setCameraActive(true);
+              }}
+            >
+              <Icon name="refresh" size={20} color="#fff" />
+              <Text
+                style={{ color: 'white', fontWeight: '600', marginLeft: 6 }}
+              >
+                Rescan
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Image */}
+          <View style={{ alignItems: 'center', marginBottom: 16 }}>
+            {/* Modal Zoom */}
+            <Modal visible={visible} transparent={true}>
+              <ImageViewer
+                imageUrls={[
+                  { url: `${api.defaults.baseURL}${aiResult.imagePath}` },
+                ]}
+                enableSwipeDown
+                onSwipeDown={() => setVisible(false)}
+              />
+            </Modal>
+
+            {/* Image Preview */}
+            <TouchableOpacity onPress={() => setVisible(true)}>
+              <Image
+                source={{ uri: `${api.defaults.baseURL}${aiResult.imagePath}` }}
+                style={{
+                  width: SCREEN_WIDTH - 40,
+                  height: SCREEN_WIDTH - 40,
+                  borderRadius: 15,
+                }}
+                onError={e =>
+                  console.log('❌ Image load error:', e.nativeEvent)
+                }
+                onLoad={() => console.log('✅ Image loaded successfully')}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Scan Info */}
+          <View style={{ marginBottom: 16 }}>
+            {/* Row 1 */}
+            <View style={{ flexDirection: 'row', marginBottom: 8, gap: 12 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                  Skin Type :
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor: '#FDE2E4',
+                    color: '#E07C8E',
+                    padding: 6,
+                    borderRadius: 6,
+                  }}
+                >
+                  {aiResult.skinType}
+                </Text>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                  Score :
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor: '#FDE2E4',
+                    color: '#E07C8E',
+                    padding: 6,
+                    borderRadius: 6,
+                  }}
+                >
+                  78/100
+                </Text>
+              </View>
+            </View>
+
+            {/* Row 2 */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                  Acne Spotted :
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor: '#FDE2E4',
+                    color: '#E07C8E',
+                    padding: 6,
+                    borderRadius: 6,
+                  }}
+                >
+                  {aiResult.acneCount} Acne Spotted
+                </Text>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                  Severity :
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor: '#FDE2E4',
+                    color: '#E07C8E',
+                    padding: 6,
+                    borderRadius: 6,
+                  }}
+                >
+                  {aiResult.severity}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              height: 1,
+              backgroundColor: '#E07C8E',
+              width: '100%',
+              marginTop: 10,
+              marginBottom: 20,
+            }}
+          />
+
+          {/* Timeline Sections */}
+          <View style={{ marginBottom: 16, paddingLeft: 5 }}>
+            {/* Ingredients For You */}
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: 20, alignItems: 'center' }}>
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    backgroundColor: '#E07C8E',
+                  }}
+                />
+                <View
+                  style={{
+                    flex: 1,
+                    width: 2,
+                    backgroundColor: '#E07C8E',
+                    marginTop: 2,
+                  }}
+                />
+              </View>
+
+              <View style={{ flex: 1, paddingLeft: 12, marginBottom: 16 }}>
+                <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                  Ingredients For You
+                </Text>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+                >
+                  <Text
+                    style={{
+                      backgroundColor: '#FFF0F2',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✔ Centella Asiatica
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFF0F2',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✔ Jojoba Oil
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFF0F2',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✔ Ceramide NP
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFF0F2',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✔ Hyaluronic Acid
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* What to Avoid */}
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ width: 20, alignItems: 'center' }}>
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    backgroundColor: '#E07C8E',
+                  }}
+                />
+                <View
+                  style={{
+                    flex: 1,
+                    width: 2,
+                    backgroundColor: '#E07C8E',
+                    marginTop: 2,
+                  }}
+                />
+              </View>
+
+              <View style={{ flex: 1, paddingLeft: 12, marginBottom: 16 }}>
+                <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                  What to Avoid
+                </Text>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+                >
+                  <Text
+                    style={{
+                      backgroundColor: '#FFEAEA',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✖ Alcohol
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFEAEA',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✖ Fragrance
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFEAEA',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✖ Coconut Oil
+                  </Text>
+                  <Text
+                    style={{
+                      backgroundColor: '#FFEAEA',
+                      color: '#E07C8E',
+                      padding: 6,
+                      borderRadius: 6,
+                    }}
+                  >
+                    ✖ AHA/BHA
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Products For You */}
+            <View style={{ flexDirection: 'row', marginBottom: 24 }}>
+              <View style={{ width: 20, alignItems: 'center' }}>
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    backgroundColor: '#E07C8E',
+                  }}
+                />
+              </View>
+
+              <View style={{ flex: 1, paddingLeft: 12 }}>
+                <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                  Products For You
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      width: 80,
+                      backgroundColor: '#c7c7c7ff',
+                      padding: 10,
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Image
+                      source={require('../../assets/banner-profile.png')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 8,
+                        marginBottom: 4,
+                      }}
+                    />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
+                      Hydrating Serum
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      width: 80,
+                      backgroundColor: '#c7c7c7ff',
+                      padding: 10,
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Image
+                      source={require('../../assets/banner-profile.png')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 8,
+                        marginBottom: 4,
+                      }}
+                    />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
+                      Hydrating Serum
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      width: 80,
+                      backgroundColor: '#c7c7c7ff',
+                      padding: 10,
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Image
+                      source={require('../../assets/banner-profile.png')}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 8,
+                        marginBottom: 4,
+                      }}
+                    />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
+                      Hydrating Serum
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Compare Button */}
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#E07C8E',
+              paddingVertical: 12,
+              borderRadius: 30,
+              alignItems: 'center',
+              marginBottom: 40,
+            }}
+            onPress={() => navigation.navigate('Calendar')}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              Start Tracking
+            </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       ) : (
         <>
           {!aiResult && cameraActive && (
@@ -297,7 +699,7 @@ const FaceScan2 = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
+  container: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   overlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   faceCircle: {
