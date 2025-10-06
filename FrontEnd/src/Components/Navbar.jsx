@@ -30,7 +30,7 @@ const Navbar = (active, onPress) => {
           >
             {isCenter ? (
               <View style={styles.centerButton}>
-                <Icon name={item.icon} size={30} color="#fff" />
+                <Icon name={item.icon} size={28} color="#fff" />
               </View>
             ) : (
               <>

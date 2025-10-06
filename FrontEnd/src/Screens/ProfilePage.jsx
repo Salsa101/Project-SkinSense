@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
+  ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -130,131 +131,120 @@ const ProfilePage = ({ navigation }) => {
   }
 
   return (
-    <KeyboardAwareScrollView
-      style={styles.container}
-      contentContainerStyle={{ flexGrow: 1 }}
-      enableOnAndroid={true}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.headerContainer}>
-        <Image
-          source={require('../../assets/banner-profile.png')}
-          style={styles.bannerImage}
-        />
-        <View style={styles.profileImageContainer}>
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerContainer}>
           <Image
-            source={require('../../assets/profile-pic.png')}
-            style={styles.profileImage}
+            source={require('../../assets/banner-profile.png')}
+            style={styles.bannerImage}
           />
-          <TouchableOpacity style={styles.cameraIconContainer}>
-            <Icon name="camera" size={18} color="#FFFF" />
-          </TouchableOpacity>
-          <Text style={styles.nameText}>{username}</Text>
-        </View>
-      </View>
-
-      <View style={styles.informationContainer}>
-        <View style={styles.editProfileButtonContainer}>
-          <TouchableOpacity
-            style={styles.editProfileButton}
-            onPress={handlePress}
-          >
-            <Icon name={isEditing ? 'save' : 'edit'} size={20} color="white" />
-            <Text style={styles.editProfileButtonText}>
-              {isEditing ? 'Save' : 'Edit Profile'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ marginTop: 20, marginBottom: 30 }}>
-          <Text style={styles.profileText}>Full Name</Text>
-          <TextInput
-            style={[
-              styles.profileTextInput,
-              isEditing ? styles.editable : styles.readOnly,
-            ]}
-            value={fullname}
-            onChangeText={setFullname}
-            placeholder="Masukkan nama lengkap"
-            editable={isEditing}
-          />
-
-          <Text style={styles.profileText}>Age</Text>
-          <TextInput
-            style={[
-              styles.profileTextInput,
-              isEditing ? styles.editable : styles.readOnly,
-            ]}
-            value={age}
-            onChangeText={setAge}
-            placeholder="Masukkan umur"
-            editable={isEditing}
-            keyboardType="numeric"
-          />
-
-          <Text style={styles.profileText}>Date of Birth</Text>
-          <View
-            style={[
-              styles.profileTextInput,
-              isEditing ? styles.editable : styles.readOnly,
-              { flexDirection: 'row', alignItems: 'center' },
-            ]}
-          >
-            <TextInput
-              style={[
-                isEditing ? styles.editable : styles.readOnly,
-                { flex: 1, paddingVertical: 0 },
-              ]}
-              value={dob ? dayjs(dob).format('DD MMMM YYYY') : ''}
-              placeholder="Masukkan tanggal lahir"
-              editable={false}
-              pointerEvents="none"
+          <View style={styles.profileImageContainer}>
+            <Image
+              source={require('../../assets/profile-pic.png')}
+              style={styles.profileImage}
             />
-            {isEditing && (
-              <TouchableOpacity onPress={() => setOpenPicker(true)}>
-                <Icon name="calendar" size={24} color="#ED97A0" />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity style={styles.cameraIconContainer}>
+              <Icon name="camera" size={18} color="#FFFF" />
+            </TouchableOpacity>
+            <Text style={styles.nameText}>{username}</Text>
+          </View>
+        </View>
+
+        <View style={styles.informationContainer}>
+          <View style={styles.editProfileButtonContainer}>
+            <TouchableOpacity
+              style={styles.editProfileButton}
+              onPress={handlePress}
+            >
+              <Icon
+                name={isEditing ? 'save' : 'edit'}
+                size={20}
+                color="white"
+              />
+              <Text style={styles.editProfileButtonText}>
+                {isEditing ? 'Save' : 'Edit Profile'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Calendar Picker */}
-          <DatePicker
-            modal
-            open={openPicker}
-            date={dobDate}
-            mode="date"
-            locale="id"
-            onConfirm={date => {
-              setOpenPicker(false);
-              setDobDate(date);
-              setDob(dayjs(date).format('YYYY-MM-DD'));
-            }}
-            onCancel={() => setOpenPicker(false)}
-          />
-        </View>
-      </View>
+          <View style={{ marginBottom: 15, marginTop: 30 }}>
+            {/* History Quiz Section */}
+            <TouchableOpacity
+              style={styles.bannerContainer}
+              onPress={() => navigation.navigate('HistoryQuiz')}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={require('../../assets/step-routine.jpg')}
+                style={styles.bannerImage}
+              />
+              <View style={styles.bannerOverlay} />
 
-      {!isEditing && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.buttonStyle} onPress={handleLogout}>
-            <Icon name="sign-out" size={20} color="white" />
-            <Text style={styles.buttonStyleText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={handleDeleteAccount}
-          >
-            <Icon name="trash" size={20} color="white" />
-            <Text style={styles.buttonStyleText}>Delete</Text>
-          </TouchableOpacity>
+              {/* Teks kiri atas */}
+              <View style={styles.bannerTextWrapperTop}>
+                <Text style={styles.bannerText}>History Quiz</Text>
+                <Text style={styles.bannerDesc}>
+                  Learn more about how to do{'\n'}skincare properly
+                </Text>
+              </View>
+
+              {/* Button "See Detail" kanan bawah */}
+              <View style={styles.bannerBottomRight}>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() => navigation.navigate('HistoryQuiz')}
+                >
+                  <Text style={styles.detailButtonText}>See Detail</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ marginBottom: 30 }}>
+            {/* History Scan Section */}
+            <TouchableOpacity
+              style={styles.bannerContainer}
+              onPress={() => navigation.navigate('HistoryScan')}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={require('../../assets/step-routine.jpg')}
+                style={styles.bannerImage}
+              />
+              <View style={styles.bannerOverlay} />
+
+              {/* Teks kiri atas */}
+              <View style={styles.bannerTextWrapperTop}>
+                <Text style={styles.bannerText}>History Scan</Text>
+                <Text style={styles.bannerDesc}>
+                  Learn more about how to do{'\n'}skincare properly
+                </Text>
+              </View>
+
+              {/* Button "See Detail" kanan bawah */}
+              <View style={styles.bannerBottomRight}>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() => navigation.navigate('HistoryScan')}
+                >
+                  <Text style={styles.detailButtonText}>See Detail</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
+      </ScrollView>
 
       {/* Navbar */}
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
         <Navbar active={active} onPress={setActive} />
       </View>
-    </KeyboardAwareScrollView>
+    </View>
   );
 };
 
@@ -349,6 +339,55 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   buttonStyleText: { fontFamily: 'Poppins-Bold', fontSize: 16, color: 'white' },
+  bannerContainer: {
+    position: 'relative',
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: 20,
+    elevation: 5,
+  },
+  bannerImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 15,
+  },
+  bannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  bannerTextWrapperTop: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    right: 15,
+  },
+  bannerText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 4,
+  },
+  bannerDesc: {
+    color: '#f5f5f5',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+  },
+  bannerBottomRight: {
+    position: 'absolute',
+    bottom: 15,
+    right: 15,
+  },
+  detailButton: {
+    backgroundColor: '#ffffff6a',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  detailButtonText: {
+    color: '#ffffffff',
+    fontSize: 12,
+    fontFamily: 'Poppins-Bold',
+  },
 });
 
 export default ProfilePage;
