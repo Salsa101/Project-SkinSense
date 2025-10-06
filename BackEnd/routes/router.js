@@ -61,6 +61,7 @@ const {
   uploadFaceController,
   getFaceResultController,
 } = require("../Controllers/FaceScanController");
+const { getScanDetail } = require("../Controllers/CompareScanController");
 
 //Auth
 router.post("/register", validateRegister, registerController);
@@ -157,6 +158,9 @@ router.patch(
   validateToken,
   toggleReminder
 );
+
+//CompareScanRoute
+router.get("/compare-scan-detail", validateToken, getScanDetail);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Feather';
@@ -18,20 +19,12 @@ import BottomSheet, {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 
+import api from '../api';
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const dummyScanData = {
-  '2025-10-12': [
-    { time: '19:20', condition: 'Dry Skin, Acne Prone', score: 80 },
-  ],
-  '2025-10-28': [
-    { time: '19:20', condition: 'Dry Skin, Acne Prone', score: 80 },
-    { time: '19:30', condition: 'Dry Skin, Acne Prone', score: 80 },
-  ],
-  '2025-10-22': [{ time: '18:00', condition: 'Oily Skin', score: 90 }],
-};
-
 const CompareScan = ({ navigation }) => {
+  const [scanData, setScanData] = useState({});
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [currentItem, setCurrentItem] = useState(null);
@@ -39,9 +32,28 @@ const CompareScan = ({ navigation }) => {
   const sheetRef = useRef(null);
   const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
 
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDates([today]);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/compare-scan-detail');
+        if (res.data.success) {
+          setScanData(res.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching scan data:', err);
+      }
+    };
+    fetchData();
+  }, []);
+
   const markedDates = {};
-  Object.keys(dummyScanData).forEach(date => {
-    const scans = dummyScanData[date];
+  Object.keys(scanData).forEach(date => {
+    const scans = scanData[date];
     const maxDots = 3;
     markedDates[date] = {
       dots: scans.slice(0, maxDots).map((item, index) => ({
@@ -86,132 +98,117 @@ const CompareScan = ({ navigation }) => {
   };
 
   const openBottomSheet = item => {
-    setCurrentItem({
-      ...item,
-      imageUri: require('../../assets/banner-profile.png'),
-      skinType: item.condition,
-      score: item.score,
-      acneCount: 5,
-      severity: 'Medium',
-      ingredientsForYou: [
-        'Centella Asiatica',
-        'Jojoba Oil',
-        'Ceramide NP',
-        'Hyaluronic Acid',
-      ],
-      avoidIngredients: ['Alcohol', 'Fragrance', 'Coconut Oil', 'AHA/BHA'],
-      products: [
-        {
-          name: 'Hydrating Serum',
-          image: require('../../assets/banner-profile.png'),
-        },
-        {
-          name: 'Hydrating Serum',
-          image: require('../../assets/banner-profile.png'),
-        },
-        {
-          name: 'Hydrating Serum',
-          image: require('../../assets/banner-profile.png'),
-        },
-      ],
-    });
-
-    sheetRef.current?.snapToIndex(2); // buka sheet
+    setCurrentItem(item);
+    sheetRef.current?.snapToIndex(2);
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={{ flex: 1, padding: 16 }}>
-          <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={() => navigation.goBack()}
-            >
-              <Icon name="arrow-left" size={20} color="#E07C8E" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Compare Scan</Text>
-            <View style={styles.editBtn}></View>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={{ flex: 1, padding: 16 }}>
+            <View style={styles.headerRow}>
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-left" size={20} color="#E07C8E" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Compare Scan</Text>
+              <View style={styles.editBtn}></View>
+            </View>
+
+            <Calendar
+              horizontal
+              pagingEnabled
+              calendarWidth={350}
+              onDayPress={handleSelectDate}
+              markedDates={markedDates}
+              markingType={'multi-dot'}
+              theme={{
+                todayTextColor: '#FF6B81',
+                selectedDayBackgroundColor: '#FF6B81',
+              }}
+            />
+
+            {selectedDates.length > 0 &&
+            scanData[selectedDates[0]] &&
+            scanData[selectedDates[0]].length > 0 ? (
+              <FlatList
+                style={{ marginTop: 15 }}
+                data={scanData[selectedDates[0]]}
+                keyExtractor={(item, index) => `${selectedDates[0]}-${index}`}
+                contentContainerStyle={{
+                  paddingBottom: selectedItems.length > 0 ? 120 : 0,
+                }}
+                renderItem={({ item }) => {
+                  const id = `${selectedDates[0]}-${item.time}`;
+                  const isSelected = selectedItems.includes(id);
+
+                  return (
+                    <TouchableOpacity
+                      onPress={() => toggleSelectItem(item)}
+                      style={[
+                        styles.scanItem,
+                        isSelected && { backgroundColor: '#E07C8E' },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 10,
+                        }}
+                      >
+                        <View style={styles.scanIcon}>
+                          <Icon1 name="scan" size={40} color={'#E07C8E'} />
+                        </View>
+                        <View>
+                          <Text
+                            style={[
+                              styles.scanTime,
+                              isSelected && { color: 'white' },
+                            ]}
+                          >
+                            {formatDateTime(selectedDates[0], item.time)}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.scanCondition,
+                              isSelected && { color: 'white' },
+                            ]}
+                          >
+                            {item.skinType}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.score,
+                              isSelected && { color: 'white' },
+                            ]}
+                          >
+                            Score: {item.score}/100
+                          </Text>
+                        </View>
+                      </View>
+
+                      <TouchableOpacity onPress={() => openBottomSheet(item)}>
+                        <View style={styles.eyeIcon}>
+                          <Icon2 name="eye" size={20} color={'#E07C8E'} />
+                        </View>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            ) : (
+              <View style={{ alignItems: 'center', marginTop: 40 }}>
+                <Text style={{ color: '#999', fontSize: 16 }}>
+                  No scan list
+                </Text>
+              </View>
+            )}
           </View>
-
-          <Calendar
-            horizontal
-            pagingEnabled
-            calendarWidth={350}
-            onDayPress={handleSelectDate}
-            markedDates={markedDates}
-            markingType={'multi-dot'}
-            theme={{
-              todayTextColor: '#FF6B81',
-              selectedDayBackgroundColor: '#FF6B81',
-            }}
-          />
-
-          <FlatList
-            style={{ marginTop: 15 }}
-            data={selectedDates.length ? dummyScanData[selectedDates[0]] : []}
-            keyExtractor={(item, index) => `${selectedDates[0]}-${index}`}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            renderItem={({ item }) => {
-              const id = `${selectedDates[0]}-${item.time}`;
-              const isSelected = selectedItems.includes(id);
-
-              return (
-                <TouchableOpacity
-                  onPress={() => toggleSelectItem(item)}
-                  style={[
-                    styles.scanItem,
-                    isSelected && { backgroundColor: '#E07C8E' },
-                  ]}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 10,
-                    }}
-                  >
-                    <View style={styles.scanIcon}>
-                      <Icon1 name="scan" size={40} color={'#E07C8E'} />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.scanTime,
-                          isSelected && { color: 'white' },
-                        ]}
-                      >
-                        {formatDateTime(selectedDates[0], item.time)}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.scanCondition,
-                          isSelected && { color: 'white' },
-                        ]}
-                      >
-                        {item.condition}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.scanScore,
-                          isSelected && { color: 'white' },
-                        ]}
-                      >
-                        Score: {item.score}/100
-                      </Text>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity onPress={() => openBottomSheet(item)}>
-                    <View style={styles.eyeIcon}>
-                      <Icon2 name="eye" size={20} color={'#E07C8E'} />
-                    </View>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
+        </ScrollView>
 
         {selectedItems.length > 0 && (
           <View style={styles.buttonContainer}>
@@ -288,7 +285,9 @@ const CompareScan = ({ navigation }) => {
                 {/* Image */}
                 <View style={{ alignItems: 'center', marginBottom: 16 }}>
                   <Image
-                    source={currentItem.imageUri}
+                    source={{
+                      uri: `${api.defaults.baseURL}${currentItem.imagePath}`,
+                    }}
                     style={{
                       width: SCREEN_WIDTH - 40,
                       height: SCREEN_WIDTH - 40,
