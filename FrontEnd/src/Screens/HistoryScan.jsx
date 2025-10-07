@@ -134,7 +134,7 @@ const HistoryScan = ({ navigation }) => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-          <View style={{ flex: 1, padding: 16 }}>
+          <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 10 }}>
             <View style={styles.headerRow}>
               <TouchableOpacity
                 style={styles.backBtn}
@@ -142,7 +142,7 @@ const HistoryScan = ({ navigation }) => {
               >
                 <Icon name="arrow-left" size={20} color="#E07C8E" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Compare Scan</Text>
+              <Text style={styles.headerTitle}>History Scan</Text>
               <View style={styles.editBtn}></View>
             </View>
 

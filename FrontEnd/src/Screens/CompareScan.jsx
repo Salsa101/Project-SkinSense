@@ -21,9 +21,16 @@ import BottomSheet, {
 
 import api from '../api';
 
+import { useCustomBackHandler } from '../Handler/CustomBackHandler';
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const CompareScan = ({ navigation }) => {
+  //Handler Back to Home
+  useCustomBackHandler(() => {
+    navigation.navigate('Home');
+  });
+
   const [scanData, setScanData] = useState({});
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -66,7 +73,7 @@ const CompareScan = ({ navigation }) => {
   const handleSelectDate = day => setSelectedDates([day.dateString]);
 
   const toggleSelectItem = item => {
-    const id = `${selectedDates[0]}-${item.time}`;
+    const id = `${selectedDates[0]}-${item.time}-${item.timestamp || item.id}`;
     if (selectedItems.includes(id)) {
       setSelectedItems(prev => prev.filter(i => i !== id));
     } else {
@@ -100,6 +107,35 @@ const CompareScan = ({ navigation }) => {
   const openBottomSheet = item => {
     setCurrentItem(item);
     sheetRef.current?.snapToIndex(2);
+  };
+
+  const handleCompare = async () => {
+    if (selectedItems.length !== 2) {
+      alert('Harus pilih 2 scan untuk dibandingkan!');
+      return;
+    }
+
+    try {
+      const selectedIds = [];
+      Object.keys(scanData).forEach(date => {
+        scanData[date].forEach(item => {
+          const idKey = `${date}-${item.time}-${item.timestamp || item.id}`;
+          if (selectedItems.includes(idKey)) selectedIds.push(item.id);
+        });
+      });
+
+      const res = await api.post('/compare-scan', {
+        firstScanId: selectedIds[0],
+        secondScanId: selectedIds[1],
+      });
+
+      if (res.data.success) {
+        navigation.navigate('CompareResult', { compareData: res.data.data });
+      }
+    } catch (err) {
+      console.error('Compare error:', err);
+      alert('Gagal membandingkan scan, coba lagi.');
+    }
   };
 
   return (
@@ -137,12 +173,16 @@ const CompareScan = ({ navigation }) => {
               <FlatList
                 style={{ marginTop: 15 }}
                 data={scanData[selectedDates[0]]}
-                keyExtractor={(item, index) => `${selectedDates[0]}-${index}`}
+                keyExtractor={(item, index) =>
+                  `${selectedDates[0]}-${index}-${item.timestamp || item.id}`
+                }
                 contentContainerStyle={{
                   paddingBottom: selectedItems.length > 0 ? 120 : 0,
                 }}
                 renderItem={({ item }) => {
-                  const id = `${selectedDates[0]}-${item.time}`;
+                  const id = `${selectedDates[0]}-${item.time}-${
+                    item.timestamp || item.id
+                  }`;
                   const isSelected = selectedItems.includes(id);
 
                   return (
@@ -215,7 +255,7 @@ const CompareScan = ({ navigation }) => {
             <Text style={styles.topText}>
               Please select 2 log history face scan ({selectedItems.length}/2)
             </Text>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={handleCompare}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -615,7 +655,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-  dateText: { color: 'white', fontSize: 14, marginTop: 2 },
+  dateText: { color: 'white', fontSize: 12, marginTop: 2 },
   arrowBtn: {
     width: 40,
     height: 40,

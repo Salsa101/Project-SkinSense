@@ -176,44 +176,11 @@ const ProfilePage = ({ navigation }) => {
             {/* History Quiz Section */}
             <TouchableOpacity
               style={styles.bannerContainer}
-              onPress={() => navigation.navigate('HistoryQuiz')}
-              activeOpacity={0.8}
-            >
-              <Image
-                source={require('../../assets/step-routine.jpg')}
-                style={styles.bannerImage}
-              />
-              <View style={styles.bannerOverlay} />
-
-              {/* Teks kiri atas */}
-              <View style={styles.bannerTextWrapperTop}>
-                <Text style={styles.bannerText}>History Quiz</Text>
-                <Text style={styles.bannerDesc}>
-                  Learn more about how to do{'\n'}skincare properly
-                </Text>
-              </View>
-
-              {/* Button "See Detail" kanan bawah */}
-              <View style={styles.bannerBottomRight}>
-                <TouchableOpacity
-                  style={styles.detailButton}
-                  onPress={() => navigation.navigate('HistoryQuiz')}
-                >
-                  <Text style={styles.detailButtonText}>See Detail</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ marginBottom: 30 }}>
-            {/* History Scan Section */}
-            <TouchableOpacity
-              style={styles.bannerContainer}
               onPress={() => navigation.navigate('HistoryScan')}
               activeOpacity={0.8}
             >
               <Image
-                source={require('../../assets/step-routine.jpg')}
+                source={require('../../assets/history-scan.jpg')}
                 style={styles.bannerImage}
               />
               <View style={styles.bannerOverlay} />
@@ -351,10 +318,10 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 15,
   },
-  bannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
+  // bannerOverlay: {
+  //   ...StyleSheet.absoluteFillObject,
+  //   backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  // },
   bannerTextWrapperTop: {
     position: 'absolute',
     top: 15,
@@ -366,19 +333,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Poppins-Bold',
     marginBottom: 4,
+    textShadowColor: '#b34a5ece',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   bannerDesc: {
-    color: '#f5f5f5',
+    color: '#fff',
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
+    textShadowColor: '#b34a5ece',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   bannerBottomRight: {
     position: 'absolute',
     bottom: 15,
-    right: 15,
+    left: 15,
   },
   detailButton: {
-    backgroundColor: '#ffffff6a',
+    backgroundColor: '#f097a7ff',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,

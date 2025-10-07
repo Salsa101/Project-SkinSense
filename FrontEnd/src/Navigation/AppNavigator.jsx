@@ -31,6 +31,7 @@ import SkincareGuide from '../Screens/SkincareGuide';
 import CompareScan from '../Screens/CompareScan';
 import HistoryScan from '../Screens/HistoryScan';
 import HistoryQuiz from '../Screens/HistoryQuiz';
+import CompareResult from '../Screens/CompareResult';
 
 const Stack = createNativeStackNavigator();
 
@@ -194,6 +195,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="CompareScan"
           component={CompareScan}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CompareResult"
+          component={CompareResult}
           options={{ headerShown: false }}
         />
         <Stack.Screen

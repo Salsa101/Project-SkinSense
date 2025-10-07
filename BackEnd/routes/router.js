@@ -64,6 +64,8 @@ const {
 const {
   getScanDetail,
   deleteScan,
+  compareScans,
+  getCompareScans,
 } = require("../Controllers/CompareScanController");
 
 //Auth
@@ -165,6 +167,12 @@ router.patch(
 //CompareScanRoute
 router.get("/compare-scan-detail", validateToken, getScanDetail);
 router.delete("/scan-detail/:id", validateToken, deleteScan);
+router.post("/compare-scan", validateToken, compareScans);
+router.get(
+  "/compare-scan/:firstScanId/:secondScanId",
+  validateToken,
+  getCompareScans
+);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {
