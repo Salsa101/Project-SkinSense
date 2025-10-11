@@ -116,12 +116,26 @@ const uploadFaceController = async (req, res) => {
     // Save to DB
     const newScan = await ResultScan.create({
       userId: userId,
-      quizId: lastQuiz ? lastQuiz.id : null,
       imagePath: `/uploads/${userId}/faces/${path.basename(finalPath)}`,
       skinType: skinType,
       severity: aiResult.severity,
       acneCount: isNaN(acneCount) ? 0 : acneCount,
     });
+
+    const lastQuizAnswers = await QuizUserAnswer.findAll({
+      where: { userId },
+      attributes: ["id", "quizQuestionId", "quizOptionId", "createdAt"],
+      order: [["createdAt", "DESC"]],
+    });
+
+    const uniqueAnswers = Object.values(
+      lastQuizAnswers.reduce((acc, ans) => {
+        if (!acc[ans.quizQuestionId]) acc[ans.quizQuestionId] = ans;
+        return acc;
+      }, {})
+    );
+
+    await newScan.addQuizAnswers(uniqueAnswers.map((q) => q.id));
 
     res.json({
       message: "Upload sukses & AI jalan, data tersimpan di DB",

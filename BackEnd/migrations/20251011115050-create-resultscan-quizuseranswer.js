@@ -1,48 +1,43 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("ResultScans", {
+    await queryInterface.createTable("ResultScanQuizUserAnswer", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
+      resultScanId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "Users", key: "id" },
+        references: { model: "ResultScans", key: "id" },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      imagePath: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      skinType: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      severity: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      acneCount: {
+      quizUserAnswerId: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        references: { model: "QuizUserAnswers", key: "id" },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("NOW()"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("NOW()"),
       },
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("ResultScans");
+    await queryInterface.dropTable("ResultScanQuizUserAnswer");
   },
 };

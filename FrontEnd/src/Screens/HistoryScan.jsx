@@ -26,10 +26,13 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const HistoryScan = ({ navigation }) => {
   const [scanData, setScanData] = useState({});
+  const [quizData, setQuizData] = useState({});
   const [selectedDates, setSelectedDates] = useState([]);
   const [currentItem, setCurrentItem] = useState(null);
+  const [currentQuiz, setCurrentQuiz] = useState(null);
 
   const sheetRef = useRef(null);
+  const quizSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
 
   useEffect(() => {
@@ -40,12 +43,23 @@ const HistoryScan = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get('/compare-scan-detail');
+        const res = await api.get('/scan-quiz-detail');
         if (res.data.success) {
-          setScanData(res.data.data);
+          const scanPart = res.data.data;
+          const quizPart = {};
+
+          // pisahin quizData per tanggal biar rapi
+          Object.keys(scanPart).forEach(date => {
+            quizPart[date] = scanPart[date]
+              .filter(item => item.quiz)
+              .map(item => item.quiz);
+          });
+
+          setScanData(scanPart);
+          setQuizData(quizPart);
         }
       } catch (err) {
-        console.error('Error fetching scan data:', err);
+        console.error('Error fetching scan+quiz data:', err);
       }
     };
     fetchData();
@@ -130,11 +144,17 @@ const HistoryScan = ({ navigation }) => {
     sheetRef.current?.snapToIndex(2);
   };
 
+  const openQuizSheet = quizItem => {
+    setCurrentQuiz(quizItem);
+    quizSheetRef.current?.snapToIndex(2);
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1, paddingHorizontal: 16, paddingBottom: 10 }}>
+            {/* HEADER */}
             <View style={styles.headerRow}>
               <TouchableOpacity
                 style={styles.backBtn}
@@ -146,6 +166,7 @@ const HistoryScan = ({ navigation }) => {
               <View style={styles.editBtn}></View>
             </View>
 
+            {/* CALENDAR */}
             <Calendar
               horizontal
               pagingEnabled
@@ -159,49 +180,113 @@ const HistoryScan = ({ navigation }) => {
               }}
             />
 
+            {/* LIST PER SCAN */}
             {selectedDates.length > 0 &&
             scanData[selectedDates[0]] &&
             scanData[selectedDates[0]].length > 0 ? (
-              <FlatList
-                style={{ marginTop: 15 }}
-                data={scanData[selectedDates[0]]}
-                keyExtractor={(item, index) => `${selectedDates[0]}-${index}`}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => openBottomSheet(item)}
-                    style={styles.scanItem}
+              <View style={{ marginTop: 20 }}>
+                {scanData[selectedDates[0]].map((scanItem, index) => (
+                  <View
+                    key={`scan-group-${index}`}
+                    style={{ marginBottom: 25 }}
                   >
+                    {/* Judul per scan */}
                     <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 10,
+                        marginBottom: 5,
                       }}
                     >
-                      <View style={styles.scanIcon}>
-                        <Icon1 name="scan" size={40} color={'#E07C8E'} />
-                      </View>
-                      <View>
-                        <Text style={styles.scanTime}>
-                          {formatDateTime(selectedDates[0], item.time)}
-                        </Text>
-                        <Text style={styles.scanCondition}>
-                          {item.skinType}
-                        </Text>
-                        <Text style={styles.score}>
-                          Score: {item.score}/100
-                        </Text>
-                      </View>
+                      <Text style={styles.sectionTitle}>{scanItem.time}</Text>
+                      <View
+                        style={{
+                          flex: 1,
+                          height: 1,
+                          borderBottomWidth: 1,
+                          borderStyle: 'dashed',
+                          borderColor: '#ccc',
+                          marginLeft: 10,
+                          marginTop: 5,
+                        }}
+                      />
                     </View>
 
-                    <TouchableOpacity onPress={() => openBottomSheet(item)}>
+                    {/* BOX QUIZ */}
+                    {quizData &&
+                    quizData[selectedDates[0]] &&
+                    quizData[selectedDates[0]][index] ? (
+                      <TouchableOpacity
+                        style={[styles.scanItem, { borderColor: '#6B81E0' }]}
+                        onPress={() =>
+                          openQuizSheet(quizData[selectedDates[0]][index])
+                        }
+                      >
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 10,
+                          }}
+                        >
+                          <View
+                            style={[
+                              styles.scanIcon,
+                              { backgroundColor: '#6B81E020' },
+                            ]}
+                          >
+                            <Icon1 name="book" size={40} color={'#6B81E0'} />
+                          </View>
+                          <View>
+                            <Text style={styles.scanTime}>History Quiz</Text>
+                            <Text style={styles.scanCondition}>
+                              Review your answer
+                            </Text>
+                            <Text style={styles.score}>Tap to see details</Text>
+                          </View>
+                        </View>
+
+                        <View style={styles.eyeIcon}>
+                          <Icon2 name="eye" size={20} color={'#E07C8E'} />
+                        </View>
+                      </TouchableOpacity>
+                    ) : (
+                      <Text style={styles.emptyBox}>No quiz result</Text>
+                    )}
+
+                    {/* BOX SCAN */}
+                    <TouchableOpacity
+                      onPress={() => openBottomSheet(scanItem)}
+                      style={[styles.scanItem, { borderColor: '#E07C8E' }]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 10,
+                        }}
+                      >
+                        <View style={styles.scanIcon}>
+                          <Icon1 name="scan" size={40} color={'#E07C8E'} />
+                        </View>
+                        <View>
+                          <Text style={styles.scanTime}>History Scan</Text>
+                          <Text style={styles.scanCondition}>
+                            {scanItem.skinType}
+                          </Text>
+                          <Text style={styles.score}>
+                            Score: {scanItem.score}/100
+                          </Text>
+                        </View>
+                      </View>
+
                       <View style={styles.eyeIcon}>
                         <Icon2 name="eye" size={20} color={'#E07C8E'} />
                       </View>
                     </TouchableOpacity>
-                  </TouchableOpacity>
-                )}
-              />
+                  </View>
+                ))}
+              </View>
             ) : (
               <View style={{ alignItems: 'center', marginTop: 40 }}>
                 <Text style={{ color: '#999', fontSize: 16 }}>
@@ -212,7 +297,68 @@ const HistoryScan = ({ navigation }) => {
           </View>
         </ScrollView>
 
-        {/* Bottom Sheet */}
+        {/* Bottom Sheet Quiz */}
+        <BottomSheet
+          ref={quizSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backdropComponent={props => (
+            <BottomSheetBackdrop
+              {...props}
+              disappearsOnIndex={-1}
+              appearsOnIndex={0}
+              pressBehavior="close"
+              opacity={0.5}
+              enableTouchThrough={false}
+            />
+          )}
+          backgroundStyle={{ backgroundColor: 'white', borderRadius: 16 }}
+        >
+          <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
+            {currentQuiz && currentQuiz.length > 0 ? (
+              <>
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    textAlign: 'center',
+                    marginBottom: 16,
+                    color: '#6B81E0',
+                  }}
+                >
+                  Quiz Review
+                </Text>
+
+                {currentQuiz.map((q, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      marginBottom: 16,
+                      backgroundColor: '#F0F3FF',
+                      padding: 12,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Text style={{ fontWeight: '600', marginBottom: 6 }}>
+                      Q{idx + 1}. {q.question}
+                    </Text>
+
+                    <Text style={{ color: '#1A1A1A', fontWeight: '300' }}>
+                      Your Answer: {q.userAnswer || q.option || '-'}
+                    </Text>
+                  </View>
+                ))}
+              </>
+            ) : (
+              <Text style={{ textAlign: 'center', marginTop: 16 }}>
+                Pilih quiz dulu
+              </Text>
+            )}
+          </BottomSheetScrollView>
+        </BottomSheet>
+
+        {/* Bottom Sheet Scan */}
         <BottomSheet
           ref={sheetRef}
           index={-1}
@@ -613,6 +759,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF6F7',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 5,
   },
 });
 

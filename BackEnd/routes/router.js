@@ -53,6 +53,10 @@ const {
   updateReminderTime,
   toggleReminder,
 } = require("../Controllers/ReminderTimeController");
+const {
+  getScanQuizDetail,
+  deleteScan,
+} = require("../Controllers/HistoryScanController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -63,7 +67,6 @@ const {
 } = require("../Controllers/FaceScanController");
 const {
   getScanDetail,
-  deleteScan,
   compareScans,
   getCompareScans,
 } = require("../Controllers/CompareScanController");
@@ -166,13 +169,16 @@ router.patch(
 
 //CompareScanRoute
 router.get("/compare-scan-detail", validateToken, getScanDetail);
-router.delete("/scan-detail/:id", validateToken, deleteScan);
 router.post("/compare-scan", validateToken, compareScans);
 router.get(
   "/compare-scan/:firstScanId/:secondScanId",
   validateToken,
   getCompareScans
 );
+
+//HistoryScan
+router.get("/scan-quiz-detail", validateToken, getScanQuizDetail);
+router.delete("/scan-detail/:id", validateToken, deleteScan);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {

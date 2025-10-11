@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "quizOptionId",
         as: "quizOption",
       });
+      QuizUserAnswer.belongsToMany(models.ResultScan, {
+        through: "ResultScanQuizUserAnswer",
+        foreignKey: "quizUserAnswerId",
+        otherKey: "resultScanId",
+        as: "scans",
+      });
     }
   }
   QuizUserAnswer.init(

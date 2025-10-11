@@ -19,9 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "product_id",
       });
 
-      ResultScan.belongsTo(models.QuizUserAnswer, {
-        foreignKey: "quizId",
-        as: "quiz",
+      ResultScan.belongsToMany(models.QuizUserAnswer, {
+        through: "ResultScanQuizUserAnswer",
+        foreignKey: "resultScanId",
+        otherKey: "quizUserAnswerId",
+        as: "quizAnswers",
       });
     }
   }
@@ -29,7 +31,6 @@ module.exports = (sequelize, DataTypes) => {
   ResultScan.init(
     {
       userId: DataTypes.INTEGER,
-      quizId: DataTypes.INTEGER,
       imagePath: DataTypes.STRING,
       skinType: DataTypes.STRING,
       severity: DataTypes.STRING,

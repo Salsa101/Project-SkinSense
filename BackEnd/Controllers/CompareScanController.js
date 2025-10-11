@@ -64,36 +64,6 @@ const getScanDetail = async (req, res) => {
   }
 };
 
-// Delete scan by ID
-const deleteScan = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-
-    const scan = await ResultScan.findOne({ where: { id, userId } });
-    if (!scan) {
-      return res.status(404).json({
-        success: false,
-        message: "Scan not found or you don't have permission to delete it",
-      });
-    }
-
-    await ResultScan.destroy({ where: { id } });
-
-    res.status(200).json({
-      success: true,
-      message: "Scan deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting scan:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete scan",
-      error: error.message,
-    });
-  }
-};
-
 // Compare 2 scans selected by user
 const compareScans = async (req, res) => {
   try {
@@ -301,4 +271,4 @@ const getCompareScans = async (req, res) => {
   }
 };
 
-module.exports = { getScanDetail, deleteScan, compareScans, getCompareScans };
+module.exports = { getScanDetail, compareScans, getCompareScans };
