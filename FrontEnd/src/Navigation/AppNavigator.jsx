@@ -32,6 +32,7 @@ import CompareScan from '../Screens/CompareScan';
 import HistoryScan from '../Screens/HistoryScan';
 import HistoryQuiz from '../Screens/HistoryQuiz';
 import CompareResult from '../Screens/CompareResult';
+import PAOInfo from '../Screens/PAOInfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -210,6 +211,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="HistoryQuiz"
           component={HistoryQuiz}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PAOInfo"
+          component={PAOInfo}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

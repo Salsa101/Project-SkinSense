@@ -576,7 +576,26 @@ const AddProduct = ({ navigation }) => {
 
             {/* PAO Info Dropdown */}
             <View style={[styles.form, { zIndex: 96 }]}>
-              <Text style={styles.formText}>Does product have PAO info?</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text style={styles.formText}>Does product have PAO info?</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('PAOInfo')}
+                >
+                  <Icon
+                    style={{ marginRight: 15 }}
+                    name="info-circle"
+                    size={18}
+                    color="#E07C8E"
+                  />
+                </TouchableOpacity>
+              </View>
+
               <SelectList
                 setSelected={val => setHasPAO(val)}
                 data={[
@@ -585,9 +604,7 @@ const AddProduct = ({ navigation }) => {
                 ]}
                 save="key"
                 placeholder="Select option"
-                boxStyles={{
-                  ...styles.dropdownPicker,
-                }}
+                boxStyles={styles.dropdownPicker}
                 inputStyles={{
                   color: '#E07C8E',
                   fontFamily: 'Poppins-Medium',
