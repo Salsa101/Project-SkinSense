@@ -13,11 +13,22 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import api from '../api';
 import Navbar from '../Components/Navbar';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const ProfilPage = ({ navigation }) => {
   const [isPushEnabled, setIsPushEnabled] = useState(true);
   const [active, setActive] = useState('Profile');
   const [user, setUser] = useState(null);
+
+  const bottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['25%'], []);
+
+  const openBottomSheet = () => bottomSheetRef.current?.expand();
+  const closeBottomSheet = () => bottomSheetRef.current?.close();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -71,11 +82,14 @@ const ProfilPage = ({ navigation }) => {
       [
         { text: 'Batal', style: 'cancel' },
         {
-          text: 'Hapus',
+          text: 'Hapus Akun',
           style: 'destructive',
           onPress: async () => {
             try {
-              await api.delete('/profile', { withCredentials: true });
+              await api.delete('/delete-account', {
+                data: {},
+                withCredentials: true,
+              });
               Alert.alert('Sukses', 'Akun berhasil dihapus.');
               navigation.replace('AccountOption');
             } catch (error) {
@@ -88,101 +102,191 @@ const ProfilPage = ({ navigation }) => {
     );
   };
 
-  return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.container}>
-        {/* Header */}
-        <View style={styles.headerContainer}>
-          <Image
-            source={
-              user?.bannerImage
-                ? { uri: `${api.defaults.baseURL}${user.bannerImage}` }
-                : require('../../assets/banner-profile.png')
+  const handleDeleteData = async () => {
+    Alert.alert(
+      'Konfirmasi',
+      'Apakah kamu yakin ingin menghapus data? Akun akan tetap ada.',
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus Data',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete('/delete-data', {
+                data: {},
+                withCredentials: true,
+              });
+              Alert.alert('Sukses', 'Data berhasil dihapus.');
+              navigation.replace('Profile');
+            } catch (error) {
+              console.error('Gagal menghapus data:', error);
+              Alert.alert('Error', 'Gagal menghapus data. Silakan coba lagi.');
             }
-            style={styles.bannerImage}
-          />
-          <View style={styles.profileImageContainer}>
+          },
+        },
+      ],
+    );
+  };
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <ScrollView style={styles.container}>
+          {/* Header */}
+          <View style={styles.headerContainer}>
             <Image
               source={
-                user?.profileImage
-                  ? { uri: `${api.defaults.baseURL}${user.profileImage}` }
-                  : require('../../assets/profile-pic.png')
+                user?.bannerImage
+                  ? { uri: `${api.defaults.baseURL}${user.bannerImage}` }
+                  : require('../../assets/banner-profile.png')
               }
-              style={styles.profileImage}
+              style={styles.bannerImage}
             />
+            <View style={styles.profileImageContainer}>
+              <Image
+                source={
+                  user?.profileImage
+                    ? { uri: `${api.defaults.baseURL}${user.profileImage}` }
+                    : require('../../assets/profile-pic.png')
+                }
+                style={styles.profileImage}
+              />
+            </View>
+
+            {/* Edit Profile Button */}
+            <TouchableOpacity
+              style={styles.editProfileButton}
+              onPress={() => navigation.navigate('EditProfile')}
+            >
+              <Icon name="create-outline" size={18} color="#FFF" />
+              <Text style={styles.editProfileText}>Edit Profile</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Edit Profile Button */}
-          <TouchableOpacity
-            style={styles.editProfileButton}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Icon name="create-outline" size={18} color="#FFF" />
-            <Text style={styles.editProfileText}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
+          <Text style={styles.nameText}>{user?.username || 'User'}</Text>
+          <Text style={styles.emailText}>
+            {user?.email || 'user@gmail.com'}
+          </Text>
 
-        <Text style={styles.nameText}>{user?.username || 'User'}</Text>
-        <Text style={styles.emailText}>{user?.email || 'user@gmail.com'}</Text>
+          {/* Menu */}
+          <View style={styles.menuContainer}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => navigation.navigate('HistoryScan')}
+            >
+              <Icon name="scan-outline" size={22} color="#E07C8E" />
+              <Text style={styles.menuText}>History Scan</Text>
+              <Icon name="chevron-forward" size={20} color="#E07C8E" />
+            </TouchableOpacity>
 
-        {/* Menu */}
-        <View style={styles.menuContainer}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('HistoryScan')}
-          >
-            <Icon name="scan-outline" size={22} color="#E07C8E" />
-            <Text style={styles.menuText}>History Scan</Text>
-            <Icon name="chevron-forward" size={20} color="#E07C8E" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => navigation.navigate('ChangePassword')}
+            >
+              <Icon name="lock-closed-outline" size={22} color="#E07C8E" />
+              <Text style={styles.menuText}>Change Password</Text>
+              <Icon name="chevron-forward" size={20} color="#E07C8E" />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('ChangePassword')}
-          >
-            <Icon name="lock-closed-outline" size={22} color="#E07C8E" />
-            <Text style={styles.menuText}>Change Password</Text>
-            <Icon name="chevron-forward" size={20} color="#E07C8E" />
-          </TouchableOpacity>
+            <View style={styles.menuItem}>
+              <Icon name="notifications-outline" size={22} color="#E07C8E" />
+              <Text style={styles.menuText}>Push Notification</Text>
+              <Switch
+                value={isPushEnabled}
+                onValueChange={toggleNotif}
+                trackColor={{ false: '#ddd', true: '#F5C5CF' }}
+                thumbColor={isPushEnabled ? '#E07C8E' : '#f4f3f4'}
+              />
+            </View>
 
-          <View style={styles.menuItem}>
-            <Icon name="notifications-outline" size={22} color="#E07C8E" />
-            <Text style={styles.menuText}>Push Notification</Text>
-            <Switch
-              value={isPushEnabled}
-              onValueChange={toggleNotif}
-              trackColor={{ false: '#ddd', true: '#F5C5CF' }}
-              thumbColor={isPushEnabled ? '#E07C8E' : '#f4f3f4'}
-            />
+            <TouchableOpacity
+              style={[styles.menuItem, { borderBottomWidth: 0 }]}
+              onPress={openBottomSheet}
+            >
+              <Icon name="settings-outline" size={22} color="#E07C8E" />
+              <Text style={styles.menuText}>Settings</Text>
+              <Icon name="chevron-forward" size={20} color="#E07C8E" />
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]}>
-            <Icon name="settings-outline" size={22} color="#E07C8E" />
-            <Text style={styles.menuText}>Settings</Text>
-            <Icon name="chevron-forward" size={20} color="#E07C8E" />
-          </TouchableOpacity>
+          {/* Logout Section */}
+          <View style={styles.logoutContainer}>
+            <TouchableOpacity
+              style={[styles.menuItem, { borderBottomWidth: 0 }]}
+              onPress={handleLogout}
+            >
+              <Icon name="log-out-outline" size={22} color="#e30000ff" />
+              <Text style={[styles.menuText, { color: '#e30000ff' }]}>
+                Logout
+              </Text>
+              <Icon name="chevron-forward" size={20} color="#e30000ff" />
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+
+        {/* Navbar */}
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+          <Navbar active={active} onPress={setActive} />
         </View>
 
-        {/* Logout Section */}
-        <View style={styles.logoutContainer}>
-          <TouchableOpacity
-            style={[styles.menuItem, { borderBottomWidth: 0 }]}
-            onPress={handleLogout}
-          >
-            <Icon name="log-out-outline" size={22} color="#e30000ff" />
-            <Text style={[styles.menuText, { color: '#e30000ff' }]}>
-              Logout
-            </Text>
-            <Icon name="chevron-forward" size={20} color="#e30000ff" />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          backdropComponent={props => (
+            <BottomSheetBackdrop
+              {...props}
+              disappearsOnIndex={-1}
+              appearsOnIndex={0}
+            />
+          )}
+        >
+          <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
+            <TouchableOpacity
+              style={{
+                padding: 15,
+                backgroundColor: '#fff3f3',
+                borderRadius: 10,
+                marginBottom: 15,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              onPress={handleDeleteData}
+            >
+              <Icon name="trash-outline" size={20} color="#E07C8E" />
+              <Text
+                style={{ marginLeft: 10, color: '#E07C8E', fontWeight: 'bold' }}
+              >
+                Hapus Data
+              </Text>
+            </TouchableOpacity>
 
-      {/* Navbar */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-        <Navbar active={active} onPress={setActive} />
+            <TouchableOpacity
+              style={{
+                padding: 15,
+                backgroundColor: '#ffe6e6',
+                borderRadius: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              onPress={handleDeleteAccount}
+            >
+              <Icon name="trash-bin-outline" size={20} color="#e30000ff" />
+              <Text
+                style={{
+                  marginLeft: 10,
+                  color: '#e30000ff',
+                  fontWeight: 'bold',
+                }}
+              >
+                Hapus Akun
+              </Text>
+            </TouchableOpacity>
+          </BottomSheetScrollView>
+        </BottomSheet>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 

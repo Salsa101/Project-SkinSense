@@ -77,8 +77,21 @@ const EditProfile = ({ navigation }) => {
       formData.append('username', name);
       formData.append('age', age);
       formData.append('date_of_birth', dob);
-      if (profileImage) formData.append('profileImage', profileImage);
-      if (bannerImage) formData.append('bannerImage', bannerImage);
+      if (profileImage) {
+        formData.append('profileImage', {
+          uri: profileImage.uri,
+          name: profileImage.name || 'profile.jpg',
+          type: profileImage.type || 'image/jpeg',
+        });
+      }
+
+      if (bannerImage) {
+        formData.append('bannerImage', {
+          uri: bannerImage.uri,
+          name: bannerImage.name || 'banner.jpg',
+          type: bannerImage.type || 'image/jpeg',
+        });
+      }
 
       const res = await api.put('/profile/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },

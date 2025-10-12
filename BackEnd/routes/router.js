@@ -13,6 +13,7 @@ const {
   notifToggle,
   updateProfile,
   deleteAccount,
+  deleteData,
   changePassword,
 } = require("../Controllers/UserController");
 const { validateToken } = require("../Middlewares/AuthMiddleware");
@@ -87,14 +88,12 @@ router.put("/profile/notif", validateToken, notifToggle);
 router.put(
   "/profile/update",
   validateToken,
-  upload("profile").fields([
-    { name: "profileImage", maxCount: 1 },
-    { name: "bannerImage", maxCount: 1 },
-  ]),
+  upload("profile").fields([{ name: "profileImage" }, { name: "bannerImage" }]),
   updateProfile
 );
-router.delete("/profile", validateToken, deleteAccount);
 router.put("/change-password", validateToken, changePassword);
+router.delete("/delete-account", validateToken, deleteAccount);
+router.delete("/delete-data", validateToken, deleteData);
 
 //Routine Product
 router.post(
