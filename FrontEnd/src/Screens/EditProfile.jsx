@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,88 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import { launchImageLibrary } from 'react-native-image-picker';
+import api from '../api';
 
 const EditProfile = ({ navigation }) => {
   const [name, setName] = useState('Rosa');
   const [email, setEmail] = useState('rosa123@gmail.com');
   const [age, setAge] = useState('20');
   const [dob, setDob] = useState('20 December 2004');
-  const [profileImage, setProfileImage] = useState(
-    require('../../assets/profile-pic.png'),
-  );
+  const [profileImage, setProfileImage] = useState(null);
+  const [bannerImage, setBannerImage] = useState(null);
 
-  const handleSave = () => {
-    console.log('Saved:', { name, email, age, dob });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/profile/view');
+        const user = res.data.user;
+
+        setName(user.username || '');
+        setEmail(user.email || '');
+        setAge(user.age ? String(user.age) : '');
+        setDob(user.date_of_birth || '');
+
+        if (user.profileImage) {
+          setProfileImage({
+            uri: `${api.defaults.baseURL}${user.profileImage}`,
+            name: 'profile.jpg',
+            type: 'image/jpeg',
+          });
+        }
+        if (user.bannerImage) {
+          setBannerImage({
+            uri: `${api.defaults.baseURL}${user.bannerImage}`,
+            name: 'banner.jpg',
+            type: 'image/jpeg',
+          });
+        }
+      } catch (err) {
+        console.error('Gagal mengambil profil:', err);
+        Alert.alert('Error', 'Gagal mengambil data profil.');
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const pickImage = setter => {
+    launchImageLibrary({ mediaType: 'photo' }, response => {
+      if (!response.didCancel && response.assets?.length > 0) {
+        const asset = response.assets[0];
+        setter({
+          uri: asset.uri,
+          name: asset.fileName || 'image.jpg',
+          type: asset.type || 'image/jpeg',
+        });
+      }
+    });
+  };
+
+  // Simpan perubahan profil
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('username', name);
+      formData.append('age', age);
+      formData.append('date_of_birth', dob);
+      if (profileImage) formData.append('profileImage', profileImage);
+      if (bannerImage) formData.append('bannerImage', bannerImage);
+
+      const res = await api.put('/profile/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      Alert.alert('Sukses', 'Profil berhasil diperbarui!');
+      navigation.goBack();
+    } catch (err) {
+      console.error('Gagal update profil:', err);
+      Alert.alert('Error', 'Gagal memperbarui profil.');
+    }
   };
 
   return (
@@ -42,10 +110,17 @@ const EditProfile = ({ navigation }) => {
         <View style={styles.headerContainer}>
           <View style={styles.bannerWrapper}>
             <Image
-              source={require('../../assets/banner-profile.png')}
+              source={
+                bannerImage
+                  ? { uri: bannerImage.uri }
+                  : require('../../assets/banner-profile.png')
+              }
               style={styles.bannerImage}
             />
-            <TouchableOpacity style={styles.bannerOverlay}>
+            <TouchableOpacity
+              style={styles.bannerOverlay}
+              onPress={() => pickImage(setBannerImage)}
+            >
               <View style={styles.editButton}>
                 <Icon name="camera-outline" size={30} color="#FFF" />
               </View>
@@ -53,8 +128,18 @@ const EditProfile = ({ navigation }) => {
           </View>
 
           <View style={styles.profileImageContainer}>
-            <Image source={profileImage} style={styles.profileImage} />
-            <TouchableOpacity style={styles.overlay}>
+            <Image
+              source={
+                profileImage
+                  ? { uri: profileImage.uri }
+                  : require('../../assets/profile-pic.png')
+              }
+              style={styles.profileImage}
+            />
+            <TouchableOpacity
+              style={styles.overlay}
+              onPress={() => pickImage(setProfileImage)}
+            >
               <View style={styles.editButton}>
                 <Icon name="camera-outline" size={24} color="#FFF" />
               </View>
@@ -64,7 +149,7 @@ const EditProfile = ({ navigation }) => {
 
         {/* Form */}
         <View style={styles.form}>
-          <Text style={styles.label}>Name</Text>
+          <Text style={styles.label}>Username</Text>
           <TextInput style={styles.input} value={name} onChangeText={setName} />
 
           <Text style={styles.label}>Email</Text>

@@ -10,6 +10,7 @@ const {
 } = require("../Controllers/AuthController");
 const {
   getProfile,
+  notifToggle,
   updateProfile,
   deleteAccount,
 } = require("../Controllers/UserController");
@@ -80,8 +81,17 @@ router.post("/logout", logoutController);
 router.get("/home", validateToken, getProfile);
 
 // Profile Page
-router.get("/profile", validateToken, getProfile);
-router.put("/profile", validateToken, updateProfile);
+router.get("/profile/view", validateToken, getProfile);
+router.put("/profile/notif", validateToken, notifToggle);
+router.put(
+  "/profile/update",
+  validateToken,
+  upload("profile").fields([
+    { name: "profileImage", maxCount: 1 },
+    { name: "bannerImage", maxCount: 1 },
+  ]),
+  updateProfile
+);
 router.delete("/profile", validateToken, deleteAccount);
 
 //Routine Product

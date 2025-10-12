@@ -43,6 +43,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: "user",
       },
+      profileImage: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      bannerImage: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      enabledNotif: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
     },
     {
       sequelize,

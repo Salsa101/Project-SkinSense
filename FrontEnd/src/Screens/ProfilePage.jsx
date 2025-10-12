@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,29 @@ import Navbar from '../Components/Navbar';
 const ProfilPage = ({ navigation }) => {
   const [isPushEnabled, setIsPushEnabled] = useState(true);
   const [active, setActive] = useState('Profile');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/profile/view');
+        setUser(res.data.user);
+        setIsPushEnabled(res.data.user.enabledNotif);
+      } catch (err) {
+        console.error('Gagal ambil profil:', err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const toggleNotif = async value => {
+    try {
+      setIsPushEnabled(value);
+      await api.put('/profile/notif', { enabledNotif: value });
+    } catch (err) {
+      console.error('Gagal update notif:', err);
+    }
+  };
 
   const handleLogout = async () => {
     Alert.alert('Konfirmasi Logout', 'Yakin ingin logout?', [
@@ -41,18 +64,50 @@ const ProfilPage = ({ navigation }) => {
     ]);
   };
 
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      'Konfirmasi',
+      'Apakah kamu yakin ingin menghapus akun ini? Tindakan ini tidak bisa dibatalkan.',
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete('/profile', { withCredentials: true });
+              Alert.alert('Sukses', 'Akun berhasil dihapus.');
+              navigation.replace('AccountOption');
+            } catch (error) {
+              console.error('Gagal menghapus akun:', error);
+              Alert.alert('Error', 'Gagal menghapus akun. Silakan coba lagi.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         {/* Header */}
         <View style={styles.headerContainer}>
           <Image
-            source={require('../../assets/banner-profile.png')}
+            source={
+              user?.bannerImage
+                ? { uri: `${api.defaults.baseURL}${user.bannerImage}` }
+                : require('../../assets/banner-profile.png')
+            }
             style={styles.bannerImage}
           />
           <View style={styles.profileImageContainer}>
             <Image
-              source={require('../../assets/profile-pic.png')}
+              source={
+                user?.profileImage
+                  ? { uri: `${api.defaults.baseURL}${user.profileImage}` }
+                  : require('../../assets/profile-pic.png')
+              }
               style={styles.profileImage}
             />
           </View>
@@ -67,8 +122,8 @@ const ProfilPage = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.nameText}>Salsa</Text>
-        <Text style={styles.emailText}>rosa@gmail.com</Text>
+        <Text style={styles.nameText}>{user?.username || 'User'}</Text>
+        <Text style={styles.emailText}>{user?.email || 'user@gmail.com'}</Text>
 
         {/* Menu */}
         <View style={styles.menuContainer}>
@@ -92,7 +147,7 @@ const ProfilPage = ({ navigation }) => {
             <Text style={styles.menuText}>Push Notification</Text>
             <Switch
               value={isPushEnabled}
-              onValueChange={setIsPushEnabled}
+              onValueChange={toggleNotif}
               trackColor={{ false: '#ddd', true: '#F5C5CF' }}
               thumbColor={isPushEnabled ? '#E07C8E' : '#f4f3f4'}
             />

@@ -36,6 +36,18 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: "user",
       },
+      profileImage: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      bannerImage: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      enabledNotif: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -11,6 +11,7 @@ module.exports = {
         username: "admin-skinsense",
         email: "admin@admin.com",
         password: hashedPassword,
+        role: "admin",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
