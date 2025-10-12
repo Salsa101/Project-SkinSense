@@ -13,6 +13,7 @@ const {
   notifToggle,
   updateProfile,
   deleteAccount,
+  changePassword,
 } = require("../Controllers/UserController");
 const { validateToken } = require("../Middlewares/AuthMiddleware");
 const { validateRegister, validateLogin } = require("../Middlewares/Validator");
@@ -93,6 +94,7 @@ router.put(
   updateProfile
 );
 router.delete("/profile", validateToken, deleteAccount);
+router.put("/change-password", validateToken, changePassword);
 
 //Routine Product
 router.post(

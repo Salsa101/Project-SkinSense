@@ -34,6 +34,7 @@ import HistoryQuiz from '../Screens/HistoryQuiz';
 import CompareResult from '../Screens/CompareResult';
 import PAOInfo from '../Screens/PAOInfo';
 import EditProfile from '../Screens/EditProfile';
+import ChangePassword from '../Screens/ChangePassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -222,6 +223,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="EditProfile"
           component={EditProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

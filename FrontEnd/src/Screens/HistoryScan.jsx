@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Modal,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Feather';
@@ -20,6 +21,8 @@ import BottomSheet, {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 
+import ImageViewer from 'react-native-image-zoom-viewer';
+
 import api from '../api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -30,6 +33,8 @@ const HistoryScan = ({ navigation }) => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [currentItem, setCurrentItem] = useState(null);
   const [currentQuiz, setCurrentQuiz] = useState(null);
+
+  const [zoomVisible, setZoomVisible] = useState(false);
 
   const sheetRef = useRef(null);
   const quizSheetRef = useRef(null);
@@ -395,17 +400,33 @@ const HistoryScan = ({ navigation }) => {
 
                 {/* Image */}
                 <View style={{ alignItems: 'center', marginBottom: 16 }}>
-                  <Image
-                    source={{
-                      uri: `${api.defaults.baseURL}${currentItem.imagePath}`,
-                    }}
-                    style={{
-                      width: SCREEN_WIDTH - 40,
-                      height: SCREEN_WIDTH - 40,
-                      borderRadius: 15,
-                    }}
-                  />
+                  <TouchableOpacity onPress={() => setZoomVisible(true)}>
+                    <Image
+                      source={{
+                        uri: `${api.defaults.baseURL}${currentItem.imagePath}`,
+                      }}
+                      style={{
+                        width: SCREEN_WIDTH - 40,
+                        height: SCREEN_WIDTH - 40,
+                        borderRadius: 15,
+                      }}
+                    />
+                  </TouchableOpacity>
                 </View>
+
+                {/* Modal Zoom */}
+                <Modal visible={zoomVisible} transparent={true}>
+                  <ImageViewer
+                    imageUrls={[
+                      {
+                        url: `${api.defaults.baseURL}${currentItem.imagePath}`,
+                      },
+                    ]}
+                    enableSwipeDown
+                    onSwipeDown={() => setZoomVisible(false)}
+                    index={0} // mulai dari gambar Before
+                  />
+                </Modal>
 
                 {/* Scan Info */}
                 <View style={{ marginBottom: 16 }}>

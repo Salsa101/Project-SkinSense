@@ -13,12 +13,14 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import api from '../api';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { height: windowHeight } = Dimensions.get('window');
 
 const SignIn = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
@@ -66,14 +68,26 @@ const SignIn = ({ navigation }) => {
             />
 
             <Text style={styles.body}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Masukkan password"
-              placeholderTextColor="#bf828dff"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                style={[styles.input, { paddingRight: 40 }]}
+                placeholder="Masukkan password"
+                placeholderTextColor="#bf828dff"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={{ position: 'absolute', right: 10, top: 17 }}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Icon
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color="#DE576F"
+                />
+              </TouchableOpacity>
+            </View>
 
             <Text style={styles.textForgot}>Forgot Password?</Text>
 

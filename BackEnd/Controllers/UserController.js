@@ -1,6 +1,7 @@
 const { User } = require("../models");
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require("bcrypt");
 
 const getProfile = async (req, res) => {
   try {
@@ -48,112 +49,18 @@ const notifToggle = async (req, res) => {
   }
 };
 
-// const updateProfile = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const { full_name, age, date_of_birth } = req.body;
-
-//     // Update data user
-//     const [updated] = await User.update(
-//       { full_name, age, date_of_birth },
-//       { where: { id: userId } }
-//     );
-
-//     if (!updated) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const updatedUser = await User.findByPk(userId, {
-//       attributes: [
-//         "id",
-//         "username",
-//         "email",
-//         "age",
-//         "date_of_birth",
-//         "profileImage",
-//         "bannerImage",
-//         "enabledNotif",
-//       ],
-//     });
-
-//     res.json({ message: "Profile updated successfully", user: updatedUser });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
-
-// const updateProfile = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const { full_name, age, date_of_birth } = req.body;
-
-//     // Ambil URL gambar (kalau upload baru, ambil dari req.file / req.files)
-//     const profileImage = req.files?.profileImage?.[0];
-//     const bannerImage = req.files?.bannerImage?.[0];
-
-//     const profileImageUrl = profileImage
-//       ? `/uploads/${userId}/profile/${profileImage.filename}`
-//       : req.body.profileImage || null;
-
-//     const bannerImageUrl = bannerImage
-//       ? `/uploads/${userId}/profile/${bannerImage.filename}`
-//       : req.body.bannerImage || null;
-
-//     // Update data
-//     const updateData = {
-//       full_name,
-//       age,
-//       date_of_birth,
-//       ...(profileImageUrl && { profileImage: profileImageUrl }),
-//       ...(bannerImageUrl && { bannerImage: bannerImageUrl }),
-//     };
-
-//     const [updated] = await User.update(updateData, { where: { id: userId } });
-
-//     if (!updated) return res.status(404).json({ message: "User not found" });
-
-//     const updatedUser = await User.findByPk(userId, {
-//       attributes: [
-//         "id",
-//         "username",
-//         "email",
-//         "full_name",
-//         "age",
-//         "date_of_birth",
-//         "profileImage",
-//         "bannerImage",
-//       ],
-//     });
-
-//     res.json({
-//       message: "Profile updated successfully",
-//       user: updatedUser,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       message: "Failed to update profile",
-//       error: error.message,
-//     });
-//   }
-// };
-
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const { username, age, date_of_birth } = req.body;
 
-    // Ambil user lama untuk ambil path gambar sebelumnya
     const oldUser = await User.findByPk(userId);
 
     if (!oldUser) return res.status(404).json({ message: "User not found" });
 
-    // Ambil file baru (kalau ada)
     const profileImage = req.files?.profileImage?.[0];
     const bannerImage = req.files?.bannerImage?.[0];
 
-    // Buat path baru
     const profileImageUrl = profileImage
       ? `/uploads/${userId}/profile/${profileImage.filename}`
       : oldUser.profileImage;
@@ -162,7 +69,6 @@ const updateProfile = async (req, res) => {
       ? `/uploads/${userId}/profile/${bannerImage.filename}`
       : oldUser.bannerImage;
 
-    // Hapus file lama kalau upload baru
     if (profileImage && oldUser.profileImage) {
       const oldPath = path.join(__dirname, "..", oldUser.profileImage);
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
@@ -173,7 +79,6 @@ const updateProfile = async (req, res) => {
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
     }
 
-    // Filter data valid
     const updateData = {
       username,
       profileImage: profileImageUrl,
@@ -190,7 +95,6 @@ const updateProfile = async (req, res) => {
 
     await User.update(updateData, { where: { id: userId } });
 
-    // Ambil data user terbaru
     const updatedUser = await User.findByPk(userId, {
       attributes: [
         "id",
@@ -217,6 +121,32 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password salah" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password berhasil diubah" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
 const deleteAccount = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -239,4 +169,10 @@ const deleteAccount = async (req, res) => {
 
 const deleteData = async (req, res) => {};
 
-module.exports = { getProfile, notifToggle, updateProfile, deleteAccount };
+module.exports = {
+  getProfile,
+  notifToggle,
+  updateProfile,
+  deleteAccount,
+  changePassword,
+};

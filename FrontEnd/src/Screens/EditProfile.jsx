@@ -85,7 +85,7 @@ const EditProfile = ({ navigation }) => {
       });
 
       Alert.alert('Sukses', 'Profil berhasil diperbarui!');
-      navigation.goBack();
+      navigation.navigate('Profile');
     } catch (err) {
       console.error('Gagal update profil:', err);
       Alert.alert('Error', 'Gagal memperbarui profil.');

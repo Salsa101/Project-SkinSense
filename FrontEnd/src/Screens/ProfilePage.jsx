@@ -136,7 +136,10 @@ const ProfilPage = ({ navigation }) => {
             <Icon name="chevron-forward" size={20} color="#E07C8E" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('ChangePassword')}
+          >
             <Icon name="lock-closed-outline" size={22} color="#E07C8E" />
             <Text style={styles.menuText}>Change Password</Text>
             <Icon name="chevron-forward" size={20} color="#E07C8E" />
@@ -166,9 +169,11 @@ const ProfilPage = ({ navigation }) => {
             style={[styles.menuItem, { borderBottomWidth: 0 }]}
             onPress={handleLogout}
           >
-            <Icon name="log-out-outline" size={22} color="#E07C8E" />
-            <Text style={[styles.menuText, { color: '#E07C8E' }]}>Logout</Text>
-            <Icon name="chevron-forward" size={20} color="#E07C8E" />
+            <Icon name="log-out-outline" size={22} color="#e30000ff" />
+            <Text style={[styles.menuText, { color: '#e30000ff' }]}>
+              Logout
+            </Text>
+            <Icon name="chevron-forward" size={20} color="#e30000ff" />
           </TouchableOpacity>
         </View>
       </ScrollView>

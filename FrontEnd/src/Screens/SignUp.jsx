@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import api from '../api';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { height: windowHeight } = Dimensions.get('window');
 
@@ -20,7 +21,9 @@ const SignUp = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [formHeight, setFormHeight] = useState(0);
 
@@ -66,7 +69,7 @@ const SignUp = ({ navigation }) => {
 
           <View
             style={styles.formContainer}
-            onLayout={(event) => setFormHeight(event.nativeEvent.layout.height)}
+            onLayout={event => setFormHeight(event.nativeEvent.layout.height)}
           >
             <Text style={styles.title}>Sign Up</Text>
 
@@ -89,25 +92,51 @@ const SignUp = ({ navigation }) => {
               keyboardType="email-address"
             />
 
+            {/* Password */}
             <Text style={styles.body}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Masukkan password"
-              placeholderTextColor="#bf828dff"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                style={[styles.input, { paddingRight: 40 }]}
+                placeholder="Masukkan password"
+                placeholderTextColor="#bf828dff"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={{ position: 'absolute', right: 10, top: 17 }}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Icon
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color="#DE576F"
+                />
+              </TouchableOpacity>
+            </View>
 
+            {/* Confirm Password */}
             <Text style={styles.body}>Confirm Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Konfirmasi password"
-              placeholderTextColor="#bf828dff"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
+            <View style={{ position: 'relative' }}>
+              <TextInput
+                style={[styles.input, { paddingRight: 40 }]}
+                placeholder="Konfirmasi password"
+                placeholderTextColor="#bf828dff"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+              />
+              <TouchableOpacity
+                style={{ position: 'absolute', right: 10, top: 17 }}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Icon
+                  name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color="#DE576F"
+                />
+              </TouchableOpacity>
+            </View>
 
             {errorMessage !== '' && (
               <Text style={styles.errorText}>{errorMessage}</Text>
