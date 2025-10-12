@@ -22,6 +22,11 @@ const registerController = async (req, res) => {
       return res.status(400).json({ message: "Password tidak cocok." });
     }
 
+    const existingUsername = await User.findOne({ where: { username } });
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username sudah digunakan." });
+    }
+
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "Email sudah digunakan." });
@@ -103,8 +108,8 @@ const loginController = async (req, res) => {
 };
 
 const logoutController = async (req, res) => {
-  res.clearCookie('token');
-  res.json({ message: 'Logout berhasil' });
-}
+  res.clearCookie("token");
+  res.json({ message: "Logout berhasil" });
+};
 
 module.exports = { registerController, loginController, logoutController };

@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     marginTop: 5,
+    color: '#333',
   },
   signInBtn: {
     backgroundColor: '#DE576F',
