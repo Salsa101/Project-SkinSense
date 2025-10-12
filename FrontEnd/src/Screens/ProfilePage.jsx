@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -23,6 +24,8 @@ const ProfilPage = ({ navigation }) => {
   const [isPushEnabled, setIsPushEnabled] = useState(true);
   const [active, setActive] = useState('Profile');
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['25%'], []);
@@ -38,6 +41,8 @@ const ProfilPage = ({ navigation }) => {
         setIsPushEnabled(res.data.user.enabledNotif);
       } catch (err) {
         console.error('Gagal ambil profil:', err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfile();
@@ -128,6 +133,24 @@ const ProfilPage = ({ navigation }) => {
       ],
     );
   };
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, justifyContent: 'center' }}
+        size="large"
+        color="#DE576F"
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.error}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
