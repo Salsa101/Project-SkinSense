@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       User.hasMany(models.Journal, { foreignKey: "userId" });
       User.hasMany(models.ReminderTime, { foreignKey: "userId" });
+      User.hasMany(models.PasswordReset, { foreignKey: "userId" });
     }
   }
   User.init(

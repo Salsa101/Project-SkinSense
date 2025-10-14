@@ -60,6 +60,10 @@ const {
   getScanQuizDetail,
   deleteScan,
 } = require("../Controllers/HistoryScanController");
+const {
+  forgotPassword,
+  resetPassword,
+} = require("../Controllers/ForgotPasswordController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -77,7 +81,9 @@ const {
 //Auth
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
-router.post("/logout", logoutController);
+router.post("/logout", validateToken, logoutController);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 // Home Page
 router.get("/home", validateToken, getProfile);
