@@ -208,7 +208,15 @@ const ProfilPage = ({ navigation }) => {
                   />
                   <Text style={styles.infoLabel}>Date of Birth</Text>
                 </View>
-                <Text style={styles.infoValue}>20 October 2004</Text>
+                <Text style={styles.infoValue}>
+                  {user?.date_of_birth
+                    ? new Date(user.date_of_birth).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                    : 'Not set yet'}
+                </Text>
               </View>
               <View style={styles.divider} />
               <View style={styles.infoItem}>
@@ -221,7 +229,9 @@ const ProfilPage = ({ navigation }) => {
                   />
                   <Text style={styles.infoLabel}>Age</Text>
                 </View>
-                <Text style={styles.infoValue}>25 Years Old</Text>
+                <Text style={styles.infoValue}>
+                  {user?.age ? `${user.age} Years Old` : 'Not set yet'}
+                </Text>
               </View>
             </View>
           </View>

@@ -114,7 +114,12 @@ const updateProfile = async (req, res) => {
       bannerImage: bannerImageUrl,
     };
 
-    if (age && !isNaN(age)) updateData.age = parseInt(age);
+    if (age === "" || age === null) {
+      updateData.age = null;
+    } else if (!isNaN(age)) {
+      updateData.age = parseInt(age);
+    }
+
     if (
       date_of_birth &&
       date_of_birth.trim() !== "" &&

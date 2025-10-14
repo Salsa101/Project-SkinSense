@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { launchImageLibrary } from 'react-native-image-picker';
 import api from '../api';
@@ -22,6 +23,8 @@ const EditProfile = ({ navigation }) => {
   const [dob, setDob] = useState('20 December 2004');
   const [profileImage, setProfileImage] = useState(null);
   const [bannerImage, setBannerImage] = useState(null);
+
+  const [isPickerVisible, setPickerVisible] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -70,7 +73,23 @@ const EditProfile = ({ navigation }) => {
     });
   };
 
-  // Simpan perubahan profil
+  const showPicker = () => setPickerVisible(true);
+  const hidePicker = () => setPickerVisible(false);
+  const handleConfirm = date => {
+    const formattedDate = date.toISOString().split('T')[0];
+    setDob(formattedDate);
+
+    const today = new Date();
+    let ageCalc = today.getFullYear() - date.getFullYear();
+    const m = today.getMonth() - date.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < date.getDate())) {
+      ageCalc--;
+    }
+    setAge(String(ageCalc));
+
+    hidePicker();
+  };
+
   const handleSave = async () => {
     try {
       const formData = new FormData();
@@ -172,6 +191,31 @@ const EditProfile = ({ navigation }) => {
             onChangeText={setEmail}
           />
 
+          <View>
+            <Text style={styles.label}>Date of Birth</Text>
+
+            <TouchableOpacity onPress={showPicker} activeOpacity={0.8}>
+              <View
+                style={[
+                  styles.input,
+                  { flexDirection: 'row', alignItems: 'center' },
+                ]}
+              >
+                <Text style={{ flex: 1, color: dob ? '#000' : '#888' }}>
+                  {dob || 'Select your date of birth'}
+                </Text>
+                <Icon name="calendar-outline" size={24} color="#E07C8E" />
+              </View>
+            </TouchableOpacity>
+
+            <DateTimePickerModal
+              isVisible={isPickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hidePicker}
+            />
+          </View>
+
           <Text style={styles.label}>Age</Text>
           <TextInput
             style={styles.input}
@@ -179,9 +223,6 @@ const EditProfile = ({ navigation }) => {
             onChangeText={setAge}
             keyboardType="numeric"
           />
-
-          <Text style={styles.label}>Date of Birth</Text>
-          <TextInput style={styles.input} value={dob} onChangeText={setDob} />
         </View>
       </ScrollView>
     </SafeAreaView>
