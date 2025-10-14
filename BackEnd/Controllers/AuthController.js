@@ -4,6 +4,7 @@ const { User } = require("../models");
 const { validationResult } = require("express-validator");
 
 const { jwtSecret } = require("../config/config");
+const { sendWelcomeEmail } = require("../Utils/sendEmail");
 
 const registerController = async (req, res) => {
   const errors = validationResult(req);
@@ -39,6 +40,8 @@ const registerController = async (req, res) => {
       email,
       password: hashedPassword,
     });
+
+    await sendWelcomeEmail(newUser);
 
     res.status(201).json({
       message: "User berhasil terdaftar.",
