@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Icon1 from 'react-native-vector-icons/FontAwesome';
 
 import api from '../api';
 import Navbar from '../Components/Navbar';
@@ -155,7 +156,10 @@ const ProfilPage = ({ navigation }) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
-        <ScrollView style={styles.container}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
           {/* Header */}
           <View style={styles.headerContainer}>
             <Image
@@ -187,10 +191,40 @@ const ProfilPage = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.nameText}>{user?.username || 'User'}</Text>
-          <Text style={styles.emailText}>
-            {user?.email || 'user@gmail.com'}
-          </Text>
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.nameText}>{user?.username || 'User'}</Text>
+            <Text style={styles.emailText}>
+              {user?.email || 'user@gmail.com'}
+            </Text>
+
+            <View style={styles.infoBox}>
+              <View style={styles.infoItem}>
+                <View style={styles.infoLabelRow}>
+                  <Icon1
+                    name="birthday-cake"
+                    size={14}
+                    color="#e28ca6"
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text style={styles.infoLabel}>Date of Birth</Text>
+                </View>
+                <Text style={styles.infoValue}>20 October 2004</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoItem}>
+                <View style={styles.infoLabelRow}>
+                  <Icon1
+                    name="user"
+                    size={14}
+                    color="#e28ca6"
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text style={styles.infoLabel}>Age</Text>
+                </View>
+                <Text style={styles.infoValue}>25 Years Old</Text>
+              </View>
+            </View>
+          </View>
 
           {/* Menu */}
           <View style={styles.menuContainer}>
@@ -342,6 +376,42 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
     color: '#B5838D',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    paddingHorizontal: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+    marginHorizontal: 20,
+    borderTopColor: '#f1c2d1',
+    borderTopWidth: 1,
+    borderBottomColor: '#f1c2d1',
+    borderBottomWidth: 1,
+  },
+  infoItem: {
+    alignItems: 'center',
+    width: 130,
+    marginVertical: 15,
+  },
+  infoLabel: {
+    color: '#e28ca6',
+  },
+  infoValue: {
+    color: '#e28ca6',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  divider: {
+    width: 1,
+    height: '100%',
+    backgroundColor: '#f1c2d1',
+    marginHorizontal: 15,
+  },
+  infoLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
   },
   header: {
     backgroundColor: '#FAD4D8',
