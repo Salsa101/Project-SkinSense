@@ -7,6 +7,8 @@ const {
   registerController,
   loginController,
   logoutController,
+  finishBoarding,
+  getUser,
 } = require("../Controllers/AuthController");
 const {
   getProfile,
@@ -84,6 +86,8 @@ router.post("/login", validateLogin, loginController);
 router.post("/logout", validateToken, logoutController);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.post("/finish-onboarding", validateToken, finishBoarding);
+router.get("/user", validateToken, getUser);
 
 // Home Page
 router.get("/home", validateToken, getProfile);

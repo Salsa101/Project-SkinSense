@@ -26,8 +26,17 @@ const SignIn = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await api.post('/login', { username, password });
+
+      const userResponse = await api.get('/user');
+      const inOnBoard = userResponse.data?.inOnBoard || false;
+
       Alert.alert('Sukses', 'Login berhasil.');
-      navigation.navigate('Home');
+
+      if (!inOnBoard) {
+        navigation.navigate('LandingPage');
+      } else {
+        navigation.navigate('Home');
+      }
     } catch (error) {
       const msg = error.response?.data?.message || 'Login gagal.';
       Alert.alert('Error', msg);

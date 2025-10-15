@@ -115,4 +115,38 @@ const logoutController = async (req, res) => {
   res.json({ message: "Logout berhasil" });
 };
 
-module.exports = { registerController, loginController, logoutController };
+const getUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findByPk(userId, {
+      attributes: ["id", "username", "email", "inOnBoard"],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan saat mengambil data user" });
+  }
+};
+
+const finishBoarding = async (req, res) => {
+  const userId = req.user.id;
+
+  await User.update({ inOnBoard: true }, { where: { id: userId } });
+
+  res.json({ message: "Onboarding selesai" });
+};
+
+module.exports = {
+  registerController,
+  loginController,
+  logoutController,
+  getUser,
+  finishBoarding,
+};

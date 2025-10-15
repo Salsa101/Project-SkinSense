@@ -190,6 +190,23 @@ const FaceScan2 = ({ navigation }) => {
     console.log('aiResult updated:', aiResult);
   }, [aiResult]);
 
+  const handlePress = async () => {
+    try {
+      const response = await api.get('/user');
+      const inOnBoard = response.data?.inOnBoard || false;
+
+      if (!inOnBoard) {
+        await api.post('/finish-onboarding');
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('Calendar');
+      }
+    } catch (error) {
+      console.log('HandlePress error:', error);
+      Alert.alert('Error', 'Gagal memproses data user.');
+    }
+  };
+
   if (!device || !hasPermission)
     return (
       <View style={styles.centered}>
@@ -598,7 +615,7 @@ const FaceScan2 = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Compare Button */}
+          {/* Home Button */}
           <TouchableOpacity
             style={{
               backgroundColor: '#E07C8E',
@@ -607,7 +624,8 @@ const FaceScan2 = ({ navigation }) => {
               alignItems: 'center',
               marginBottom: 40,
             }}
-            onPress={() => navigation.navigate('Calendar')}
+            // onPress={() => navigation.navigate('Calendar')}
+            onPress={handlePress}
           >
             <Text style={{ color: 'white', fontWeight: 'bold' }}>
               Start Tracking
