@@ -232,7 +232,7 @@ const deleteData = async (req, res) => {
     deleteFolderRecursive(userUploadFolder);
 
     await User.update(
-      { profileImage: null, bannerImage: null },
+      { profileImage: null, bannerImage: null, age: null, date_of_birth: null },
       { where: { id: userId } }
     );
 
