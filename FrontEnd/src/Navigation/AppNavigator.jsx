@@ -47,9 +47,14 @@ const AppNavigator = () => {
     const checkAuth = async () => {
       try {
         const response = await api.get('/home');
+        const user = response.data?.user;
 
-        if (response.data?.user) {
-          setInitialRoute('Home');
+        if (user) {
+          if (user.inOnBoard) {
+            setInitialRoute('Home');
+          } else {
+            setInitialRoute('LandingPage');
+          }
         } else {
           setInitialRoute('AccountOption');
         }

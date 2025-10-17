@@ -38,6 +38,7 @@ const getProfile = async (req, res) => {
         "profileImage",
         "bannerImage",
         "enabledNotif",
+        "inOnBoard",
       ],
     });
 

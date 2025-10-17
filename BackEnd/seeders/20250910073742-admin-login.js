@@ -12,6 +12,7 @@ module.exports = {
         email: "admin@admin.com",
         password: hashedPassword,
         role: "admin",
+        inOnBoard: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
