@@ -1,5 +1,5 @@
 const { User, PasswordReset } = require("../models");
-const sendEmail = require("../Utils/sendEmail");
+const { sendEmail } = require("../Utils/sendEmail");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const logoPath = path.join(__dirname, "../Utils/Logo.png");
