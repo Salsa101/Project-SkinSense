@@ -16,6 +16,36 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        quizQuestion: "How often do you use skincare everyday?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "Do you have sensitive skin?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "What is your main skin concern?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "Do you use sunscreen daily?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "Are you currently pregnant and breastfeeding?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
