@@ -66,7 +66,11 @@ const {
   forgotPassword,
   resetPassword,
 } = require("../Controllers/ForgotPasswordController");
-const { getLatestScan } = require("../Controllers/HomeScreenController");
+const {
+  getLatestScan,
+  getExpiringSoon,
+  getWeeklyTip,
+} = require("../Controllers/HomeScreenController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -93,6 +97,8 @@ router.get("/user", validateToken, getUser);
 // Home Page
 router.get("/home", validateToken, getProfile);
 router.get("/latest-scan", validateToken, getLatestScan);
+router.get("/product-expired", validateToken, getExpiringSoon);
+router.get("/weekly-tips", validateToken, getWeeklyTip);
 
 // Profile Page
 router.get("/profile/view", validateToken, getProfile);

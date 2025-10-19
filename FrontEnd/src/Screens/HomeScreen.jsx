@@ -27,6 +27,9 @@ const HomeScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [active, setActive] = useState('Home');
   const [latestScan, setLatestScan] = useState(null);
+  const [expiringProducts, setExpiringProducts] = useState([]);
+  const [weeklyNews, setWeeklyNews] = useState(null);
+  const [bookmarked, setBookmarked] = useState({});
 
   const [infoHeight, setInfoHeight] = useState(0);
 
@@ -46,20 +49,6 @@ const HomeScreen = ({ navigation }) => {
     'Dec',
   ];
   const todayStr = `${today.getDate()} ${monthNames[today.getMonth()]}`;
-
-  const data = [
-    {
-      date: '19 Oct',
-      items: [
-        { title: 'Sunscreen', desc: 'Azarine 50 spf' },
-        { title: 'Moisturizer', desc: 'Skintific Gel' },
-      ],
-    },
-    {
-      date: '22 Oct',
-      items: [{ title: 'Serum', desc: 'Somethinc' }],
-    },
-  ];
 
   //Exit Handler
   useExitAppHandler();
@@ -101,6 +90,57 @@ const HomeScreen = ({ navigation }) => {
     fetchLatestScan();
   }, []);
 
+  useEffect(() => {
+    const fetchExpiring = async () => {
+      try {
+        const res = await api.get('/product-expired', {
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          const formattedData = res.data.data.map(product => ({
+            date: new Date(product.expirationDate).toLocaleDateString('en-US', {
+              day: '2-digit',
+              month: 'short',
+            }),
+            items: [
+              {
+                title: product.Product.productName,
+                desc: product.Product.productType || '',
+              },
+            ],
+          }));
+          setExpiringProducts(formattedData);
+        }
+      } catch (err) {
+        console.error('Error fetching expiring products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExpiring();
+  }, []);
+
+  useEffect(() => {
+    const fetchWeeklyNews = async () => {
+      try {
+        const res = await api.get('/weekly-tips', { withCredentials: true });
+        if (res.data.success) {
+          setWeeklyNews(res.data.data);
+        } else {
+          setWeeklyNews(null);
+        }
+      } catch (err) {
+        console.error('Error fetching weekly news:', err);
+        setWeeklyNews(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWeeklyNews();
+  }, []);
+
   const getTimeAgo = createdAt => {
     const created = new Date(createdAt);
     const today = new Date();
@@ -109,6 +149,21 @@ const HomeScreen = ({ navigation }) => {
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return '1 day ago';
     return `${diffDays} days ago`;
+  };
+
+  const toggleBookmark = async newsId => {
+    try {
+      if (bookmarked[newsId]) {
+        await api.delete(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: false }));
+      } else {
+        await api.post(`/news/${newsId}/bookmark`);
+        setBookmarked(prev => ({ ...prev, [newsId]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal update bookmark ❌');
+    }
   };
 
   if (loading) {
@@ -296,7 +351,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.expiredUpcomingTitle}>
             Upcoming Product Expiry
           </Text>
-          {data.map((section, sectionIndex) => (
+          {expiringProducts.map((section, sectionIndex) => (
             <View key={sectionIndex} style={styles.section}>
               <Text
                 style={[
@@ -312,7 +367,6 @@ const HomeScreen = ({ navigation }) => {
                   section.date === todayStr && { backgroundColor: '#DE576F' },
                 ]}
               />
-
               <View
                 style={[
                   styles.rightColumn,
@@ -322,9 +376,22 @@ const HomeScreen = ({ navigation }) => {
                 {section.items.map((item, itemIndex) => (
                   <View key={itemIndex} style={styles.expiredCard}>
                     <View style={styles.row}>
-                      <View>
-                        <Text style={styles.expiredTitle}>{item.title}</Text>
-                        <Text style={styles.desc}>{item.desc}</Text>
+                      <View style={{ flexShrink: 1, marginRight: 15 }}>
+                        <Text
+                          style={styles.expiredTitle}
+                          numberOfLines={2}
+                          ellipsizeMode="tail"
+                        >
+                          {item.title}
+                        </Text>
+                        <Text
+                          style={styles.desc}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {item.desc.charAt(0).toUpperCase() +
+                            item.desc.slice(1)}
+                        </Text>
                       </View>
                       <Icon2
                         name="prescription-bottle"
@@ -340,8 +407,63 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Tips Skincare */}
-        <View style={styles.expiredUpcoming}>
+        <View style={styles.tipsSkincare}>
           <Text style={styles.expiredUpcomingTitle}>Tips for You</Text>
+
+          {weeklyNews ? (
+            <TouchableOpacity
+              style={styles.newscard}
+              onPress={() =>
+                navigation.navigate('NewsDetail', { id: weeklyNews.id })
+              }
+              activeOpacity={0.8}
+            >
+              <View style={styles.imageContainer}>
+                <Image
+                  source={
+                    weeklyNews.newsImage
+                      ? {
+                          uri: `${api.defaults.baseURL}${weeklyNews.newsImage}`,
+                        }
+                      : require('../../assets/category-admin.jpg')
+                  }
+                  style={styles.image}
+                />
+                <TouchableOpacity
+                  style={styles.bookmarkBtn}
+                  onPress={() => toggleBookmark(weeklyNews.id)}
+                >
+                  <Icon
+                    name={bookmarked[weeklyNews.id] ? 'bookmark' : 'bookmark-o'}
+                    size={24}
+                    color="#E07C8E"
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.content}>
+                <Text style={styles.newsTitle}>{weeklyNews.title}</Text>
+                <View style={styles.categoryContainer}>
+                  {weeklyNews.Categories?.map(category => (
+                    <TouchableOpacity
+                      key={category.id}
+                      style={styles.categoryBadge}
+                      onPress={() =>
+                        navigation.navigate('CategoryNews', {
+                          categoryId: category.id,
+                          categoryName: category.name,
+                        })
+                      }
+                    >
+                      <Text style={styles.categoryText}>{category.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <Text>No news available this week</Text>
+          )}
         </View>
       </ScrollView>
 
@@ -580,6 +702,44 @@ const styles = StyleSheet.create({
   desc: {
     fontSize: 13,
     color: '#666',
+  },
+  newscard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    overflow: 'hidden',
+    elevation: 3,
+  },
+  imageContainer: { position: 'relative' },
+  image: { width: '100%', height: 140 },
+  bookmarkBtn: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 6,
+    elevation: 10,
+  },
+  content: { padding: 12, backgroundColor: '#FFEFF1' },
+  newsTitle: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+    marginBottom: 8,
+  },
+  categoryContainer: { flexDirection: 'row', gap: 8 },
+  categoryBadge: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#F4B4C0',
+  },
+  categoryText: {
+    fontSize: 12,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-SemiBold',
   },
 });
 
