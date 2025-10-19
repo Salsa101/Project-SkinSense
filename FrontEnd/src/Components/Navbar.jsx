@@ -37,13 +37,13 @@ const Navbar = (active, onPress) => {
                 {item.type === 'FontAwesome6' ? (
                   <Icon1
                     name={item.icon}
-                    size={24}
+                    size={20}
                     color={isActive ? '#a05c5c' : '#aaa'}
                   />
                 ) : (
                   <Icon
                     name={item.icon}
-                    size={24}
+                    size={20}
                     color={isActive ? '#a05c5c' : '#aaa'}
                   />
                 )}
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#f9f4f0',
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 3,
+    paddingBottom: 5,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     color: '#aaa',
     marginTop: 4,
     fontFamily: 'Poppins-Medium',
+    lineHeight: 20,
   },
   activeLabel: {
     color: '#a05c5c',
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   },
   centerWrapper: {
     position: 'relative',
-    top: -28,
+    top: -22,
   },
   centerButton: {
     width: 60,

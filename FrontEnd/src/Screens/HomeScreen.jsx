@@ -7,19 +7,58 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
 
 import api from '../api';
 import Navbar from '../Components/Navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon1 from 'react-native-vector-icons/Ionicons';
+import Icon2 from 'react-native-vector-icons/FontAwesome5';
 
 import { useExitAppHandler } from '../Handler/CustomBackHandler';
+
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState('');
   const [active, setActive] = useState('Home');
+
+  const [infoHeight, setInfoHeight] = useState(0);
+
+  const today = new Date();
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  const todayStr = `${today.getDate()} ${monthNames[today.getMonth()]}`;
+
+  const data = [
+    {
+      date: '19 Oct',
+      items: [
+        { title: 'Sunscreen', desc: 'Azarine 50 spf' },
+        { title: 'Moisturizer', desc: 'Skintific Gel' },
+      ],
+    },
+    {
+      date: '22 Oct',
+      items: [{ title: 'Serum', desc: 'Somethinc' }],
+    },
+  ];
 
   //Exit Handler
   useExitAppHandler();
@@ -62,137 +101,210 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FCF7F2' }}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header */}
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: 100,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Hello User */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.welcometext}>
-              Hello,{' '}
-              <Text style={styles.username}>{userData?.user?.username}</Text>
+            <Text style={styles.hello}>
+              Hello, <Text style={styles.name}>Rosa</Text>
             </Text>
-            <Text style={styles.skintypetext}>Dry Skin & Acne Prone</Text>
+            <Text style={styles.subText}>Ready to your skin journey?</Text>
           </View>
-          {/* <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <Icon name="bell" size={22} color="#DE576F" />
+        </View>
+
+        {/* Latest Scan */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Your Latest Scan</Text>
+            <TouchableOpacity>
+              <Text style={styles.details}>See details</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.date}>2 days ago</Text>
+
+          <View style={styles.scanRow}>
             <Image
-              source={require('../../assets/profile-picture.png')}
-              style={styles.profileImage}
+              source={require('../../assets/product-image.png')}
+              style={[styles.scanImage, { height: infoHeight }]}
+              resizeMode="cover"
             />
-          </TouchableOpacity> */}
-        </View>
 
-        {/* Reminder */}
-        <View style={styles.reminderSection}>
-          <Image
-            source={require('../../assets/face-picture.png')}
-            style={styles.faceImage}
-          />
-          <View style={styles.reminderContainer}>
-            <View style={styles.reminderContent}>
-              <Text style={styles.reminderTitle}>Reminder</Text>
-              <Text style={styles.reminderTitle}>+</Text>
+            <View
+              style={styles.info}
+              onLayout={e => setInfoHeight(e.nativeEvent.layout.height)}
+            >
+              <View style={[styles.infoBox, { marginBottom: 10 }]}>
+                <Text
+                  style={styles.label}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Skin Type
+                </Text>
+                <Text
+                  style={styles.value}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Combination
+                </Text>
+              </View>
+              <View style={[styles.infoBox, { marginBottom: 10 }]}>
+                <Text
+                  style={styles.label}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Acne Spot
+                </Text>
+                <Text
+                  style={styles.value}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  5
+                </Text>
+              </View>
+              <View style={styles.infoBox}>
+                <Text
+                  style={styles.label}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Severity
+                </Text>
+                <Text
+                  style={styles.value}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Medium
+                </Text>
+              </View>
+              <View style={styles.infoBox}>
+                <Text
+                  style={styles.label}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Score
+                </Text>
+                <Text
+                  style={[styles.value, { color: '#DE576F' }]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  90/100
+                </Text>
+              </View>
             </View>
-            <Text style={styles.reminderText}>
-              • Product A is expiring in 4 days
-            </Text>
-            <Text style={styles.reminderText}>• Apply your sunscreen</Text>
           </View>
         </View>
 
-        {/* Compare Button */}
-        <TouchableOpacity onPress={() => navigation.navigate('CompareScan')}>
-          <View style={styles.compareButtonContent}>
-            <Text style={styles.compareButtonText}>Compare Your Skin</Text>
-            <Icon
-              name="arrow-right"
-              size={15}
-              marginRight={10}
-              color="#DE576F"
-              style={styles.compareIcon}
-            />
+        {/* Compare Scan */}
+        <TouchableOpacity
+          style={styles.compareButton}
+          onPress={() => navigation.navigate('CompareScan')}
+        >
+          <View style={styles.compareContent}>
+            <View style={styles.iconCircle}>
+              <Icon1 name="scan" size={18} color="#F8CED5" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={styles.compareTitle}>Compare Scan</Text>
+              <Text style={styles.compareDesc}>Compare your result scan</Text>
+            </View>
+            <Icon1 name="chevron-forward" size={20} color="#DE576F" />
           </View>
         </TouchableOpacity>
 
-        {/* Ingredients Section */}
-        <View style={styles.ingredientsSection}>
-          <Text style={styles.ingredientsTitle}>Ingredients For You</Text>
-          <View style={styles.ingredientsContainer}>
-            <Text style={styles.ingredientsText}>Centella asiatica</Text>
-            <Text style={styles.ingredientsText}>Ceramide NP</Text>
-            <Text style={styles.ingredientsText}>Jojoba Oil</Text>
-            <Text style={styles.ingredientsText}>BHA</Text>
-            <Text style={styles.ingredientsText}>Hyaluronic Acid</Text>
-          </View>
-        </View>
-
-        {/* Product Section */}
-        <View style={styles.productSection}>
-          <View style={styles.productTitleContainer}>
-            <Text style={styles.productTitle}>Products For You</Text>
-            <Text style={styles.seeMore}>See more</Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.productScrollContainer}
+        {/* Reminder Card */}
+        <TouchableOpacity style={styles.reminderCard}>
+          <ImageBackground
+            source={require('../../assets/news1.jpg')}
+            style={styles.reminderImage}
+            imageStyle={{ borderRadius: 12 }}
           >
-            {/* Product 1 */}
-            <View style={styles.productContainer}>
-              <Image
-                source={require('../../assets/product-image.png')}
-                style={styles.productImage}
-              />
-              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-              <View style={styles.ingredientProductContainer}>
-                <Text style={styles.ingredientProductText}>BHA</Text>
-                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+            <View style={styles.overlay}>
+              <View style={styles.contentColumn}>
+                <View style={styles.topRow}>
+                  <Icon2 name="sun" size={20} color="#fff" />
+                  <View style={styles.textColumn}>
+                    <Text style={styles.progressText}>0/5 Completed</Text>
+                    <Text style={styles.title}>
+                      End your day properly with your night routine
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </View>
 
-            {/* Product 2 */}
-            <View style={styles.productContainer}>
-              <Image
-                source={require('../../assets/product-image.png')}
-                style={styles.productImage}
-              />
-              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-              <View style={styles.ingredientProductContainer}>
-                <Text style={styles.ingredientProductText}>BHA</Text>
-                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+              <View style={styles.arrowContainer}>
+                <Icon name="long-arrow-right" size={20} color="#fff" />
               </View>
             </View>
+          </ImageBackground>
+        </TouchableOpacity>
 
-            {/* Product 3 */}
-            <View style={styles.productContainer}>
-              <Image
-                source={require('../../assets/product-image.png')}
-                style={styles.productImage}
+        {/* Expired Upcoming */}
+        <View style={styles.expiredUpcoming}>
+          <Text style={styles.expiredUpcomingTitle}>
+            Upcoming Product Expiry
+          </Text>
+          {data.map((section, sectionIndex) => (
+            <View key={sectionIndex} style={styles.section}>
+              <Text
+                style={[
+                  styles.expiredDate,
+                  sectionIndex === 0 && { marginTop: 0 },
+                ]}
+              >
+                {section.date}
+              </Text>
+              <View
+                style={[
+                  styles.line,
+                  section.date === todayStr && { backgroundColor: '#DE576F' },
+                ]}
               />
-              <Text style={styles.productName}>Somethinc Pure Retinol</Text>
-              <View style={styles.ingredientProductContainer}>
-                <Text style={styles.ingredientProductText}>BHA</Text>
-                <Text style={styles.ingredientProductText}>Ceramide NP</Text>
+
+              <View
+                style={[
+                  styles.rightColumn,
+                  sectionIndex === 0 && { marginTop: 0 },
+                ]}
+              >
+                {section.items.map((item, itemIndex) => (
+                  <View key={itemIndex} style={styles.expiredCard}>
+                    <View style={styles.row}>
+                      <View>
+                        <Text style={styles.expiredTitle}>{item.title}</Text>
+                        <Text style={styles.desc}>{item.desc}</Text>
+                      </View>
+                      <Icon2
+                        name="prescription-bottle"
+                        size={18}
+                        color="#DE576F"
+                      />
+                    </View>
+                  </View>
+                ))}
               </View>
             </View>
-          </ScrollView>
-          <View></View>
+          ))}
         </View>
 
-        {/* Tips Section */}
-        <View style={styles.tipsSection}>
-          <View style={styles.tipsTitleContainer}>
-            <Text style={styles.tipsTitle}>Tips For You</Text>
-            <Text style={styles.seeMore}>See more</Text>
-          </View>
-
-          <View style={styles.tipsContainer}>
-            <Text style={styles.tipsName}>Lorem ipsum</Text>
-            <Text style={styles.tipsText}>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-              Assumenda debitis voluptas tempore, labore error molestias libero
-              accusantium fuga nesciunt...
-            </Text>
-          </View>
+        {/* Tips Skincare */}
+        <View style={styles.expiredUpcoming}>
+          <Text style={styles.expiredUpcomingTitle}>Tips for You</Text>
         </View>
       </ScrollView>
 
@@ -203,223 +315,234 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const stylesProductScrollContainer = {
-  paddingRight: 15,
-  paddingBottom: 20,
-};
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    marginTop: 30,
-    marginHorizontal: 15,
-    marginBottom: 75,
+    flex: 1,
+    backgroundColor: '#FCF7F2',
   },
   header: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  reminderSection: {
-    marginTop: 30,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  faceImage: {
-    display: 'flex',
-    marginTop: 2,
-    marginLeft: 9,
-  },
-  reminderContainer: {
-    display: 'flex',
-    backgroundColor: '#FFF0F3',
-    marginRight: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 17,
-    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
-  },
-  reminderContent: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  reminderTitle: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 18,
-    color: '#DE576F',
-    paddingHorizontal: 15,
-  },
-  reminderText: {
-    fontFamily: 'Poppins-Light',
-    fontSize: 12,
-    color: '#DE576F',
-    marginLeft: 15,
-  },
-  compareButtonContent: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 5,
-    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
-    borderRadius: 20,
+    marginBottom: 25,
+  },
+  hello: {
+    fontSize: 22,
+    color: '#333',
+    fontWeight: '400',
+  },
+  name: {
+    fontWeight: '700',
+    color: '#DE576F',
+  },
+  subText: {
+    color: '#A77B7B',
+    fontSize: 14,
+  },
+  card: {
+    backgroundColor: '#FCE6E9',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  details: {
+    fontSize: 13,
+    color: '#DE576F',
+  },
+  date: {
+    color: '#A77B7B',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  scanRow: {
+    flexDirection: 'row',
+    marginTop: 15,
+    alignItems: 'flex-start',
+  },
+  scanImage: {
+    width: 90,
+    borderRadius: 12,
+    marginRight: 12,
+  },
+  info: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  infoBox: {
+    width: '48%',
     backgroundColor: '#FFF0F3',
-    marginTop: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  label: {
+    fontSize: 12,
+    color: '#A77B7B',
+  },
+  value: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
   },
   compareButton: {
-    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
-    borderRadius: 17,
-    backgroundColor: '#FFF0F3',
-    marginTop: 30,
-  },
-  compareButtonText: {
-    color: '#DE576F',
-    fontFamily: 'Poppins-Bold',
-    fontSize: 16,
-  },
-  compareIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  ingredientsSection: {
-    marginTop: 30,
-  },
-  ingredientsTitle: {
-    fontFamily: 'Poppins-Bold',
-    marginBottom: 10,
-    color: '#DE576F',
-    fontSize: 19,
-  },
-  ingredientsContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-  ingredientsText: {
-    backgroundColor: '#FFE1E2',
-    fontFamily: 'Poppins-Light',
-    color: '#DE576F',
-    marginBottom: 10,
-    marginRight: 4,
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-    borderRadius: 15,
-  },
-
-  productTitleContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 30,
-  },
-  productTitle: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 19,
-    color: '#DE576F',
-  },
-  seeMore: {
-    fontFamily: 'Poppins-Medium',
-    fontSize: 18,
-    color: '#EFB9C2',
-  },
-  productContainer: {
-    flex: 1,
-    backgroundColor: '#FFF0F3',
-    boxShadow: '0px 4px 4px rgba(151, 67, 67, 0.35)',
-    padding: 20,
-    borderRadius: 20,
-    marginTop: 15,
-    marginRight: 15,
+    backgroundColor: '#FCE6E9',
+    borderRadius: 30,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  productImage: {
-    width: '100%',
-    height: undefined,
-    aspectRatio: 1,
-    marginBottom: 15,
-    resizeMode: 'cover',
-  },
-  productName: {
-    fontFamily: 'Poppins-Light',
-    fontSize: 16,
-    color: '#DE576F',
-  },
-  ingredientProductContainer: {
-    display: 'flex',
+  compareContent: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#DE576F',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  compareTitle: {
+    fontWeight: '600',
+    fontSize: 15,
+    color: '#333',
+  },
+  compareDesc: {
+    fontSize: 12,
+    color: '#A77B7B',
+    marginRight: 10,
+  },
+  reminderCard: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    marginVertical: 10,
+    alignSelf: 'center',
+    overflow: 'hidden',
+  },
+  reminderImage: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  contentColumn: {
+    flexDirection: 'column',
     gap: 5,
   },
-  ingredientProductText: {
-    backgroundColor: '#FFE1E2',
-    fontFamily: 'Poppins-Light',
-    color: '#DE576F',
-    marginBottom: 5,
-    marginTop: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 15,
-  },
-  tipsSection: {
-    marginTop: 40,
-    marginBottom: 35,
-  },
-  tipsTitleContainer: {
-    display: 'flex',
+  topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 8,
   },
-  tipsContainer: {
-    backgroundColor: '#FFF0F3',
-    boxShadow: '0px 4px 12px rgba(227, 209, 212, 0.75)',
-    padding: 15,
-    marginTop: 10,
-    borderRadius: 10,
+  textColumn: {
+    marginLeft: 5,
+    flex: 1,
   },
-  tipsTitle: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 19,
-    color: '#DE576F',
-  },
-  tipsName: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 16,
-    color: '#DE576F',
-  },
-  tipsText: {
-    fontFamily: 'Poppins-Light',
-    fontSize: 12,
-    color: '#DE576F',
+  progressText: {
+    color: '#ffffff',
+    fontWeight: '500',
+    marginBottom: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  error: {
-    color: 'red',
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '900',
+    marginRight: 20,
+    lineHeight: 25,
   },
-  welcometext: {
-    fontSize: 28,
-    fontFamily: 'Poppins-Regular',
-    color: '#DE576F',
+  arrowContainer: {
+    alignSelf: 'flex-end',
   },
-  username: {
-    fontSize: 26,
-    fontFamily: 'Poppins-Bold',
-    color: '#DE576F',
-    paddingRight: 10,
+
+  expiredUpcoming: {
+    marginVertical: 20,
   },
-  skintypetext: {
-    marginTop: 0,
+  expiredUpcomingTitle: {
+    fontWeight: 'bold',
     fontSize: 18,
-    fontFamily: 'Poppins-Regular',
-    color: '#DE576F',
+    color: '#333',
+    marginBottom: 25,
+  },
+  section: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 0,
+  },
+  expiredDate: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333',
+    marginTop: 25,
+  },
+  line: {
+    width: 2,
+    backgroundColor: '#ccc',
+    alignSelf: 'stretch',
+    marginHorizontal: 15,
+  },
+  rightColumn: {
+    flex: 1,
+    gap: 8,
+    marginTop: 25,
+  },
+  expiredCard: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  expiredTitle: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  desc: {
+    fontSize: 13,
+    color: '#666',
   },
 });
 
