@@ -26,6 +26,7 @@ const HomeScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState('');
   const [active, setActive] = useState('Home');
+  const [latestScan, setLatestScan] = useState(null);
 
   const [infoHeight, setInfoHeight] = useState(0);
 
@@ -82,6 +83,34 @@ const HomeScreen = ({ navigation }) => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    const fetchLatestScan = async () => {
+      try {
+        const res = await api.get('/latest-scan', {
+          withCredentials: true,
+        });
+        setLatestScan(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.error('Error fetching latest scan:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestScan();
+  }, []);
+
+  const getTimeAgo = createdAt => {
+    const created = new Date(createdAt);
+    const today = new Date();
+    const diffDays = Math.floor((today - created) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+  };
+
   if (loading) {
     return (
       <ActivityIndicator
@@ -114,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.header}>
           <View>
             <Text style={styles.hello}>
-              Hello, <Text style={styles.name}>Rosa</Text>
+              Hello, <Text style={styles.name}>{userData?.user?.username}</Text>
             </Text>
             <Text style={styles.subText}>Ready to your skin journey?</Text>
           </View>
@@ -125,15 +154,23 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Your Latest Scan</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('HistoryScan', {
+                  date: latestScan?.createdAt,
+                })
+              }
+            >
               <Text style={styles.details}>See details</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.date}>2 days ago</Text>
+          <Text style={styles.date}>{getTimeAgo(latestScan?.createdAt)}</Text>
 
           <View style={styles.scanRow}>
             <Image
-              source={require('../../assets/product-image.png')}
+              source={{
+                uri: `${api.defaults.baseURL}${latestScan?.imagePath}`,
+              }}
               style={[styles.scanImage, { height: infoHeight }]}
               resizeMode="cover"
             />
@@ -155,7 +192,7 @@ const HomeScreen = ({ navigation }) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  Combination
+                  {latestScan?.skinType}
                 </Text>
               </View>
               <View style={[styles.infoBox, { marginBottom: 10 }]}>
@@ -171,7 +208,7 @@ const HomeScreen = ({ navigation }) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  5
+                  {latestScan?.acneCount}
                 </Text>
               </View>
               <View style={styles.infoBox}>
@@ -187,7 +224,7 @@ const HomeScreen = ({ navigation }) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  Medium
+                  {latestScan?.severity}
                 </Text>
               </View>
               <View style={styles.infoBox}>

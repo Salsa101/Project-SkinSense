@@ -27,7 +27,7 @@ import api from '../api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const HistoryScan = ({ navigation }) => {
+const HistoryScan = ({ navigation, route }) => {
   const [scanData, setScanData] = useState({});
   const [quizData, setQuizData] = useState({});
   const [selectedDates, setSelectedDates] = useState([]);
@@ -39,6 +39,18 @@ const HistoryScan = ({ navigation }) => {
   const sheetRef = useRef(null);
   const quizSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+
+  const paramDate = route.params?.date;
+
+  useEffect(() => {
+    if (paramDate) {
+      const formattedDate = new Date(paramDate).toISOString().split('T')[0];
+      setSelectedDates([formattedDate]);
+    } else {
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDates([today]);
+    }
+  }, [paramDate]);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -53,7 +65,6 @@ const HistoryScan = ({ navigation }) => {
           const scanPart = res.data.data;
           const quizPart = {};
 
-          // pisahin quizData per tanggal biar rapi
           Object.keys(scanPart).forEach(date => {
             quizPart[date] = scanPart[date]
               .filter(item => item.quiz)
