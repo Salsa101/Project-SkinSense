@@ -16,31 +16,31 @@ const stepsData = [
     id: 1,
     title: 'Facewash',
     desc: 'Bersihkan wajah dengan facewash untuk menghilangkan kotoran dan minyak berlebih.',
-    image: require('../../assets/facewash.png'),
+    image: require('../../assets/step-facewash.png'),
   },
   {
     id: 2,
     title: 'Toner',
     desc: 'Gunakan toner untuk menyeimbangkan pH kulit dan melembabkan wajah.',
-    image: require('../../assets/facewash.png'),
+    image: require('../../assets/step-toner.png'),
   },
   {
     id: 3,
     title: 'Serum',
     desc: 'Aplikasikan serum sesuai kebutuhan kulit agar hasil lebih optimal.',
-    image: require('../../assets/facewash.png'),
+    image: require('../../assets/step-serum.png'),
   },
   {
     id: 4,
     title: 'Moisturizer',
     desc: 'Gunakan moisturizer untuk mengunci kelembaban kulit sepanjang hari.',
-    image: require('../../assets/facewash.png'),
+    image: require('../../assets/step-moisturizer.png'),
   },
   {
     id: 5,
     title: 'Sunscreen',
     desc: 'Lindungi kulit dari sinar matahari dengan sunscreen.',
-    image: require('../../assets/facewash.png'),
+    image: require('../../assets/step-sunscreen.png'),
   },
 ];
 
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     fontSize: 14,
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
     color: '#333',
     paddingHorizontal: 20,
