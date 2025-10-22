@@ -3,6 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    await queryInterface.sequelize.query(`TRUNCATE TABLE "QuizQuestions" RESTART IDENTITY CASCADE;`);
     await queryInterface.bulkInsert("QuizQuestions", [
       {
         quizQuestion: "What’s your skin type?",
