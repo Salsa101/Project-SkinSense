@@ -378,7 +378,10 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Reminder Card */}
-        <TouchableOpacity style={styles.reminderCard}>
+        <TouchableOpacity
+          style={styles.reminderCard}
+          onPress={() => navigation.navigate('Calendar')}
+        >
           <ImageBackground
             source={require('../../assets/news1.jpg')}
             style={styles.reminderImage}

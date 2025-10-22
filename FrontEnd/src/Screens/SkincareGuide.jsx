@@ -194,8 +194,9 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     backgroundColor: '#d94c64',
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   navButtons: {
     flexDirection: 'row',
