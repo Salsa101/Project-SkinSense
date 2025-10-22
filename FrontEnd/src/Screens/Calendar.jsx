@@ -52,6 +52,8 @@ const Calendar = ({ navigation }) => {
 
   const [allJournals, setAllJournals] = useState([]);
 
+  const [progress, setProgress] = useState(null);
+
   const moodMap = ['cry', 'sad', 'neutral', 'happy', 'excited'];
 
   const moodIcons = [
@@ -106,6 +108,28 @@ const Calendar = ({ navigation }) => {
 
     fetchJournalsByMonth();
   }, [selected]);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const res = await api.get('/routine-progress');
+        if (res.data.success) {
+          setProgress(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch routine progress:', err);
+      }
+    };
+
+    fetchProgress();
+
+    const interval = setInterval(fetchProgress, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const hour = new Date().getHours();
+  const isDaytime = hour >= 6 && hour < 18;
 
   const markedDates = useMemo(() => {
     const marks = {};
@@ -485,8 +509,13 @@ const Calendar = ({ navigation }) => {
               </Text>
             </View>
             <Text style={styles.progress}>
-              {currentData.filter(task => task.done).length}/
-              {currentData.length} Completed
+              {isDaytime
+                ? `${progress?.morning?.done ?? 0}/${
+                    progress?.morning?.total ?? 0
+                  } Completed`
+                : `${progress?.night?.done ?? 0}/${
+                    progress?.night?.total ?? 0
+                  } Completed`}
             </Text>
           </View>
 

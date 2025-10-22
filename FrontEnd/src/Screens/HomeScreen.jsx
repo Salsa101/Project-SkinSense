@@ -30,8 +30,12 @@ const HomeScreen = ({ navigation }) => {
   const [expiringProducts, setExpiringProducts] = useState([]);
   const [weeklyNews, setWeeklyNews] = useState(null);
   const [bookmarked, setBookmarked] = useState({});
+  const [progress, setProgress] = useState(null);
 
   const [infoHeight, setInfoHeight] = useState(0);
+
+  const hour = new Date().getHours();
+  const isDaytime = hour >= 6 && hour < 18;
 
   const today = new Date();
   const monthNames = [
@@ -79,9 +83,12 @@ const HomeScreen = ({ navigation }) => {
           withCredentials: true,
         });
         setLatestScan(res.data);
-        console.log(res.data);
       } catch (error) {
-        console.error('Error fetching latest scan:', error);
+        if (error.response?.status === 404) {
+          setLatestScan(null);
+        } else {
+          console.error('Error fetching latest scan:', error);
+        }
       } finally {
         setLoading(false);
       }
@@ -139,6 +146,20 @@ const HomeScreen = ({ navigation }) => {
     };
 
     fetchWeeklyNews();
+  }, []);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const res = await api.get('/routine-progress');
+        if (res.data.success) {
+          setProgress(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch routine progress:', err);
+      }
+    };
+    fetchProgress();
   }, []);
 
   const getTimeAgo = createdAt => {
@@ -209,97 +230,134 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Your Latest Scan</Text>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('HistoryScan', {
-                  date: latestScan?.createdAt,
-                })
-              }
-            >
-              <Text style={styles.details}>See details</Text>
-            </TouchableOpacity>
+            {latestScan && (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('HistoryScan', {
+                    date: latestScan?.createdAt,
+                  })
+                }
+              >
+                <Text style={styles.details}>See details</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <Text style={styles.date}>{getTimeAgo(latestScan?.createdAt)}</Text>
 
-          <View style={styles.scanRow}>
-            <Image
-              source={{
-                uri: `${api.defaults.baseURL}${latestScan?.imagePath}`,
-              }}
-              style={[styles.scanImage, { height: infoHeight }]}
-              resizeMode="cover"
-            />
+          {latestScan ? (
+            <>
+              <Text style={styles.date}>
+                {getTimeAgo(latestScan?.createdAt)}
+              </Text>
 
-            <View
-              style={styles.info}
-              onLayout={e => setInfoHeight(e.nativeEvent.layout.height)}
-            >
-              <View style={[styles.infoBox, { marginBottom: 10 }]}>
-                <Text
-                  style={styles.label}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
+              <View style={styles.scanRow}>
+                {latestScan?.imagePath ? (
+                  <Image
+                    source={{
+                      uri: `${api.defaults.baseURL}${latestScan.imagePath}`,
+                    }}
+                    style={[styles.scanImage, { height: infoHeight }]}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/journal.png')}
+                    style={[styles.scanImage, { height: infoHeight }]}
+                    resizeMode="contain"
+                  />
+                )}
+
+                <View
+                  style={styles.info}
+                  onLayout={e => setInfoHeight(e.nativeEvent.layout.height)}
                 >
-                  Skin Type
-                </Text>
-                <Text
-                  style={styles.value}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {latestScan?.skinType}
-                </Text>
+                  <View style={[styles.infoBox, { marginBottom: 10 }]}>
+                    <Text
+                      style={styles.label}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Skin Type
+                    </Text>
+                    <Text
+                      style={styles.value}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {latestScan?.skinType || '-'}
+                    </Text>
+                  </View>
+                  <View style={[styles.infoBox, { marginBottom: 10 }]}>
+                    <Text
+                      style={styles.label}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Acne Spot
+                    </Text>
+                    <Text
+                      style={styles.value}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {latestScan?.acneCount ?? 0}
+                    </Text>
+                  </View>
+                  <View style={styles.infoBox}>
+                    <Text
+                      style={styles.label}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Severity
+                    </Text>
+                    <Text
+                      style={styles.value}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {latestScan?.severity || '-'}
+                    </Text>
+                  </View>
+                  <View style={styles.infoBox}>
+                    <Text
+                      style={styles.label}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Score
+                    </Text>
+                    <Text
+                      style={[styles.value, { color: '#DE576F' }]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      90/100
+                    </Text>
+                  </View>
+                </View>
               </View>
-              <View style={[styles.infoBox, { marginBottom: 10 }]}>
-                <Text
-                  style={styles.label}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  Acne Spot
+            </>
+          ) : (
+            <View style={styles.emptyScan}>
+              <Image
+                source={require('../../assets/journal.png')}
+                style={styles.emptyImage}
+                resizeMode="contain"
+              />
+              <View style={styles.emptyTextContainer}>
+                <Text style={styles.emptyTitle}>Let's scan your face!</Text>
+                <Text style={styles.emptyDesc}>
+                  Discover recommendation product just for You.
                 </Text>
-                <Text
-                  style={styles.value}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
+                <TouchableOpacity
+                  style={styles.scanButton}
+                  onPress={() => navigation.navigate('LandingPage')}
                 >
-                  {latestScan?.acneCount}
-                </Text>
-              </View>
-              <View style={styles.infoBox}>
-                <Text
-                  style={styles.label}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  Severity
-                </Text>
-                <Text
-                  style={styles.value}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {latestScan?.severity}
-                </Text>
-              </View>
-              <View style={styles.infoBox}>
-                <Text
-                  style={styles.label}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  Score
-                </Text>
-                <Text
-                  style={[styles.value, { color: '#DE576F' }]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  90/100
-                </Text>
+                  <Text style={styles.scanButtonText}>Scan Face</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Compare Scan */}
@@ -329,11 +387,25 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.overlay}>
               <View style={styles.contentColumn}>
                 <View style={styles.topRow}>
-                  <Icon2 name="sun" size={20} color="#fff" />
+                  {isDaytime ? (
+                    <Icon2 name="sun" size={20} color="#fff" />
+                  ) : (
+                    <Icon2 name="moon" size={20} color="#fff" />
+                  )}
                   <View style={styles.textColumn}>
-                    <Text style={styles.progressText}>0/5 Completed</Text>
+                    <Text style={styles.progressText}>
+                      {isDaytime
+                        ? `${progress?.morning?.done ?? 0}/${
+                            progress?.morning?.total ?? 0
+                          } Completed`
+                        : `${progress?.night?.done ?? 0}/${
+                            progress?.night?.total ?? 0
+                          } Completed`}
+                    </Text>
                     <Text style={styles.title}>
-                      End your day properly with your night routine
+                      {isDaytime
+                        ? 'Begin your day with your morning routine'
+                        : 'End your day properly with your night routine'}
                     </Text>
                   </View>
                 </View>
@@ -351,59 +423,75 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.expiredUpcomingTitle}>
             Upcoming Product Expiry
           </Text>
-          {expiringProducts.map((section, sectionIndex) => (
-            <View key={sectionIndex} style={styles.section}>
-              <Text
-                style={[
-                  styles.expiredDate,
-                  sectionIndex === 0 && { marginTop: 0 },
-                ]}
-              >
-                {section.date}
-              </Text>
-              <View
-                style={[
-                  styles.line,
-                  section.date === todayStr && { backgroundColor: '#DE576F' },
-                ]}
-              />
-              <View
-                style={[
-                  styles.rightColumn,
-                  sectionIndex === 0 && { marginTop: 0 },
-                ]}
-              >
-                {section.items.map((item, itemIndex) => (
-                  <View key={itemIndex} style={styles.expiredCard}>
-                    <View style={styles.row}>
-                      <View style={{ flexShrink: 1, marginRight: 15 }}>
-                        <Text
-                          style={styles.expiredTitle}
-                          numberOfLines={2}
-                          ellipsizeMode="tail"
-                        >
-                          {item.title}
-                        </Text>
-                        <Text
-                          style={styles.desc}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {item.desc.charAt(0).toUpperCase() +
-                            item.desc.slice(1)}
-                        </Text>
+
+          {expiringProducts.length > 0 ? (
+            expiringProducts.map((section, sectionIndex) => (
+              <View key={sectionIndex} style={styles.section}>
+                <Text
+                  style={[
+                    styles.expiredDate,
+                    sectionIndex === 0 && { marginTop: 0 },
+                  ]}
+                >
+                  {section.date}
+                </Text>
+
+                <View
+                  style={[
+                    styles.line,
+                    section.date === todayStr && { backgroundColor: '#DE576F' },
+                  ]}
+                />
+
+                <View
+                  style={[
+                    styles.rightColumn,
+                    sectionIndex === 0 && { marginTop: 0 },
+                  ]}
+                >
+                  {section.items.map((item, itemIndex) => (
+                    <View key={itemIndex} style={styles.expiredCard}>
+                      <View style={styles.row}>
+                        <View style={{ flexShrink: 1, marginRight: 15 }}>
+                          <Text
+                            style={styles.expiredTitle}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                          >
+                            {item.title}
+                          </Text>
+                          <Text
+                            style={styles.desc}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {item.desc.charAt(0).toUpperCase() +
+                              item.desc.slice(1)}
+                          </Text>
+                        </View>
+                        <Icon2
+                          name="prescription-bottle"
+                          size={18}
+                          color="#DE576F"
+                        />
                       </View>
-                      <Icon2
-                        name="prescription-bottle"
-                        size={18}
-                        color="#DE576F"
-                      />
                     </View>
-                  </View>
-                ))}
+                  ))}
+                </View>
               </View>
-            </View>
-          ))}
+            ))
+          ) : (
+            <Text
+              style={{
+                color: '#999',
+                fontSize: 13,
+                marginTop: 5,
+                textAlign: 'center',
+              }}
+            >
+              No upcoming expired products 🎉
+            </Text>
+          )}
         </View>
 
         {/* Tips Skincare */}
@@ -740,6 +828,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E07C8E',
     fontFamily: 'Poppins-SemiBold',
+  },
+
+  emptyScan: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  emptyImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  emptyTextContainer: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  emptyDesc: {
+    fontSize: 13,
+    color: '#777',
+    marginVertical: 5,
+  },
+  scanButton: {
+    backgroundColor: '#DE576F',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: 'flex-start',
+    marginTop: 5,
+  },
+  scanButtonText: {
+    color: '#fff',
+    fontWeight: '500',
   },
 });
 

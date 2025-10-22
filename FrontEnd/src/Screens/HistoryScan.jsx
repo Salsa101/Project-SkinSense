@@ -43,19 +43,15 @@ const HistoryScan = ({ navigation, route }) => {
   const paramDate = route.params?.date;
 
   useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+
     if (paramDate) {
       const formattedDate = new Date(paramDate).toISOString().split('T')[0];
       setSelectedDates([formattedDate]);
     } else {
-      const today = new Date().toISOString().split('T')[0];
       setSelectedDates([today]);
     }
   }, [paramDate]);
-
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setSelectedDates([today]);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

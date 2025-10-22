@@ -12,7 +12,6 @@ const deleteFile = (filePath) => {
   try {
     if (filePath && fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log("File deleted:", filePath);
     }
   } catch (err) {
     console.error("Gagal hapus file:", err);

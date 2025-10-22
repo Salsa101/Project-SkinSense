@@ -70,6 +70,7 @@ const {
   getLatestScan,
   getExpiringSoon,
   getWeeklyTip,
+  getRoutineProgress,
 } = require("../Controllers/HomeScreenController");
 const upload = require("../Middlewares/UploadImage");
 
@@ -99,6 +100,7 @@ router.get("/home", validateToken, getProfile);
 router.get("/latest-scan", validateToken, getLatestScan);
 router.get("/product-expired", validateToken, getExpiringSoon);
 router.get("/weekly-tips", validateToken, getWeeklyTip);
+router.get("/routine-progress", validateToken, getRoutineProgress);
 
 // Profile Page
 router.get("/profile/view", validateToken, getProfile);

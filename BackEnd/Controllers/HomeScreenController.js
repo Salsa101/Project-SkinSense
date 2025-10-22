@@ -107,4 +107,47 @@ const getWeeklyTip = async (req, res) => {
   }
 };
 
-module.exports = { getLatestScan, getExpiringSoon, getWeeklyTip };
+const getRoutineProgress = async (req, res) => {
+  try {
+    const morningTotal = await RoutineProduct.count({
+      where: { timeOfDay: "morning" },
+    });
+    const morningDone = await RoutineProduct.count({
+      where: { timeOfDay: "morning", doneStatus: true },
+    });
+
+    const nightTotal = await RoutineProduct.count({
+      where: { timeOfDay: "night" },
+    });
+    const nightDone = await RoutineProduct.count({
+      where: { timeOfDay: "night", doneStatus: true },
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        morning: {
+          done: morningDone,
+          total: morningTotal,
+        },
+        night: {
+          done: nightDone,
+          total: nightTotal,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching routine progress:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch routine progress",
+    });
+  }
+};
+
+module.exports = {
+  getLatestScan,
+  getExpiringSoon,
+  getWeeklyTip,
+  getRoutineProgress,
+};
