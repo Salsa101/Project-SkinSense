@@ -151,7 +151,9 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const res = await api.get('/routine-progress');
+        const res = await api.get('/routine-progress', {
+          withCredentials: true,
+        });
         if (res.data.success) {
           setProgress(res.data.data);
         }

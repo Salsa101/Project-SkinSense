@@ -112,7 +112,9 @@ const Calendar = ({ navigation }) => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const res = await api.get('/routine-progress');
+        const res = await api.get('/routine-progress', {
+          withCredentials: true,
+        });
         if (res.data.success) {
           setProgress(res.data.data);
         }
@@ -123,7 +125,7 @@ const Calendar = ({ navigation }) => {
 
     fetchProgress();
 
-    const interval = setInterval(fetchProgress, 1000);
+    const interval = setInterval(fetchProgress, 5000);
 
     return () => clearInterval(interval);
   }, []);
