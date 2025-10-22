@@ -35,9 +35,9 @@ const ForgotPassword = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lupa Password</Text>
+      <Text style={styles.title}>Forgot Password</Text>
       <Text style={styles.subtitle}>
-        Masukkan email kamu untuk menerima tautan reset password.
+        Enter your email to receive a password reset link.
       </Text>
 
       <TextInput
@@ -55,7 +55,7 @@ const ForgotPassword = ({ navigation }) => {
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Mengirim...' : 'Kirim Email Reset'}
+          {loading ? 'Sending...' : 'Send Reset Email'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
+    color: '#d94c64',
     marginBottom: 10,
   },
   subtitle: {
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#d94c64',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',

@@ -37,7 +37,7 @@ const PAOInfo = ({ navigation }) => {
           <View style={styles.divider} />
 
           <Text style={styles.example}>
-            <Text style={{ fontWeight: '600' }}>Example:</Text> “6M” means the
+            <Text style={{ fontFamily: 'Poppins-SemiBold' }}>Example:</Text> “6M” means the
             product should be used within 6 months of opening.
           </Text>
         </View>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
     color: '#E07C8E',
     textAlign: 'center',
     marginBottom: 20,
@@ -83,12 +83,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
     color: '#E07C8E',
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
+    fontFamily: 'Poppins-Regular',
     color: '#555',
     lineHeight: 22,
   },
@@ -99,6 +100,7 @@ const styles = StyleSheet.create({
   },
   example: {
     fontSize: 13,
+    fontFamily: 'Poppins-Italic',
     color: '#E07C8E',
     fontStyle: 'italic',
   },
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#FFF',
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 15,
   },
 });
