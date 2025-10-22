@@ -53,12 +53,12 @@ const ResetPassword = ({ route, navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Reset Password</Text>
       <Text style={styles.subtitle}>
-        Masukkan kode OTP yang dikirim ke email dan password baru kamu.
+        Enter the OTP code sent to your email and your new password.
       </Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Kode OTP"
+        placeholder="OTP Code"
         placeholderTextColor={'#000000'}
         value={otp}
         onChangeText={setOtp}
@@ -67,7 +67,7 @@ const ResetPassword = ({ route, navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Password Baru"
+        placeholder="New Password"
         placeholderTextColor={'#000000'}
         value={newPassword}
         onChangeText={setNewPassword}
@@ -76,7 +76,7 @@ const ResetPassword = ({ route, navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Konfirmasi Password"
+        placeholder="Confirm New Password"
         placeholderTextColor={'#000000'}
         value={confirmPassword}
         onChangeText={setConfirmPassword}

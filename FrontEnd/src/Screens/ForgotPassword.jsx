@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
+  Image,
 } from 'react-native';
 import api from '../api';
 
@@ -22,7 +24,7 @@ const ForgotPassword = ({ navigation }) => {
       setLoading(true);
       const res = await api.post('/forgot-password', { email });
 
-      Alert.alert('Berhasil', res.data.message);
+      Alert.alert('Success', res.data.message);
 
       navigation.navigate('ResetPassword', { email });
     } catch (err) {
@@ -34,15 +36,27 @@ const ForgotPassword = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      <Text style={styles.subtitle}>
-        Enter your email to receive a password reset link.
-      </Text>
+    
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
+        <Text style={styles.title}>Forgot Password</Text>
+        <Text style={styles.subtitle}>
+          Enter your email to receive a password reset link.
+        </Text>
+
+        <View style={styles.decorContainer}>
+          <Image
+            source={require('../../assets/phonepw.png')}
+            style={styles.decorImage}
+          />
+        </View>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Masukkan Email"
+        placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -55,10 +69,11 @@ const ForgotPassword = ({ navigation }) => {
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Sending...' : 'Send Reset Email'}
+          {loading ? 'Mengirim...' : 'Send Email Reset'}
         </Text>
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+      
   );
 };
 
@@ -70,25 +85,35 @@ const styles = StyleSheet.create({
     padding: 25,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: 'Poppins-Bold',
-    color: '#d94c64',
+    color: '#E07C8E',
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#555',
     marginBottom: 25,
   },
+  decorImage: {
+    width: 350,
+    height: 350,
+    resizeMode: 'contain',
+    alignItems: 'center',
+  },
+  decorContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#E07C8E',
     borderRadius: 8,
     padding: 12,
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#d94c64',
+    backgroundColor: '#E07C8E',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
