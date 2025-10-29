@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import api from '../api';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ResetPassword = ({ route, navigation }) => {
   const { email } = route.params;
@@ -19,6 +20,8 @@ const ResetPassword = ({ route, navigation }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleResetPassword = async () => {
     if (!otp.trim() || !newPassword.trim() || !confirmPassword.trim()) {
@@ -85,23 +88,48 @@ const ResetPassword = ({ route, navigation }) => {
         keyboardType="numeric"
       />
 
+      <View style={styles.inputWrapper}> 
       <TextInput
         style={styles.input}
         placeholder="New Password"
         placeholderTextColor={'#000000'}
         value={newPassword}
         onChangeText={setNewPassword}
-        secureTextEntry
+        secureTextEntry={!showNewPassword}
       />
+      <TouchableOpacity
+    style={styles.eyeIcon}
+    onPress={() => setShowNewPassword(!showNewPassword)}
+  >
+    <Icon
+      name={showNewPassword ? 'eye-off-outline' : 'eye-outline'}
+      size={20}
+      color="#E07C8E"
+          />
+       </TouchableOpacity>
+      </View>
 
+      <View style={styles.inputWrapper}> 
       <TextInput
         style={styles.input}
         placeholder="Confirm New Password"
         placeholderTextColor={'#000000'}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
-        secureTextEntry
+        secureTextEntry={!showConfirmPassword}
       />
+
+      <TouchableOpacity
+        style={styles.eyeIcon}
+        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+      >
+        <Icon
+          name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+          size={20}
+          color="#E07C8E"
+        />
+      </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         style={[styles.button, loading && { opacity: 0.6 }]}
@@ -151,6 +179,15 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
   },
+  inputWrapper: {  
+  position: 'relative',
+  marginBottom: 15,
+},
+eyeIcon: { 
+  position: 'absolute',
+  right: 12,
+  top: 12,
+},
   button: {
     backgroundColor: '#E07C8E',
     padding: 15,
