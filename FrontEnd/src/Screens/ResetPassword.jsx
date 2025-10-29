@@ -6,6 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import api from '../api';
 
@@ -50,7 +54,23 @@ const ResetPassword = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+       
+        <View style={styles.decorContainer}>
+          <Image
+            source={require('../../assets/resetpw.png')}
+            style={styles.decorImage}
+            resizeMode="contain"
+          />
+        </View>
+    
       <Text style={styles.title}>Reset Password</Text>
       <Text style={styles.subtitle}>
         Enter the OTP code sent to your email and your new password.
@@ -92,7 +112,9 @@ const ResetPassword = ({ route, navigation }) => {
           {loading ? 'Mengirim...' : 'Reset Password'}
         </Text>
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+    
   );
 };
 
@@ -103,10 +125,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 25,
   },
+  decorContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  decorImage: {
+    width: 300,
+    height: 300,
+  },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     marginBottom: 10,
+    color: '#E07C8E',
   },
   subtitle: {
     fontSize: 14,
@@ -121,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#E07C8E',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
