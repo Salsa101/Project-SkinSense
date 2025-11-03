@@ -17,6 +17,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/Ionicons';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 
+import { notification } from '../Handler/Notification.js';
+
 import { useExitAppHandler } from '../Handler/CustomBackHandler';
 
 const { width } = Dimensions.get('window');
@@ -207,6 +209,16 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
+  const klikNotif = () => {
+    notification.configure();
+    notification.buatChannel('1');
+    notification.kirimNotifikasiJadwal(
+      '1',
+      'New Notification',
+      'This is a new notification',
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -225,7 +237,9 @@ const HomeScreen = ({ navigation }) => {
             </Text>
             <Text style={styles.subText}>Ready to your skin journey?</Text>
           </View>
-          <Icon name="bell" size={22} color="#DE576F" />
+          <TouchableOpacity onPress={klikNotif}>
+            <Icon name="bell" size={22} color="#DE576F" />
+          </TouchableOpacity>
         </View>
 
         {/* Latest Scan */}
