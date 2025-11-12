@@ -20,7 +20,7 @@ const ResetPassword = ({ route, navigation }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false); 
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleResetPassword = async () => {
@@ -65,7 +65,6 @@ const ResetPassword = ({ route, navigation }) => {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-       
         <View style={styles.decorContainer}>
           <Image
             source={require('../../assets/resetpw.png')}
@@ -73,76 +72,75 @@ const ResetPassword = ({ route, navigation }) => {
             resizeMode="contain"
           />
         </View>
-    
-      <Text style={styles.title}>Reset Password</Text>
-      <Text style={styles.subtitle}>
-        Enter the OTP code sent to your email and your new password.
-      </Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="OTP Code"
-        placeholderTextColor={'#000000'}
-        value={otp}
-        onChangeText={setOtp}
-        keyboardType="numeric"
-      />
-
-      <View style={styles.inputWrapper}> 
-      <TextInput
-        style={styles.input}
-        placeholder="New Password"
-        placeholderTextColor={'#000000'}
-        value={newPassword}
-        onChangeText={setNewPassword}
-        secureTextEntry={!showNewPassword}
-      />
-      <TouchableOpacity
-    style={styles.eyeIcon}
-    onPress={() => setShowNewPassword(!showNewPassword)}
-  >
-    <Icon
-      name={showNewPassword ? 'eye-off-outline' : 'eye-outline'}
-      size={20}
-      color="#E07C8E"
-          />
-       </TouchableOpacity>
-      </View>
-
-      <View style={styles.inputWrapper}> 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm New Password"
-        placeholderTextColor={'#000000'}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry={!showConfirmPassword}
-      />
-
-      <TouchableOpacity
-        style={styles.eyeIcon}
-        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-      >
-        <Icon
-          name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
-          size={20}
-          color="#E07C8E"
-        />
-      </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.6 }]}
-        onPress={handleResetPassword}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? 'Mengirim...' : 'Reset Password'}
+        <Text style={styles.title}>Reset Password</Text>
+        <Text style={styles.subtitle}>
+          Enter the OTP code sent to your email and your new password.
         </Text>
-      </TouchableOpacity>
+
+        <TextInput
+          style={styles.input}
+          placeholder="OTP Code"
+          placeholderTextColor={'#000000'}
+          value={otp}
+          onChangeText={setOtp}
+          keyboardType="numeric"
+        />
+
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="New Password"
+            placeholderTextColor={'#000000'}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry={!showNewPassword}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowNewPassword(!showNewPassword)}
+          >
+            <Icon
+              name={showNewPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color="#E07C8E"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm New Password"
+            placeholderTextColor={'#000000'}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+          />
+
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <Icon
+              name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color="#E07C8E"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.button, loading && { opacity: 0.6 }]}
+          onPress={handleResetPassword}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Mengirim...' : 'Reset Password'}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
-    
   );
 };
 
@@ -179,15 +177,15 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
   },
-  inputWrapper: {  
-  position: 'relative',
-  marginBottom: 15,
-},
-eyeIcon: { 
-  position: 'absolute',
-  right: 12,
-  top: 12,
-},
+  inputWrapper: {
+    position: 'relative',
+    marginBottom: 15,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+  },
   button: {
     backgroundColor: '#E07C8E',
     padding: 15,
