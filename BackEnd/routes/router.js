@@ -187,11 +187,7 @@ router.post(
 router.get("/scans", validateToken, getFaceResultController);
 
 //Recommendation Ingredients
-router.get(
-  "/recommendations/:userId",
-  validateToken,
-  getRecommendedIngredients
-);
+router.get("/recommendations", validateToken, getRecommendedIngredients);
 
 //Journal
 router.get("/journal/view", validateToken, getJournalByDate);
