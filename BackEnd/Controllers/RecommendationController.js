@@ -1,22 +1,26 @@
-const db = require("../config/config.js");
+const db = require("../config/db.js");
 
 const getRecommendedIngredients = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log("✅ userId:", userId);
 
     const quizAnswers = await db.query(
       `
-      SELECT q.quizquestionid, qq.quizquestion, o.optiontext
+      SELECT q."quizQuestionId", qq."quizQuestion", o."title"
       FROM "QuizUserAnswers" a
-      JOIN "QuizOptions" o ON a.quizoptionid = o.id
-      JOIN "QuizQuestions" qq ON o.quizquestionid = qq.id
-      JOIN "QuizOptions" q ON a.quizoptionid = q.id
-      WHERE a.userid = $1
-    `,
-      [userId]
+      JOIN "QuizOptions" o ON a."quizOptionId" = o.id
+      JOIN "QuizQuestions" qq ON o."quizQuestionId" = qq.id
+      JOIN "QuizOptions" q ON a."quizOptionId" = q.id
+      WHERE a."userId" = $1
+      `,
+      {
+        bind: [userId],
+        type: db.QueryTypes.SELECT,
+      }
     );
 
-    if (quizAnswers.rows.length === 0) {
+    if (quizAnswers.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No quiz answers found for this user.",
@@ -26,22 +30,27 @@ const getRecommendedIngredients = async (req, res) => {
     // --- STEP 2: Fetch latest skin scan result ---
     const scanResult = await db.query(
       `
-      SELECT skintype, severity
+      SELECT "skinType", "severity"
       FROM "ResultScans"
-      WHERE userid = $1
-      ORDER BY createdate DESC
+      WHERE "userId" = $1
+      ORDER BY "createdAt" DESC
       LIMIT 1
     `,
-      [userId]
+      {
+        bind: [userId],
+        type: db.QueryTypes.SELECT,
+      }
     );
 
-    const skinTypeFromScan = scanResult.rows[0]?.skintype || null;
-    const severity = scanResult.rows[0]?.severity || null;
+    console.log("✅ scanResult:", scanResult);
+
+    const skinTypeFromScan = scanResult[0]?.skinType || null;
+    const severity = scanResult[0]?.severity || null;
 
     // --- STEP 3: Analyze quiz answers ---
     const answersMap = {};
-    quizAnswers.rows.forEach((ans) => {
-      answersMap[ans.quizquestionid] = ans.optiontext?.toLowerCase();
+    quizAnswers.forEach((ans) => {
+      answersMap[ans.quizquestionid] = ans.title?.toLowerCase();
     });
 
     const isSensitive = answersMap[8]?.includes("yes") || false;
@@ -68,8 +77,8 @@ const getRecommendedIngredients = async (req, res) => {
 
     // --- STEP 5: Build base ingredient query ---
     let ingredientQuery = `
-      SELECT id, name, description, tags, "skinTypes", "isSensitive"
-      FROM "SkincareIngredients"
+      SELECT id, name, "isOily", "isSensitive", "weight"
+      FROM "Ingredients"
       WHERE TRUE
     `;
 
@@ -84,10 +93,11 @@ const getRecommendedIngredients = async (req, res) => {
     }
 
     // Execute query
-    const ingredientsResult = await db.query(ingredientQuery, [
-      skinTypeFromScan,
-    ]);
-    const ingredients = ingredientsResult.rows;
+    const ingredientsResult = await db.query(ingredientQuery, {
+      bind: [skinTypeFromScan],
+      type: db.QueryTypes.SELECT,
+    });
+    const ingredients = ingredientsResult;
 
     // --- STEP 6: Score ingredients based on quiz + concern relevance ---
     const concernTags = concernToTags[mainConcern.toLowerCase()] || [];
@@ -95,25 +105,61 @@ const getRecommendedIngredients = async (req, res) => {
     const ingredientScores = ingredients.map((ingredient) => {
       let score = 0;
 
+      console.log(`\n🍃 Ingredient: ${ingredient.name}`);
+
       // Match by skin type
-      if (skinTypeFromScan && ingredient.skinTypes?.includes(skinTypeFromScan))
+      // if (skinTypeFromScan && ingredient.skinTypes?.includes(skinTypeFromScan))
+      //   score += 3;
+
+      if (
+        skinTypeFromScan &&
+        ingredient.skinTypes?.includes(skinTypeFromScan)
+      ) {
         score += 3;
+        console.log(`  ✅ Skin type match (+3)`);
+      } else {
+        console.log(`  ❌ Skin type no match`);
+      }
 
       // Match by concern tags
       const matchedTags = concernTags.filter((t) =>
         ingredient.tags?.map((tag) => tag.toLowerCase()).includes(t)
       );
-      if (matchedTags.length > 0) score += matchedTags.length * 5;
+      // if (matchedTags.length > 0) score += matchedTags.length * 5;
+      if (matchedTags.length > 0) {
+        score += matchedTags.length * 5;
+        console.log(
+          `  ✅ Matched concern tags [${matchedTags.join(", ")}] (+${
+            matchedTags.length * 5
+          })`
+        );
+      } else {
+        console.log(`  ❌ No matched concern tags`);
+      }
 
       // Bonus for sensitive-safe
-      if (isSensitive && ingredient.isSensitive) score += 2;
+      // if (isSensitive && ingredient.isSensitive) score += 2;
+      if (isSensitive && ingredient.isSensitive) {
+        score += 2;
+        console.log(`  ✅ Sensitive-safe bonus (+2)`);
+      }
 
       // Bonus for age-related logic
-      if (ageRange.includes("40") && ingredient.tags.includes("anti-aging"))
+      // if (ageRange.includes("40") && ingredient.tags.includes("anti-aging"))
+      //   score += 3;
+      if (ageRange.includes("40") && ingredient.tags?.includes("anti-aging")) {
         score += 3;
+        console.log(`  ✅ Age-related bonus (+3)`);
+      }
 
       // Bonus if user uses sunscreen and ingredient has SPF/antioxidant
-      if (usesSunscreen && ingredient.tags.includes("spf")) score += 2;
+      // if (usesSunscreen && ingredient.tags.includes("spf")) score += 2;
+      if (usesSunscreen && ingredient.tags?.includes("spf")) {
+        score += 2;
+        console.log(`  ✅ Sunscreen bonus (+2)`);
+      }
+
+      console.log(`  💯 Total score: ${score}`);
 
       return { ...ingredient, score };
     });

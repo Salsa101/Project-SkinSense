@@ -112,6 +112,54 @@ const FaceScan2 = ({ navigation }) => {
     [detectFaces],
   );
 
+  // const takeFacePhoto = async () => {
+  //   if (!cameraRef.current || !faceBoundsRef.current) return;
+  //   try {
+  //     setScanning(true);
+
+  //     const photo = await cameraRef.current.takePhoto({ skipMetadata: true });
+
+  //     const formData = new FormData();
+  //     formData.append('facePhoto', {
+  //       uri: 'file://' + photo.path,
+  //       type: 'image/jpeg',
+  //       name: 'face.jpg',
+  //     });
+
+  //     const response = await api.post('/upload-face', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
+
+  //     console.log('Upload response:', response.data);
+
+  //     setCameraActive(false);
+
+  //     const scanId = response.data?.scan?.id;
+
+  //     let tries = 0;
+  //     let found = null;
+  //     while (tries < 10 && !found) {
+  //       const res = await api.get('/scans');
+  //       if (res.data.scans.length > 0) {
+  //         const latest = res.data.scans[0];
+  //         if (!scanId || latest.id === scanId) {
+  //           found = latest;
+  //           setAiResult(latest);
+  //         }
+  //       }
+  //       if (!found) {
+  //         await new Promise(r => setTimeout(r, 1500));
+  //         tries++;
+  //       }
+  //     }
+
+  //     setScanning(false);
+  //   } catch (e) {
+  //     console.log('Error taking or uploading photo:', e);
+  //     setScanning(false);
+  //   }
+  // };
+
   const takeFacePhoto = async () => {
     if (!cameraRef.current || !faceBoundsRef.current) return;
     try {
@@ -151,6 +199,13 @@ const FaceScan2 = ({ navigation }) => {
           await new Promise(r => setTimeout(r, 1500));
           tries++;
         }
+      }
+
+      // 🔥 panggil rekomendasi di sini setelah scan berhasil ditemukan
+      if (found) {
+        const rec = await api.get('/recommendations');
+        console.log('Recommendations:', rec.data);
+        setRecommendationData(rec.data);
       }
 
       setScanning(false);
@@ -206,6 +261,20 @@ const FaceScan2 = ({ navigation }) => {
       Alert.alert('Error', 'Gagal memproses data user.');
     }
   };
+
+  // useEffect(() => {
+  //   const fetchRecommendations = async () => {
+  //     try {
+  //       const res = await api.get('/recommendations');
+  //       setRecommendationData(res.data);
+  //       console.log(res.data);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   fetchRecommendations();
+  // }, []);
 
   if (!device || !hasPermission)
     return (
