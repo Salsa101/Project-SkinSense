@@ -12,6 +12,30 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+        quizQuestion: "Does your skin feels oily in the t-zone",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+       {
+        quizQuestion: "When you apply moisturizer, your skin feels",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "Does your skin have dry flakey patches?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestion: "How often do you experience breakouts or pimples?",
+        description: "Pilih jawaban yang paling benar.",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         quizQuestion: "What’s your age range?",
         description: "Pilih jawaban yang paling benar.",
         createdAt: new Date(),

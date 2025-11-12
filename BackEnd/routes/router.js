@@ -72,10 +72,6 @@ const {
   getWeeklyTip,
   getRoutineProgress,
 } = require("../Controllers/HomeScreenController");
-const {
-  getReminderNotifications,
-  getRoutineProductNotifications,
-} = require("../Controllers/NotificationController");
 const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
@@ -89,6 +85,10 @@ const {
   compareScans,
   getCompareScans,
 } = require("../Controllers/CompareScanController");
+
+const {
+  getRecommendedIngredients,
+} = require("../Controllers/RecommendationController");
 
 //Auth
 router.post("/register", validateRegister, registerController);
@@ -105,14 +105,6 @@ router.get("/latest-scan", validateToken, getLatestScan);
 router.get("/product-expired", validateToken, getExpiringSoon);
 router.get("/weekly-tips", validateToken, getWeeklyTip);
 router.get("/routine-progress", validateToken, getRoutineProgress);
-
-//Notification
-router.get("/reminder-times/notif", validateToken, getReminderNotifications);
-router.get(
-  "/expiry-product/notif",
-  validateToken,
-  getRoutineProductNotifications
-);
 
 // Profile Page
 router.get("/profile/view", validateToken, getProfile);
@@ -181,6 +173,13 @@ router.post(
   uploadFaceController
 );
 router.get("/scans", validateToken, getFaceResultController);
+//Recommendation Ingredients
+router.get(
+  "/recommendations/:userId",
+  validateToken,
+  getRecommendedIngredients
+);  
+
 
 //Journal
 router.get("/journal/view", validateToken, getJournalByDate);
