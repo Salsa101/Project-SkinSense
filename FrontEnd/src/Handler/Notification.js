@@ -84,7 +84,7 @@ class Notification {
       message: pesan, // (required)
       date: waktu, // in 60 secs\
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
-      repeatTime: 1, // (optional) Increment of configured repeatType. Check 'Repeating Notifications' section for more info.
+      repeatType: 'day', // (optional) Increment of configured repeatType. Check 'Repeating Notifications' section for more info.
     });
   };
 }

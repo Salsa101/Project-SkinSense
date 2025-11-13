@@ -7,7 +7,7 @@ export const fetchAndScheduleNotifications = async () => {
     const reminderRes = await api.get('/reminder-times/notif');
     console.log('Reminder response:', reminderRes.data);
 
-    if (reminderRes.data) {
+    if (reminderRes.data && reminderRes.data.length > 0) {
       reminderRes.data.forEach(rem => {
         if (!rem.reminderTime) return;
 
@@ -25,6 +25,7 @@ export const fetchAndScheduleNotifications = async () => {
         if (time <= now) time.setDate(time.getDate() + 1);
 
         console.log(`Scheduling ${rem.timeOfDay} reminder at`, time.toString());
+        notification.buatChannel(`${rem.id}`);
         notification.kirimNotifikasiJadwal(
           `${rem.id}`,
           `Skincare ${rem.timeOfDay}`,
