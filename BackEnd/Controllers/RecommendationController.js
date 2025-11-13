@@ -5,17 +5,44 @@ const getRecommendedIngredients = async (req, res) => {
     const userId = req.user.id;
     console.log("✅ userId:", userId);
 
-    const quizAnswers = await db.query(
+    const resultScan = await db.query(
       `
-      SELECT q."quizQuestionId", qq."quizQuestion", o."title"
-      FROM "QuizUserAnswers" a
-      JOIN "QuizOptions" o ON a."quizOptionId" = o.id
-      JOIN "QuizQuestions" qq ON o."quizQuestionId" = qq.id
-      JOIN "QuizOptions" q ON a."quizOptionId" = q.id
-      WHERE a."userId" = $1
+      SELECT id
+      FROM "ResultScans"
+      WHERE "userId" = $1
+      ORDER BY "createdAt" DESC
+      LIMIT 1;
       `,
       {
         bind: [userId],
+        type: db.QueryTypes.SELECT,
+      }
+    );
+
+    if (!resultScan.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No scan result found for this user",
+      });
+    }
+
+    const resultScanId = resultScan[0].id;
+    console.log("✅ resultScanId:", resultScanId);
+
+    const quizAnswers = await db.query(
+      `
+      SELECT 
+        qq."quizQuestion", 
+        qo."title" AS "answerTitle"
+      FROM "ResultScanQuizUserAnswer" rsqa
+      JOIN "QuizUserAnswers" qua ON rsqa."quizUserAnswerId" = qua.id
+      JOIN "QuizOptions" qo ON qua."quizOptionId" = qo.id
+      JOIN "QuizQuestions" qq ON qo."quizQuestionId" = qq.id
+      WHERE rsqa."resultScanId" = $1
+      AND qua."userId" = $2;
+      `,
+      {
+        bind: [resultScanId, userId],
         type: db.QueryTypes.SELECT,
       }
     );
@@ -48,13 +75,34 @@ const getRecommendedIngredients = async (req, res) => {
     const severity = scanResult[0]?.severity || null;
 
     // --- STEP 3: Analyze quiz answers ---
+    quizAnswers.sort((a, b) => a.id - b.id);
+
     const answersMap = {};
-    quizAnswers.forEach((ans) => {
-      answersMap[ans.quizquestionid] = ans.title?.toLowerCase();
+
+    const normalize = (str) => str.toLowerCase().trim();
+
+    quizAnswers.forEach((a) => {
+      answersMap[normalize(a.quizQuestion)] = a.answerTitle;
     });
 
-    const isSensitive = answersMap[8]?.includes("yes") || false;
-    const mainConcern = answersMap[9] || "General";
+    console.log("📋 quizAnswers:", quizAnswers);
+
+    const isSensitive =
+      answersMap[normalize("Do you have sensitive skin?")]
+        ?.toLowerCase()
+        .includes("yes") || false;
+    const mainConcern =
+      answersMap[normalize("What is your main skin concern?")] || "General";
+
+    let normalizedConcern = mainConcern.toLowerCase().trim();
+
+    if (normalizedConcern.includes("acne")) normalizedConcern = "acne";
+    else if (normalizedConcern.includes("dull")) normalizedConcern = "dullness";
+    else if (normalizedConcern.includes("wrinkle")) normalizedConcern = "aging";
+    else if (normalizedConcern.includes("pigment"))
+      normalizedConcern = "pigmentation";
+    else normalizedConcern = "general"; // fallback
+
     const ageRange = answersMap[6] || "";
     const usesSunscreen = answersMap[10]?.includes("yes") || false;
 
@@ -77,7 +125,7 @@ const getRecommendedIngredients = async (req, res) => {
 
     // --- STEP 5: Build base ingredient query ---
     let ingredientQuery = `
-      SELECT id, name, "isOily", "isSensitive", "weight"
+      SELECT id, name, "isOily", "isSensitive", "weight", "skinTypes", "tags"
       FROM "Ingredients"
       WHERE TRUE
     `;
@@ -100,7 +148,11 @@ const getRecommendedIngredients = async (req, res) => {
     const ingredients = ingredientsResult;
 
     // --- STEP 6: Score ingredients based on quiz + concern relevance ---
-    const concernTags = concernToTags[mainConcern.toLowerCase()] || [];
+    const concernTags = concernToTags[normalizedConcern] || [];
+
+    console.log(`🧠 mainConcern: ${mainConcern}`);
+    console.log(`🎯 normalizedConcern: ${normalizedConcern}`);
+    console.log(`🔖 concernTags:`, concernTags);
 
     const ingredientScores = ingredients.map((ingredient) => {
       let score = 0;
@@ -168,12 +220,25 @@ const getRecommendedIngredients = async (req, res) => {
     ingredientScores.sort((a, b) => b.score - a.score);
 
     // --- STEP 7: Return top recommendations ---
-    res.json({
+    // res.json({
+    //   success: true,
+    //   userSkinType: skinTypeFromScan || "Unknown",
+    //   mainConcern,
+    //   recommended: ingredientScores.slice(0, 5), // top 5
+    // });
+
+    // --- STEP 7: Return top recommendations ---
+    const result = {
       success: true,
       userSkinType: skinTypeFromScan || "Unknown",
       mainConcern,
       recommended: ingredientScores.slice(0, 5), // top 5
-    });
+    };
+
+    console.log("🎯 Final Recommendation Result:");
+    console.log(JSON.stringify(result, null, 2));
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res
