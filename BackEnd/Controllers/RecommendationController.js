@@ -109,19 +109,17 @@ const getRecommendedIngredients = async (req, res) => {
 
     // --- STEP 4: Define concern → ingredient tags mapping ---
     const concernToTags = {
-      acne: ["anti-acne", "niacinamide", "salicylic-acid", "azelaic-acid"],
-      dryness: ["hydrating", "ceramide", "hyaluronic-acid"],
-      oily: ["oil-control", "niacinamide", "clay"],
-      dullness: ["brightening", "vitamin-c", "aha", "exfoliating"],
-      aging: ["anti-aging", "retinol", "peptides", "collagen"],
-      sensitive: ["soothing", "fragrance-free", "centella", "aloe-vera"],
+      acne: ["bha","aha", "moisturizing", "anti-bacterial", "acne-treatment", "benzoyl peroxide"],
+      dryness: ["hydration", "humectant", "dry", "moisturizing"],
+      oily: ["oil-control", "sebum-regulation","anti-inflammatory", "aha", "bha"],
+      dullness: ["brightening", "aha", "exfoliation", "anti-oxidant"],
+      aging: ["anti-aging","cell-turnover", "peptides", "collagen"],
+      sensitive: ["soothing", "fragrance-free"],
       pigmentation: [
         "brightening",
-        "vitamin-c",
-        "licorice-root",
-        "alpha-arbutin",
+        "cell-turnover"
       ],
-      sunDamage: ["spf", "antioxidant", "vitamin-e"],
+      "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
     // --- STEP 5: Build base ingredient query ---
@@ -141,7 +139,8 @@ const getRecommendedIngredients = async (req, res) => {
       ingredientQuery += ` AND "isPregnancySafe" = TRUE`;
     }
 
-    // Optional: filter by skin type if available
+
+    // filter by skin type
     if (skinTypeFromScan) {
       ingredientQuery += ` AND ($1 = ANY("skinTypes") OR 'all' = ANY("skinTypes"))`;
     }

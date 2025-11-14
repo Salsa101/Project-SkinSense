@@ -33,7 +33,7 @@ module.exports = {
     await queryInterface.addColumn("Ingredients", "isPregnancySafe", {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // set a default for existing rows
+      defaultValue: false,
     });
 
   },
