@@ -6,13 +6,13 @@ module.exports = {
     await queryInterface.addColumn("Ingredients", "isSensitive", {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // set a default for existing rows
+      defaultValue: false,
     });
 
     await queryInterface.addColumn("Ingredients", "isOily", {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // set default weight
+      defaultValue: false, 
     });
 
     await queryInterface.addColumn("Ingredients", "weight", {
