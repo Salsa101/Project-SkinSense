@@ -30,6 +30,12 @@ module.exports = {
       type: Sequelize.ARRAY(Sequelize.STRING),
       allowNull: true,
     });
+    await queryInterface.addColumn("Ingredients", "isPregnancySafe", {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false, // set a default for existing rows
+    });
+
   },
 
   async down(queryInterface, Sequelize) {
@@ -38,5 +44,6 @@ module.exports = {
     await queryInterface.removeColumn("Ingredients", "weight");
     await queryInterface.removeColumn("Ingredients", "skinTypes");
     await queryInterface.removeColumn("Ingredients", "tags");
+    await queryInterface.removeColumn("Ingredients", "isPregnancySafe");
   },
 };

@@ -105,6 +105,7 @@ const getRecommendedIngredients = async (req, res) => {
 
     const ageRange = answersMap[6] || "";
     const usesSunscreen = answersMap[10]?.includes("yes") || false;
+    const isPregnancy = answersMap[11]?.includes("yes") || false;  
 
     // --- STEP 4: Define concern → ingredient tags mapping ---
     const concernToTags = {
@@ -134,6 +135,12 @@ const getRecommendedIngredients = async (req, res) => {
     if (isSensitive) {
       ingredientQuery += ` AND "isSensitive" = TRUE`;
     }
+
+    // pregnancy-safe filter
+    if (isPregnancy) {
+      ingredientQuery += ` AND "isPregnancySafe" = TRUE`;
+    }
+
 
     // Optional: filter by skin type if available
     if (skinTypeFromScan) {
@@ -211,7 +218,7 @@ const getRecommendedIngredients = async (req, res) => {
         console.log(`  ✅ Sunscreen bonus (+2)`);
       }
 
-      console.log(`  💯 Total score: ${score}`);
+      console.log(`Total score: ${score}`);
 
       return { ...ingredient, score };
     });
