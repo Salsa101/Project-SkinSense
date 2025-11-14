@@ -105,23 +105,23 @@ const getRecommendedIngredients = async (req, res) => {
 
     const ageRange = answersMap[6] || "";
     const usesSunscreen = answersMap[10]?.includes("yes") || false;
-    const isPregnancy = answersMap[11]?.includes("yes") || false;  
+    const isPregnancy = answersMap[11]?.includes("yes") || false;
 
     // --- STEP 4: Define concern → ingredient tags mapping ---
     const concernToTags = {
-      acne: ["anti-acne", "niacinamide", "salicylic acid", "azelaic acid"],
-      dryness: ["hydrating", "ceramide", "hyaluronic acid"],
+      acne: ["anti-acne", "niacinamide", "salicylic-acid", "azelaic-acid"],
+      dryness: ["hydrating", "ceramide", "hyaluronic-acid"],
       oily: ["oil-control", "niacinamide", "clay"],
-      dullness: ["brightening", "vitamin c", "aha", "exfoliating"],
+      dullness: ["brightening", "vitamin-c", "aha", "exfoliating"],
       aging: ["anti-aging", "retinol", "peptides", "collagen"],
-      sensitive: ["soothing", "fragrance-free", "centella", "aloe vera"],
+      sensitive: ["soothing", "fragrance-free", "centella", "aloe-vera"],
       pigmentation: [
         "brightening",
-        "vitamin c",
-        "licorice root",
-        "alpha arbutin",
+        "vitamin-c",
+        "licorice-root",
+        "alpha-arbutin",
       ],
-      "sun damage": ["spf", "antioxidant", "vitamin e"],
+      sunDamage: ["spf", "antioxidant", "vitamin-e"],
     };
 
     // --- STEP 5: Build base ingredient query ---
@@ -141,10 +141,9 @@ const getRecommendedIngredients = async (req, res) => {
       ingredientQuery += ` AND "isPregnancySafe" = TRUE`;
     }
 
-
     // Optional: filter by skin type if available
     if (skinTypeFromScan) {
-      ingredientQuery += ` AND $1 = ANY("skinTypes")`;
+      ingredientQuery += ` AND ($1 = ANY("skinTypes") OR 'all' = ANY("skinTypes"))`;
     }
 
     // Execute query
@@ -172,7 +171,8 @@ const getRecommendedIngredients = async (req, res) => {
 
       if (
         skinTypeFromScan &&
-        ingredient.skinTypes?.includes(skinTypeFromScan)
+        (ingredient.skinTypes?.includes(skinTypeFromScan) ||
+          ingredient.skinTypes?.includes("all"))
       ) {
         score += 3;
         console.log(`  ✅ Skin type match (+3)`);
