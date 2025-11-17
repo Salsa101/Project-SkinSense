@@ -66,7 +66,7 @@ function News() {
         <div className="d-flex justify-content-between align-items-center">
           <div>
             <h2>News</h2>
-            <p>Don't forget to add category first!</p>
+            <p style={{ color: "red" }}>Don't forget to add category first!</p>
           </div>
           <a href="/admin/news/add" className="btn btn-outline-primary">
             + Add News

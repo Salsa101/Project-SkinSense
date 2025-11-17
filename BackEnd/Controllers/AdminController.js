@@ -1,11 +1,12 @@
 const { User, Product } = require("../models");
-const { News, Category } = require("../models");
+const { News, Category, Ingredient, ProductIngredient } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config/config");
 const { validationResult } = require("express-validator");
 const fs = require("fs");
 const path = require("path");
+const { Op } = require("sequelize");
 
 const deleteFile = (filePath) => {
   try {
@@ -85,6 +86,12 @@ const getAllProducts = async (req, res) => {
           as: "user",
           attributes: ["id", "username", "email", "role"],
         },
+        {
+          model: Ingredient,
+          as: "Ingredients",
+          attributes: ["id", "name", "tags"],
+          through: { attributes: [] },
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -100,6 +107,7 @@ const getAllProducts = async (req, res) => {
 const addProduct = async (req, res) => {
   try {
     const { productName, productBrand, productType } = req.body;
+    const ingredients = JSON.parse(req.body.ingredients);
 
     const newProduct = await Product.create({
       productName,
@@ -110,6 +118,8 @@ const addProduct = async (req, res) => {
         : null,
       userId: req.user.id,
     });
+
+    await newProduct.setIngredients(ingredients);
 
     res.json(newProduct);
   } catch (err) {
@@ -152,7 +162,18 @@ const getProductById = async (req, res) => {
       return res.status(400).json({ message: "ID tidak valid" });
     }
 
-    const product = await Product.findOne({ where: { id } });
+    const product = await Product.findOne({
+      where: { id },
+      include: [
+        {
+          model: Ingredient,
+          as: "Ingredients",
+          attributes: ["id", "name", "tags"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
     if (!product)
       return res.status(404).json({ message: "Produk tidak ditemukan" });
 
@@ -180,6 +201,11 @@ const updateProduct = async (req, res) => {
       // hapus file lama
       deleteFile(product.productImage);
       product.productImage = `/uploads/${req.user.id}/products/${req.file.filename}`;
+    }
+
+    if (req.body.ingredients) {
+      const ingredientIds = JSON.parse(req.body.ingredients);
+      await product.setIngredients(ingredientIds);
     }
 
     await product.save();
@@ -483,6 +509,108 @@ const isActiveCategory = async (req, res) => {
   }
 };
 
+// const getIngredients = async (req, res) => {
+//   const ingredients = await Ingredient.findAll({ order: [["name", "ASC"]] });
+//   res.json(ingredients);
+// };
+
+const getIngredients = async (req, res) => {
+  const search = req.query.search || "";
+
+  const ingredients = await Ingredient.findAll({
+    where: {
+      name: {
+        [Op.iLike]: `%${search}%`,
+      },
+    },
+    order: [["id", "ASC"]],
+  });
+
+  res.json(ingredients);
+};
+
+const addIngredient = async (req, res) => {
+  try {
+    const { name, isSensitive, isOily, weight, skinTypes, tags } = req.body;
+
+    const ingredient = await Ingredient.create({
+      name,
+      isSensitive,
+      isOily,
+      weight,
+      skinTypes: skinTypes.map((s) => s.toLowerCase()),
+      tags,
+    });
+
+    res.json(ingredient);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteIngredient = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "Ingredient ID is required" });
+    }
+
+    await ProductIngredient.destroy({
+      where: { ingredients_id: id },
+    });
+
+    const deleted = await Ingredient.destroy({
+      where: { id },
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Ingredient not found" });
+    }
+
+    res.json({ message: "Ingredient deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getIngredientById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const ingredient = await Ingredient.findByPk(id);
+
+    if (!ingredient) return res.status(404).json({ message: "Not found" });
+
+    res.json(ingredient);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateIngredient = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, isSensitive, isOily, weight, skinTypes, tags } = req.body;
+
+    const ingredient = await Ingredient.findByPk(id);
+    if (!ingredient) return res.status(404).json({ message: "Not found" });
+
+    ingredient.name = name;
+    ingredient.isSensitive = isSensitive;
+    ingredient.isOily = isOily;
+    ingredient.weight = weight;
+    ingredient.skinTypes = skinTypes.map((s) => s.toLowerCase());
+    ingredient.tags = tags;
+
+    await ingredient.save();
+
+    res.json({ message: "Ingredient updated", ingredient });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   adminLoginController,
   adminLogoutController,
@@ -504,4 +632,9 @@ module.exports = {
   getCategoryDetail,
   isActiveCategory,
   toggleNewsActive,
+  getIngredients,
+  addIngredient,
+  deleteIngredient,
+  getIngredientById,
+  updateIngredient,
 };

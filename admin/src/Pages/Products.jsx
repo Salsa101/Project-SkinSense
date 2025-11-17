@@ -72,7 +72,12 @@ function Products() {
       <Navbar />
       <div className="container mt-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>Products</h2>
+          <div>
+            <h2>Products</h2>
+            <p style={{ color: "red" }}>
+              Don't forget to add ingredient first!
+            </p>
+          </div>
           <a href="/admin/add-product" className="btn btn-outline-primary">
             + Add Product
           </a>
@@ -138,6 +143,7 @@ function Products() {
               <th>Name</th>
               <th>Brand</th>
               <th>Type</th>
+              <th>Ingredients</th>
               <th>Added By</th>
               <th>Verified</th>
               <th>Action</th>
@@ -165,6 +171,17 @@ function Products() {
                 <td>{p.productName}</td>
                 <td>{p.productBrand}</td>
                 <td>{p.productType}</td>
+                <td>
+                  {p.Ingredients && p.Ingredients.length > 0 ? (
+                    <ul style={{ paddingLeft: "15px", margin: 0 }}>
+                      {p.Ingredients.map((ing) => (
+                        <li key={ing.id}>{ing.name}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <small>No ingredients</small>
+                  )}
+                </td>
                 <td>
                   {p.user?.role === "admin" ? p.user.username : "Unknown"}
                 </td>

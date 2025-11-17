@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ProductIngredient,
         foreignKey: "product_id",
         otherKey: "ingredients_id",
+        as: "Ingredients",
       });
 
       Product.belongsToMany(models.ResultScan, {

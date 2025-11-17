@@ -67,6 +67,18 @@ const Navbar = () => {
             <li className="nav-item">
               <a
                 className={`nav-link ${
+                  location.pathname.startsWith("/admin/ingredients")
+                    ? "active"
+                    : ""
+                }`}
+                href="/admin/ingredients"
+              >
+                Ingredient
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className={`nav-link ${
                   location.pathname.startsWith("/admin/news") ? "active" : ""
                 }`}
                 href="/admin/news"

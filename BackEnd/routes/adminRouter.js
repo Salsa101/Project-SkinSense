@@ -29,6 +29,11 @@ const {
   getCategoryDetail,
   isActiveCategory,
   toggleNewsActive,
+  getIngredients,
+  addIngredient,
+  deleteIngredient,
+  getIngredientById,
+  updateIngredient,
 } = require("../Controllers/AdminController");
 const {
   getUserGrowth,
@@ -102,5 +107,12 @@ router.put(
 
 //Analytics Route
 router.get("/analytics", validateToken, isAdmin, getAnalytics);
+
+//Ingredients
+router.get("/ingredients", validateToken, isAdmin, getIngredients);
+router.post("/ingredients/add", validateToken, isAdmin, addIngredient);
+router.delete("/ingredients/delete", validateToken, isAdmin, deleteIngredient);
+router.get("/ingredients/:id", validateToken, isAdmin, getIngredientById);
+router.put("/ingredients/update/:id", validateToken, isAdmin, updateIngredient);
 
 module.exports = router;

@@ -237,9 +237,9 @@ const HomeScreen = ({ navigation }) => {
             </Text>
             <Text style={styles.subText}>Ready to your skin journey?</Text>
           </View>
-          <TouchableOpacity onPress={klikNotif}>
+          {/* <TouchableOpacity onPress={klikNotif}>
             <Icon name="bell" size={22} color="#DE576F" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Latest Scan */}

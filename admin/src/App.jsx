@@ -12,6 +12,9 @@ import AddCategory from "./Pages/AddCategory";
 import EditCategory from "./Pages/EditCategory";
 import EditNews from "./Pages/EditNews";
 import Analytics from "./Pages/Analytics";
+import Ingredients from "./Pages/Ingredients";
+import AddIngredient from "./Pages/AddIngredient";
+import EditIngredient from "./Pages/EditIngredient";
 
 function App() {
   return (
@@ -103,6 +106,30 @@ function App() {
           element={
             <ProtectedRoute>
               <Analytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ingredients"
+          element={
+            <ProtectedRoute>
+              <Ingredients />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ingredients/add"
+          element={
+            <ProtectedRoute>
+              <AddIngredient />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ingredients/:id"
+          element={
+            <ProtectedRoute>
+              <EditIngredient />
             </ProtectedRoute>
           }
         />

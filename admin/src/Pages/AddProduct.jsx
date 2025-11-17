@@ -3,6 +3,37 @@ import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 function AddProduct() {
+  const [ingredientSearch, setIngredientSearch] = useState("");
+  const [ingredientResults, setIngredientResults] = useState([]);
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
+
+  const handleSearchIngredient = async (e) => {
+    const q = e.target.value;
+    setIngredientSearch(q);
+
+    if (q.length < 2) {
+      setIngredientResults([]);
+      return;
+    }
+
+    try {
+      const res = await api.get(`/admin/ingredients?search=${q}`);
+      setIngredientResults(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addIngredientToList = (ingredient) => {
+    if (!selectedIngredients.some((i) => i.id === ingredient.id)) {
+      setSelectedIngredients([...selectedIngredients, ingredient]);
+    }
+  };
+
+  const removeIngredient = (id) => {
+    setSelectedIngredients(selectedIngredients.filter((i) => i.id !== id));
+  };
+
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -26,6 +57,11 @@ function AddProduct() {
     formData.append("productName", form.productName);
     formData.append("productBrand", form.productBrand);
     formData.append("productType", form.productType);
+    formData.append(
+      "ingredients",
+      JSON.stringify(selectedIngredients.map((i) => i.id))
+    );
+
     if (file) formData.append("productImage", file);
 
     try {
@@ -41,7 +77,7 @@ function AddProduct() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Add Product</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         <div className="mb-3">
@@ -90,6 +126,63 @@ function AddProduct() {
             className="form-control"
             onChange={handleFileChange}
           />
+        </div>
+
+        {/* SEARCH INGREDIENT */}
+        <div className="mb-3">
+          <label className="form-label">Search Ingredient</label>
+          <input
+            type="text"
+            className="form-control"
+            value={ingredientSearch}
+            onChange={handleSearchIngredient}
+            placeholder="Search ingredient..."
+          />
+
+          {/* SEARCH RESULT */}
+          {ingredientResults.length > 0 && (
+            <div
+              className="border p-2 mt-2"
+              style={{ maxHeight: "150px", overflowY: "auto" }}
+            >
+              {ingredientResults.map((ing) => (
+                <div
+                  key={ing.id}
+                  className="p-1"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => addIngredientToList(ing)}
+                >
+                  ✔ {ing.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* SELECTED INGREDIENTS */}
+        <div className="mb-3">
+          <label className="form-label">Selected Ingredients</label>
+          <div className="border p-2">
+            {selectedIngredients.length === 0 && (
+              <small>No ingredients selected.</small>
+            )}
+
+            {selectedIngredients.map((ing) => (
+              <div
+                key={ing.id}
+                className="d-flex justify-content-between align-items-center border-bottom py-1"
+              >
+                <span>{ing.name}</span>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeIngredient(ing.id)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
         <button type="submit" className="btn btn-primary">
           Add Product

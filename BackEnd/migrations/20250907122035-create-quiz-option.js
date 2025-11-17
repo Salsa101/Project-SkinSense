@@ -22,6 +22,11 @@ module.exports = {
       description: {
         type: Sequelize.TEXT,
       },
+      weight: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        defaultValue: null,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

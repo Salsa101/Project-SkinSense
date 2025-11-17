@@ -24,8 +24,38 @@ module.exports = (sequelize, DataTypes) => {
   }
   Ingredient.init(
     {
-      name: DataTypes.STRING,
-      allowNull: false,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      isSensitive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      isOily: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      weight: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      skinTypes: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+      },
+      tags: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+      },
+      isPregnancySafe: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
