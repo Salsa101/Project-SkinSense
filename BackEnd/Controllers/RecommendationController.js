@@ -109,16 +109,26 @@ const getRecommendedIngredients = async (req, res) => {
 
     // --- STEP 4: Define concern → ingredient tags mapping ---
     const concernToTags = {
-      acne: ["bha","aha", "moisturizing", "anti-bacterial", "acne-treatment", "benzoyl peroxide"],
-      dryness: ["hydration", "humectant", "dry", "moisturizing"],
-      oily: ["oil-control", "sebum-regulation","anti-inflammatory", "aha", "bha"],
-      dullness: ["brightening", "aha", "exfoliation", "anti-oxidant"],
-      aging: ["anti-aging","cell-turnover", "peptides", "collagen"],
-      sensitive: ["soothing", "fragrance-free"],
-      pigmentation: [
-        "brightening",
-        "cell-turnover"
+      acne: [
+        "bha",
+        "aha",
+        "moisturizing",
+        "anti-bacterial",
+        "acne-treatment",
+        "benzoyl peroxide",
       ],
+      dryness: ["hydration", "humectant", "dry", "moisturizing"],
+      oily: [
+        "oil-control",
+        "sebum-regulation",
+        "anti-inflammatory",
+        "aha",
+        "bha",
+      ],
+      dullness: ["brightening", "aha", "exfoliation", "anti-oxidant"],
+      aging: ["anti-aging", "cell-turnover", "peptides", "collagen"],
+      sensitive: ["soothing", "fragrance-free"],
+      pigmentation: ["brightening", "cell-turnover"],
       "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
@@ -138,7 +148,6 @@ const getRecommendedIngredients = async (req, res) => {
     if (isPregnancy) {
       ingredientQuery += ` AND "isPregnancySafe" = TRUE`;
     }
-
 
     // filter by skin type
     if (skinTypeFromScan) {
@@ -244,7 +253,91 @@ const getRecommendedIngredients = async (req, res) => {
     console.log("🎯 Final Recommendation Result:");
     console.log(JSON.stringify(result, null, 2));
 
+    // --- SAVE TOP 5 RECOMMENDATIONS TO ResultScanIngredients ---
+    const recommendedIngredients = ingredientScores.slice(0, 5);
+
+    const recommendedIds = recommendedIngredients.map((ing) => ing.id);
+
+    for (const ing of recommendedIngredients) {
+      await db.query(
+        `
+        INSERT INTO "ResultScanIngredients" 
+          ("resultScan_id", "ingredients_id", "score", "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, NOW(), NOW());
+        `,
+        {
+          bind: [resultScanId, ing.id, ing.score],
+          type: db.QueryTypes.INSERT,
+        }
+      );
+    }
+
+    console.log("💾 Saved recommended ingredients to ResultScanIngredients");
+
+    // 1. Ambil produk yang match >= 3 ingredients
+    const bestProducts = await db.query(
+      `
+      SELECT 
+        p.id AS product_id,
+        p."productName" AS productName,
+        p."productType" AS productType,
+        p."productBrand" AS productBrand,
+        p."productImage" AS productImage,
+        COUNT(pi."ingredients_id") AS matchedIngredients
+      FROM "Products" p
+      JOIN "ProductIngredients" pi ON p.id = pi.product_id
+      WHERE pi."ingredients_id" = ANY($1)
+      GROUP BY p.id, p."productName", p."productType", p."productBrand", p."productImage"
+      HAVING COUNT(pi."ingredients_id") >= 3
+      ORDER BY matchedIngredients DESC;
+    `,
+      {
+        bind: [recommendedIds],
+        type: db.QueryTypes.SELECT,
+      }
+    );
+
+    console.log("📦 BEFORE FILTER:", bestProducts);
+
+    // 2. Filter: hanya ambil 1 produk per productType
+    const selectedTypes = new Set();
+    const finalRecommendations = [];
+
+    for (const prod of bestProducts) {
+      const type = prod.productType
+        ? prod.productType.trim().toLowerCase()
+        : `type-${prod.product_id}`; // FIX DISINI
+
+      if (!selectedTypes.has(type)) {
+        selectedTypes.add(type);
+        finalRecommendations.push(prod);
+      }
+    }
+
+    console.log("🎯 FINAL RECOMMENDED:", finalRecommendations);
+
+    // 3. Simpan FINAL RECOMMENDATIONS, bukan bestProducts
+    for (const prod of finalRecommendations) {
+      await db.query(
+        `
+    INSERT INTO "ResultScanProducts"
+      ("resultScan_id", "product_id", "createdAt", "updatedAt")
+    VALUES ($1, $2, NOW(), NOW());
+    `,
+        {
+          bind: [resultScanId, prod.product_id],
+          type: db.QueryTypes.INSERT,
+        }
+      );
+    }
+
+    console.log("💾 Saved recommended products to ResultScanProducts");
+
+    result.recommendedProducts = bestProducts;
+
     res.json(result);
+
+    console.log(result);
   } catch (err) {
     console.error(err);
     res

@@ -5,7 +5,9 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     const { Op } = Sequelize;
-     await queryInterface.sequelize.query(`TRUNCATE TABLE "Ingredients" RESTART IDENTITY CASCADE;`);
+    await queryInterface.sequelize.query(
+      `TRUNCATE TABLE "Ingredients" RESTART IDENTITY CASCADE;`
+    );
     const now = new Date();
     await queryInterface.bulkInsert(
       "Ingredients",
@@ -27,7 +29,12 @@ module.exports = {
           isOily: false,
           weight: 1.0,
           skinTypes: ["oily", "combination", "sensitive", "normal"],
-          tags: ["sebum-regulation", "brightening", "acne-treatment", "oil-control"],
+          tags: [
+            "sebum-regulation",
+            "brightening",
+            "acne-treatment",
+            "oil-control",
+          ],
           isPregnancySafe: true,
           createdAt: now,
           updatedAt: now,
@@ -38,7 +45,13 @@ module.exports = {
           isOily: true,
           weight: 0.9,
           skinTypes: ["oily", "combination"],
-          tags: ["exfoliation", "sebum-regulation","bha", "acne-treatment", "oil-control"],
+          tags: [
+            "exfoliation",
+            "sebum-regulation",
+            "bha",
+            "acne-treatment",
+            "oil-control",
+          ],
           isPregnancySafe: false,
           createdAt: now,
           updatedAt: now,
@@ -49,7 +62,7 @@ module.exports = {
           isOily: false,
           weight: 0.95,
           skinTypes: ["normal", "oily", "combination"],
-          tags: ["retinol", "anti-aging", "cell-turnover",  "acne-treatment"],
+          tags: ["retinol", "anti-aging", "cell-turnover", "acne-treatment"],
           isPregnancySafe: false,
           createdAt: now,
           updatedAt: now,
@@ -82,7 +95,7 @@ module.exports = {
           isOily: true,
           weight: 0.6,
           skinTypes: ["dry", "normal"],
-          tags: ["emollient", "moisturizing","dry"],
+          tags: ["emollient", "moisturizing", "dry"],
           isPregnancySafe: true,
           createdAt: now,
           updatedAt: now,
@@ -109,7 +122,7 @@ module.exports = {
           createdAt: now,
           updatedAt: now,
         },
-          {
+        {
           name: "Ceramides",
           isSensitive: true,
           isOily: false,
@@ -120,7 +133,7 @@ module.exports = {
           createdAt: now,
           updatedAt: now,
         },
-          {
+        {
           name: "Vitamin C",
           isSensitive: false,
           isOily: true,
@@ -130,7 +143,51 @@ module.exports = {
           isPregnancySafe: true,
           createdAt: now,
           updatedAt: now,
-        }
+        },
+        {
+          name: "Centella Asiatica",
+          isSensitive: true,
+          isOily: false,
+          weight: 0.7,
+          skinTypes: ["sensitive", "all"],
+          tags: ["soothing", "anti-inflammatory", "repair"],
+          isPregnancySafe: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          name: "Glycolic Acid",
+          isSensitive: true,
+          isOily: true,
+          weight: 0.85,
+          skinTypes: ["oily", "combination"],
+          tags: ["aha", "exfoliation", "brightening"],
+          isPregnancySafe: false,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          name: "Peptides",
+          isSensitive: false,
+          isOily: false,
+          weight: 0.75,
+          skinTypes: ["all"],
+          tags: ["anti-aging", "firming", "repair"],
+          isPregnancySafe: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          name: "Green Tea Extract",
+          isSensitive: true,
+          isOily: false,
+          weight: 0.65,
+          skinTypes: ["sensitive", "combination", "normal"],
+          tags: ["anti-oxidant", "soothing", "anti-inflammatory"],
+          isPregnancySafe: true,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       {}
     );
@@ -152,7 +209,7 @@ module.exports = {
             "Shea Butter",
             "Squalane",
             "Aloe Vera",
-            "Ceramides"
+            "Ceramides",
           ],
         },
       },

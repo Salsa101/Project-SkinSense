@@ -48,6 +48,10 @@ const FaceScan2 = ({ navigation }) => {
   const [cameraActive, setCameraActive] = useState(true);
 
   const [aiResult, setAiResult] = useState(null);
+  const [recommendationData, setRecommendationData] = useState({
+    recommended: [],
+    recommendedProducts: [],
+  });
 
   const [polling, setPolling] = useState(false);
 
@@ -111,54 +115,6 @@ const FaceScan2 = ({ navigation }) => {
     },
     [detectFaces],
   );
-
-  // const takeFacePhoto = async () => {
-  //   if (!cameraRef.current || !faceBoundsRef.current) return;
-  //   try {
-  //     setScanning(true);
-
-  //     const photo = await cameraRef.current.takePhoto({ skipMetadata: true });
-
-  //     const formData = new FormData();
-  //     formData.append('facePhoto', {
-  //       uri: 'file://' + photo.path,
-  //       type: 'image/jpeg',
-  //       name: 'face.jpg',
-  //     });
-
-  //     const response = await api.post('/upload-face', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     });
-
-  //     console.log('Upload response:', response.data);
-
-  //     setCameraActive(false);
-
-  //     const scanId = response.data?.scan?.id;
-
-  //     let tries = 0;
-  //     let found = null;
-  //     while (tries < 10 && !found) {
-  //       const res = await api.get('/scans');
-  //       if (res.data.scans.length > 0) {
-  //         const latest = res.data.scans[0];
-  //         if (!scanId || latest.id === scanId) {
-  //           found = latest;
-  //           setAiResult(latest);
-  //         }
-  //       }
-  //       if (!found) {
-  //         await new Promise(r => setTimeout(r, 1500));
-  //         tries++;
-  //       }
-  //     }
-
-  //     setScanning(false);
-  //   } catch (e) {
-  //     console.log('Error taking or uploading photo:', e);
-  //     setScanning(false);
-  //   }
-  // };
 
   const takeFacePhoto = async () => {
     if (!cameraRef.current || !faceBoundsRef.current) return;
@@ -261,20 +217,6 @@ const FaceScan2 = ({ navigation }) => {
       Alert.alert('Error', 'Gagal memproses data user.');
     }
   };
-
-  // useEffect(() => {
-  //   const fetchRecommendations = async () => {
-  //     try {
-  //       const res = await api.get('/recommendations');
-  //       setRecommendationData(res.data);
-  //       console.log(res.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-
-  //   fetchRecommendations();
-  // }, []);
 
   if (!device || !hasPermission)
     return (
@@ -472,46 +414,19 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  <Text
-                    style={{
-                      backgroundColor: '#FFF0F2',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✔ Centella Asiatica
-                  </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFF0F2',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✔ Jojoba Oil
-                  </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFF0F2',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✔ Ceramide NP
-                  </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFF0F2',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✔ Hyaluronic Acid
-                  </Text>
+                  {recommendationData.recommended?.map(item => (
+                    <Text
+                      key={item.id}
+                      style={{
+                        backgroundColor: '#FFF0F2',
+                        color: '#E07C8E',
+                        padding: 6,
+                        borderRadius: 6,
+                      }}
+                    >
+                      ✔ {item.name}
+                    </Text>
+                  ))}
                 </View>
               </View>
             </View>
@@ -605,81 +520,69 @@ const FaceScan2 = ({ navigation }) => {
                 <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
                   Products For You
                 </Text>
-                <View
-                  style={{
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    paddingRight: 12,
                   }}
                 >
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      width: 80,
-                      backgroundColor: '#c7c7c7ff',
-                      padding: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Image
-                      source={require('../../assets/banner-profile.png')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 8,
-                        marginBottom: 4,
-                      }}
-                    />
-                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
-                      Hydrating Serum
-                    </Text>
-                  </View>
+                  {recommendationData.recommendedProducts?.map(
+                    (product, index) => (
+                      <View
+                        key={product.product_id}
+                        style={{
+                          alignItems: 'center',
+                          width: 120,
+                          backgroundColor: '#FFEAEA',
+                          padding: 10,
+                          borderRadius: 8,
+                          marginRight:
+                            index ===
+                            recommendationData.recommendedProducts.length - 1
+                              ? 0
+                              : 12, // jarak antar card
+                        }}
+                      >
+                        <Image
+                          source={
+                            product.image
+                              ? { uri: product.image } // pakai image dari API
+                              : require('../../assets/product-placeholder.jpg') // placeholder
+                          }
+                          style={{
+                            width: 95,
+                            height: 95,
+                            borderRadius: 8,
+                            marginBottom: 4,
+                          }}
+                        />
 
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      width: 80,
-                      backgroundColor: '#c7c7c7ff',
-                      padding: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Image
-                      source={require('../../assets/banner-profile.png')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 8,
-                        marginBottom: 4,
-                      }}
-                    />
-                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
-                      Hydrating Serum
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      width: 80,
-                      backgroundColor: '#c7c7c7ff',
-                      padding: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Image
-                      source={require('../../assets/banner-profile.png')}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 8,
-                        marginBottom: 4,
-                      }}
-                    />
-                    <Text style={{ fontSize: 12, textAlign: 'center' }}>
-                      Hydrating Serum
-                    </Text>
-                  </View>
-                </View>
+                        <Text
+                          style={{
+                            marginTop: 4,
+                            fontSize: 12,
+                            textAlign: 'flex-start',
+                            fontWeight: 'bold',
+                            color: '#E07C8E',
+                          }}
+                        >
+                          {product.productname}
+                        </Text>
+                        <Text style={{ fontSize: 12, alignSelf: 'flex-start' }}>
+                          {product.productbrand}
+                        </Text>
+                        <Text style={{ fontSize: 12, alignSelf: 'flex-start' }}>
+                          {product.producttype
+                            ? product.producttype.charAt(0).toUpperCase() +
+                              product.producttype.slice(1)
+                            : ''}
+                        </Text>
+                      </View>
+                    ),
+                  )}
+                </ScrollView>
               </View>
             </View>
           </View>
