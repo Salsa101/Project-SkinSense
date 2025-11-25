@@ -47,6 +47,65 @@ const getRecommendedIngredients = async (req, res) => {
       }
     );
 
+    // --- STEP X: Score Mapping for Final Score Calculation ---
+    const scoreMap = {
+      // Q1 – Skin Type
+      Normal: 95,
+      Oily: 60,
+      Dry: 40,
+      Combination: 70,
+      "I don’t know": 50,
+
+      // Q2 – Oily T-zone
+      Yes_q2: 60,
+      Sometimes_q2: 50,
+      No_q2: 95,
+
+      // Q3 – Skin after moisturizer
+      "Tight and dry": 40,
+      Normal_q3: 95,
+      "Greasy and Heavy": 50,
+
+      // Q4 – Acne triggers
+      Yes_q4: 40,
+      Sometimes_q4: 60,
+      No_q4: 95,
+
+      // Q5 – Frequency breakout
+      "Very Often": 40,
+      Often: 50,
+      Sometimes_q5: 60,
+      Rarely: 95,
+
+      // Q6 – Age
+      "12 or Younger": 80,
+      "13-22": 80,
+      "23-29": 95,
+      "30-39": 75,
+      "40 or Older": 65,
+
+      // Q7 – Skincare routine frequency
+      Everyday: 95,
+      "4-5 a Weeks": 70,
+      "I don't use Skincare": 40,
+
+      // Q8 – Sensitive skin?
+      Yes_q8: 40,
+      No_q8: 95,
+
+      // Q10 – Sunscreen usage
+      Yes_q10: 95,
+      No_q10: 50,
+    };
+
+    // Make lookup by question
+    const answerByQuestion = {};
+    quizAnswers.forEach((qa) => {
+      answerByQuestion[qa.quizQuestion] = qa.answerTitle;
+    });
+
+    // console.log("🧪 MAPPED QUIZ ANSWERS:", answerByQuestion);
+
     if (quizAnswers.length === 0) {
       return res.status(404).json({
         success: false,
@@ -57,7 +116,7 @@ const getRecommendedIngredients = async (req, res) => {
     // --- STEP 2: Fetch latest skin scan result ---
     const scanResult = await db.query(
       `
-      SELECT "skinType", "severity"
+      SELECT "skinType", "severity", "acneCount", "score"
       FROM "ResultScans"
       WHERE "userId" = $1
       ORDER BY "createdAt" DESC
@@ -72,7 +131,137 @@ const getRecommendedIngredients = async (req, res) => {
     console.log("✅ scanResult:", scanResult);
 
     const skinTypeFromScan = scanResult[0]?.skinType || null;
-    const severity = scanResult[0]?.severity || null;
+    const severity = scanResult[0]?.severity ?? null;
+    const acneCount = scanResult[0]?.acneCount ?? null;
+
+    // Helper getScore
+    const s = (answer, key) =>
+      scoreMap[`${answer}${key ? "_" + key : ""}`] || scoreMap[answer] || 0;
+
+    // Q1
+    const q1 = s(answerByQuestion["What’s your skin type?"]);
+
+    // Q2
+    const q2 = s(
+      answerByQuestion["Does your skin feels oily in the t-zone"],
+      "q2"
+    );
+
+    // Q3
+    const q3 = s(
+      answerByQuestion["When you apply moisturizer, your skin feels"],
+      "q3"
+    );
+
+    // Q4
+    const q4 = s(
+      answerByQuestion["Does your skin have dry flakey patches?"],
+      "q4"
+    );
+
+    // Q5
+    const q5 = s(
+      answerByQuestion["How often do you experience breakouts or pimples?"],
+      "q5"
+    );
+
+    // Q6
+    const q6 = s(answerByQuestion["What’s your age range?"]);
+
+    // Q7
+    const q7 = s(answerByQuestion["How often do you use skincare everyday?"]);
+
+    // Q8
+    const q8 = s(answerByQuestion["Do you have sensitive skin?"], "q8");
+
+    // Q10
+    const q10 = s(answerByQuestion["Do you use sunscreen daily?"], "q10");
+
+    // Acne Score (from scan)
+    let acneScore = 0;
+
+    if (acneCount === 0) acneScore = 95;
+    else if (acneCount <= 5) acneScore = 80;
+    else if (acneCount <= 15) acneScore = 60;
+    else if (acneCount <= 30) acneScore = 40;
+    else acneScore = 20;
+
+    const sum = q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q10 + acneScore;
+    const finalScore = sum / 10;
+
+    console.log("🎯 FINAL SCORE:", finalScore);
+
+    await db.query(
+      `
+    UPDATE "ResultScans"
+    SET "score" = $1
+    WHERE id = $2
+  `,
+      {
+        bind: [finalScore, resultScanId],
+        type: db.QueryTypes.UPDATE,
+      }
+    );
+
+    // DEBUG: Print setiap skor dari jawaban user
+    console.log("🔍 SCORE BREAKDOWN:");
+
+    console.log(
+      "Q1 (Skin type):",
+      answerByQuestion["What’s your skin type?"],
+      "=>",
+      q1
+    );
+    console.log(
+      "Q2 (T-zone oily):",
+      answerByQuestion["Does your skin feels oily in the t-zone"],
+      "=>",
+      q2
+    );
+    console.log(
+      "Q3 (After moisturizer):",
+      answerByQuestion["When you apply moisturizer, your skin feels"],
+      "=>",
+      q3
+    );
+    console.log(
+      "Q4 (Dry patches):",
+      answerByQuestion["Does your skin have dry flakey patches?"],
+      "=>",
+      q4
+    );
+    console.log(
+      "Q5 (Breakouts):",
+      answerByQuestion["How often do you experience breakouts or pimples?"],
+      "=>",
+      q5
+    );
+    console.log(
+      "Q6 (Age):",
+      answerByQuestion["What’s your age range?"],
+      "=>",
+      q6
+    );
+    console.log(
+      "Q7 (Skincare frequency):",
+      answerByQuestion["How often do you use skincare everyday?"],
+      "=>",
+      q7
+    );
+    console.log(
+      "Q8 (Sensitive skin):",
+      answerByQuestion["Do you have sensitive skin?"],
+      "=>",
+      q8
+    );
+    console.log(
+      "Q10 (Sunscreen):",
+      answerByQuestion["Do you use sunscreen daily?"],
+      "=>",
+      q10
+    );
+
+    console.log("🟦 Acne Count:", acneCount, "=> acneScore:", acneScore);
 
     // --- STEP 3: Analyze quiz answers ---
     quizAnswers.sort((a, b) => a.id - b.id);
@@ -334,10 +523,9 @@ const getRecommendedIngredients = async (req, res) => {
     console.log("💾 Saved recommended products to ResultScanProducts");
 
     result.recommendedProducts = bestProducts;
+    result.finalScore = finalScore;
 
     res.json(result);
-
-    console.log(result);
   } catch (err) {
     console.error(err);
     res

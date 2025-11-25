@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       skinType: DataTypes.STRING,
       severity: DataTypes.STRING,
       acneCount: DataTypes.INTEGER,
+      score: DataTypes.FLOAT,
     },
     {
       sequelize,

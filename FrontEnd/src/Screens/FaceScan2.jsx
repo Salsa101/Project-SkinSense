@@ -333,7 +333,7 @@ const FaceScan2 = ({ navigation }) => {
                     borderRadius: 6,
                   }}
                 >
-                  78/100
+                  {recommendationData?.finalScore}%
                 </Text>
               </View>
             </View>
