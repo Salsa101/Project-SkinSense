@@ -11,12 +11,14 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ResultScanIngredient,
         foreignKey: "resultScan_id",
         otherKey: "ingredients_id",
+        as: "ingredients",
       });
 
       ResultScan.belongsToMany(models.Product, {
         through: models.ResultScanProduct,
         foreignKey: "resultScan_id",
         otherKey: "product_id",
+        as: "products", 
       });
 
       ResultScan.belongsToMany(models.QuizUserAnswer, {

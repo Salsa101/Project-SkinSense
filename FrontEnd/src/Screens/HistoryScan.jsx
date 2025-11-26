@@ -287,7 +287,7 @@ const HistoryScan = ({ navigation, route }) => {
                             {scanItem.skinType}
                           </Text>
                           <Text style={styles.score}>
-                            Score: {scanItem.score}/100
+                            Score: {scanItem.score}%
                           </Text>
                         </View>
                       </View>
@@ -468,7 +468,7 @@ const HistoryScan = ({ navigation, route }) => {
                           borderRadius: 6,
                         }}
                       >
-                        {currentItem.score}/100
+                        {currentItem.score}%
                       </Text>
                     </View>
                   </View>
@@ -639,38 +639,73 @@ const HistoryScan = ({ navigation, route }) => {
                       <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
                         Products For You
                       </Text>
-                      <View
-                        style={{
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
                           flexDirection: 'row',
-                          justifyContent: 'space-between',
+                          paddingRight: 12,
                         }}
                       >
-                        {currentItem.products.map((product, idx) => (
+                        {currentItem.products?.map((product, index) => (
                           <View
-                            key={idx}
+                            key={index}
                             style={{
                               alignItems: 'center',
-                              width: 80,
-                              backgroundColor: '#c7c7c7ff',
+                              width: 120,
+                              backgroundColor: '#FFEAEA',
                               padding: 10,
                               borderRadius: 8,
+                              marginRight:
+                                index === currentItem.products.length - 1
+                                  ? 0
+                                  : 12, // jarak antar card
                             }}
                           >
+                            {console.log('Product image:', product.image)}
                             <Image
-                              source={product.image}
+                              source={
+                                product.image
+                                  ? {
+                                      uri: `${api.defaults.baseURL}${product.image}`,
+                                    }
+                                  : require('../../assets/product-placeholder.jpg')
+                              }
                               style={{
-                                width: 60,
-                                height: 60,
+                                width: 95,
+                                height: 95,
                                 borderRadius: 8,
                                 marginBottom: 4,
                               }}
                             />
-                            <Text style={{ fontSize: 12, textAlign: 'center' }}>
+
+                            <Text
+                              style={{
+                                marginTop: 4,
+                                fontSize: 12,
+                                textAlign: 'flex-start',
+                                fontWeight: 'bold',
+                                color: '#E07C8E',
+                              }}
+                            >
                               {product.name}
+                            </Text>
+                            <Text
+                              style={{ fontSize: 12, alignSelf: 'flex-start' }}
+                            >
+                              {product.brand}
+                            </Text>
+                            <Text
+                              style={{ fontSize: 12, alignSelf: 'flex-start' }}
+                            >
+                              {product.type
+                                ? product.type.charAt(0).toUpperCase() +
+                                  product.type.slice(1)
+                                : ''}
                             </Text>
                           </View>
                         ))}
-                      </View>
+                      </ScrollView>
                     </View>
                   </View>
                 </View>

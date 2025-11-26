@@ -547,9 +547,11 @@ const FaceScan2 = ({ navigation }) => {
                       >
                         <Image
                           source={
-                            product.image
-                              ? { uri: product.image } // pakai image dari API
-                              : require('../../assets/product-placeholder.jpg') // placeholder
+                            product.productimage
+                              ? {
+                                  uri: `${api.defaults.baseURL}${product.productimage}`,
+                                } // pakai productimage
+                              : require('../../assets/product-placeholder.jpg') // fallback
                           }
                           style={{
                             width: 95,

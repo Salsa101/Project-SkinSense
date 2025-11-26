@@ -4,6 +4,10 @@ const {
   QuizQuestion,
   QuizOption,
   ResultScanQuizUserAnswer,
+  ResultScanIngredient,
+  ResultScanProduct,
+  Ingredient,
+  Product,
 } = require("../models");
 const fs = require("fs");
 const path = require("path");
@@ -28,7 +32,7 @@ const getScanQuizDetail = async (req, res) => {
         {
           model: QuizUserAnswer,
           as: "quizAnswers",
-          through: { attributes: [] }, // jangan ambil data pivot
+          through: { attributes: [] },
           include: [
             {
               model: QuizQuestion,
@@ -42,11 +46,31 @@ const getScanQuizDetail = async (req, res) => {
             },
           ],
         },
+        // === INGREDIENTS ===
+        {
+          model: Ingredient,
+          as: "ingredients",
+          attributes: ["name"],
+          through: { attributes: ["score"] },
+        },
+        // === PRODUCTS ===
+        {
+          model: Product,
+          as: "products",
+          attributes: [
+            "productName",
+            "productBrand",
+            "productType",
+            "productImage",
+          ],
+          through: { attributes: [] },
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     const groupedData = {};
+
     scans.forEach((scan) => {
       const dateKey = scan.createdAt.toISOString().split("T")[0];
       if (!groupedData[dateKey]) groupedData[dateKey] = [];
@@ -61,7 +85,9 @@ const getScanQuizDetail = async (req, res) => {
         skinType: scan.skinType,
         severity: scan.severity,
         acneCount: scan.acneCount,
-        score: Math.floor(Math.random() * 21) + 80,
+        score: scan.score,
+
+        // === QUIZ ===
         quiz: scan.quizAnswers
           .sort((a, b) => a.quizQuestion.id - b.quizQuestion.id)
           .map((q) => ({
@@ -70,22 +96,22 @@ const getScanQuizDetail = async (req, res) => {
             option: q.quizOption.title,
             date: q.createdAt,
           })),
-        ingredientsForYou: [
-          "Centella Asiatica",
-          "Jojoba Oil",
-          "Ceramide NP",
-          "Hyaluronic Acid",
-        ],
+
+        // === INGREDIENTS FOR YOU ===
+        ingredientsForYou: scan.ingredients.map((i) => i.name),
+
+        // === AVOID INGREDIENTS (dummy dulu) ===
         avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil", "AHA/BHA"],
-        products: [
-          { name: "Hydrating Serum", image: "https://via.placeholder.com/100" },
-          { name: "Soothing Toner", image: "https://via.placeholder.com/100" },
-          { name: "Barrier Cream", image: "https://via.placeholder.com/100" },
-        ],
+
+        // === PRODUCTS ===
+        products: scan.products.map((p) => ({
+          name: p.productName,
+          brand: p.productBrand,
+          type: p.productType,
+          image: p.productImage,
+        })),
       });
     });
-
-    // console.log("Grouped Data Full:", JSON.stringify(groupedData, null, 2));
 
     res.status(200).json({
       success: true,
