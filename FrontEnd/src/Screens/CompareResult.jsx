@@ -131,20 +131,64 @@ const CompareResult = ({ route, navigation }) => {
 
         {/* Score */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Score</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={styles.cardTitle}>Score:</Text>
+
+            {after.rating && (
+              <View
+                style={{
+                  backgroundColor:
+                    after.rating === 'Poor'
+                      ? '#FDE2E4'
+                      : after.rating === 'Fair'
+                      ? '#FFF4E0'
+                      : after.rating === 'Good'
+                      ? '#E0FDE0'
+                      : '#D6E4FF',
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    color:
+                      after.rating === 'Poor'
+                        ? '#E07C8E'
+                        : after.rating === 'Fair'
+                        ? '#FFA500'
+                        : after.rating === 'Good'
+                        ? '#32CD32'
+                        : '#1E40AF',
+                    fontWeight: 'bold',
+                    fontSize: 12,
+                  }}
+                >
+                  {after.rating}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <View style={styles.divider} />
 
           <View style={styles.scoreRow}>
             <Text style={styles.scoreText}>Before</Text>
-            <Text style={styles.scoreValue}>{before.score}/100</Text>
+            <Text style={styles.scoreValue}>{before.score}%</Text>
           </View>
           <View style={styles.barContainer}>
             <View style={[styles.bar, { width: `${before.score}%` }]} />
           </View>
           <View style={styles.scoreRow}>
             <Text style={styles.scoreText}>After</Text>
-            <Text style={styles.scoreValue}>{after.score}/100</Text>
+            <Text style={styles.scoreValue}>{after.score}%</Text>
           </View>
           <View style={styles.barContainer}>
             <View
@@ -153,6 +197,19 @@ const CompareResult = ({ route, navigation }) => {
                 { width: `${after.score}%`, backgroundColor: '#ff8fb1' },
               ]}
             />
+          </View>
+          <View>
+            {/* Score change note */}
+            {difference.scoreChangeNote && (
+              <Text
+                style={[
+                  styles.subText,
+                  { marginBottom: 4, fontStyle: 'italic' },
+                ]}
+              >
+                {difference.scoreChangeNote}
+              </Text>
+            )}
           </View>
         </View>
 

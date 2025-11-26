@@ -662,7 +662,6 @@ const HistoryScan = ({ navigation, route }) => {
                                   : 12, // jarak antar card
                             }}
                           >
-                            {console.log('Product image:', product.image)}
                             <Image
                               source={
                                 product.image

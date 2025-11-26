@@ -1,4 +1,4 @@
-const { ResultScan } = require("../models");
+const { ResultScan, Product, Ingredient } = require("../models");
 
 const getScanDetail = async (req, res) => {
   try {
@@ -6,10 +6,30 @@ const getScanDetail = async (req, res) => {
 
     const scans = await ResultScan.findAll({
       where: { userId },
+      include: [
+        {
+          model: Ingredient,
+          as: "ingredients",
+          attributes: ["name"],
+          through: { attributes: ["score"] },
+        },
+        {
+          model: Product,
+          as: "products",
+          attributes: [
+            "productName",
+            "productBrand",
+            "productType",
+            "productImage",
+          ],
+          through: { attributes: [] },
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
     const groupedData = {};
+
     scans.forEach((scan) => {
       const dateKey = scan.createdAt.toISOString().split("T")[0];
       if (!groupedData[dateKey]) groupedData[dateKey] = [];
@@ -24,29 +44,18 @@ const getScanDetail = async (req, res) => {
         skinType: scan.skinType,
         severity: scan.severity,
         acneCount: scan.acneCount,
-        score: Math.floor(Math.random() * 21) + 80,
-        // sementara ingredient & produk dummy
-        ingredientsForYou: [
-          "Centella Asiatica",
-          "Jojoba Oil",
-          "Ceramide NP",
-          "Hyaluronic Acid",
-        ],
+        score: scan.score,
+
+        ingredientsForYou: scan.ingredients.map((i) => i.name),
+
         avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil", "AHA/BHA"],
-        products: [
-          {
-            name: "Hydrating Serum",
-            image: "https://via.placeholder.com/100",
-          },
-          {
-            name: "Soothing Toner",
-            image: "https://via.placeholder.com/100",
-          },
-          {
-            name: "Barrier Cream",
-            image: "https://via.placeholder.com/100",
-          },
-        ],
+
+        products: scan.products.map((p) => ({
+          name: p.productName,
+          brand: p.productBrand,
+          type: p.productType,
+          image: p.productImage,
+        })),
       });
     });
 
@@ -55,10 +64,10 @@ const getScanDetail = async (req, res) => {
       data: groupedData,
     });
   } catch (error) {
-    console.error("Error fetching compare scan:", error);
+    console.error("Error fetching scan detail:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch compare scan data",
+      message: "Failed to fetch scan data",
       error: error.message,
     });
   }
@@ -116,6 +125,26 @@ const compareScans = async (req, res) => {
         severityDescription = "Severity information not available";
     }
 
+    // --- Score rating ---
+    let afterScoreRating = "";
+    const afterScore = after.score;
+    if (afterScore >= 0 && afterScore <= 49) afterScoreRating = "Poor";
+    else if (afterScore >= 50 && afterScore <= 69) afterScoreRating = "Fair";
+    else if (afterScore >= 70 && afterScore <= 84) afterScoreRating = "Good";
+    else if (afterScore >= 85 && afterScore <= 95)
+      afterScoreRating = "Excellent";
+
+    // --- Note perubahan skor ---
+    let scoreNote = "";
+    const scoreDiff = afterScore - before.score;
+    if (scoreDiff > 0) {
+      scoreNote = `Skin health improved by ${scoreDiff} points — indicating better hydration and reduced acne activity.`;
+    } else if (scoreDiff < 0) {
+      scoreNote = `Skin health reduced by ${Math.abs(
+        scoreDiff
+      )} points — indicating lower hydration level and possible increase in acne activity.`;
+    }
+
     // Buat respons perbandingan
     const comparison = {
       before: {
@@ -129,7 +158,7 @@ const compareScans = async (req, res) => {
         skinType: before.skinType,
         severity: before.severity,
         acneCount: before.acneCount,
-        score: Math.floor(Math.random() * 21) + 70,
+        score: before.score,
       },
       after: {
         id: after.id,
@@ -142,7 +171,8 @@ const compareScans = async (req, res) => {
         skinType: after.skinType,
         severity: after.severity,
         acneCount: after.acneCount,
-        score: Math.floor(Math.random() * 21) + 80,
+        score: after.score,
+        rating: afterScoreRating, 
       },
       difference: {
         acneChange:
@@ -152,6 +182,7 @@ const compareScans = async (req, res) => {
             ? `${acneDiff} spots reduced`
             : "No acne detected",
         severityChange: severityDescription,
+        scoreChangeNote: scoreNote,
       },
     };
 

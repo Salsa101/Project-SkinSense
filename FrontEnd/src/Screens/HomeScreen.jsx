@@ -347,7 +347,7 @@ const HomeScreen = ({ navigation }) => {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      90/100
+                      {latestScan?.score || '-'}%
                     </Text>
                   </View>
                 </View>
