@@ -594,16 +594,17 @@ const styles = StyleSheet.create({
   },
   hello: {
     fontSize: 22,
-    color: '#333',
-    fontWeight: '400',
+    color: '#DE576F',
+    fontFamily: 'Poppins-Light',
   },
   name: {
-    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
     color: '#DE576F',
   },
   subText: {
-    color: '#A77B7B',
+    color: '#DE576F',
     fontSize: 14,
+    fontFamily: 'Poppins-Regular',
   },
   card: {
     backgroundColor: '#FCE6E9',
@@ -623,14 +624,14 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#DE576F',
   },
   details: {
     fontSize: 13,
     color: '#DE576F',
   },
   date: {
-    color: '#A77B7B',
+    color: '#DE576F',
     fontSize: 12,
     marginTop: 4,
   },
@@ -666,9 +667,9 @@ const styles = StyleSheet.create({
     color: '#A77B7B',
   },
   value: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 10,
+    fontFamily: 'Poppins-Bold',
+    color: '#DE576F',
   },
   compareButton: {
     backgroundColor: '#FCE6E9',
@@ -696,7 +697,7 @@ const styles = StyleSheet.create({
   compareTitle: {
     fontWeight: '600',
     fontSize: 15,
-    color: '#333',
+    color: '#DE576F',
   },
   compareDesc: {
     fontSize: 12,
@@ -746,7 +747,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: 'Poppins-Bold',
     marginRight: 20,
     lineHeight: 25,
   },
@@ -758,9 +759,9 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   expiredUpcomingTitle: {
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 18,
-    color: '#333',
+    color: '#DE576F',
     marginBottom: 25,
   },
   section: {
@@ -770,9 +771,9 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   expiredDate: {
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 14,
-    color: '#333',
+    color: '#DE576F',
     marginTop: 25,
   },
   line: {
@@ -796,9 +797,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   expiredTitle: {
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-Bold',
     fontSize: 14,
-    color: '#333',
+    color: '#DE576F',
     marginBottom: 4,
   },
   row: {
@@ -867,7 +868,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#DE576F',
   },
   emptyDesc: {
     fontSize: 13,
