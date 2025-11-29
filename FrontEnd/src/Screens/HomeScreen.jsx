@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
     color: '#DE576F',
   },
   details: {
@@ -695,12 +695,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   compareTitle: {
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
     fontSize: 15,
     color: '#DE576F',
   },
   compareDesc: {
     fontSize: 12,
+    fontFamily: 'Poppins-Regular',
     color: '#A77B7B',
     marginRight: 10,
   },
@@ -778,7 +779,7 @@ const styles = StyleSheet.create({
   },
   line: {
     width: 2,
-    backgroundColor: '#ccc',
+    backgroundColor: '#EB889A',
     alignSelf: 'stretch',
     marginHorizontal: 15,
   },
@@ -788,11 +789,11 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   expiredCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF0F3',
     borderRadius: 10,
     padding: 15,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: '#974343',
     shadowOpacity: 0.1,
     shadowRadius: 5,
   },
@@ -809,10 +810,11 @@ const styles = StyleSheet.create({
   },
   desc: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: 'Poppins-Regular',
+    color: '#A77B7B',
   },
   newscard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF0F3',
     borderRadius: 20,
     overflow: 'hidden',
     elevation: 3,
@@ -867,11 +869,12 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
     color: '#DE576F',
   },
   emptyDesc: {
     fontSize: 13,
+    fontFamily: 'Poppins-Regular',
     color: '#777',
     marginVertical: 5,
   },
@@ -885,7 +888,7 @@ const styles = StyleSheet.create({
   },
   scanButtonText: {
     color: '#fff',
-    fontWeight: '500',
+    fontFamily: 'Poppins-SemiBold',
   },
 });
 
