@@ -48,7 +48,7 @@ const getScanDetail = async (req, res) => {
 
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
-        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil", "AHA/BHA"],
+        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil"],
 
         products: scan.products.map((p) => ({
           name: p.productName,

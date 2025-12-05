@@ -68,11 +68,15 @@ class Notification {
     );
   };
 
-  kirimNotifikasi = (channel, judul, pesan) => {
-    PushNotification.localNotification({
+  kirimNotifikasiJadwal = (channel, judul, pesan, waktu, id) => {
+    PushNotification.localNotificationSchedule({
+      id: id,
       channelId: channel,
-      title: judul, // (optional)
-      message: pesan, // (required)
+      title: judul,
+      message: pesan,
+      date: waktu,
+      allowWhileIdle: true,
+      repeatType: 'day',
     });
   };
 
@@ -85,6 +89,36 @@ class Notification {
       date: waktu, // in 60 secs\
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
       repeatType: 'day', // (optional) Increment of configured repeatType. Check 'Repeating Notifications' section for more info.
+    });
+  };
+
+  cancelAllNotifications = () => {
+    // Cancel ALL scheduled notifications
+    PushNotification.getScheduledLocalNotifications(list => {
+      list.forEach(item => {
+        if (item.id) {
+          PushNotification.cancelLocalNotification(item.id);
+        }
+      });
+    });
+  };
+  
+  cekSemuaNotifikasi = () => {
+    PushNotification.getScheduledLocalNotifications(list => {
+      console.log('=== DAFTAR NOTIF TERJADWAL ===');
+
+      list.forEach(n => {
+        const waktu = n.date ? new Date(n.date) : null;
+
+        console.log('ID:', n.id);
+        console.log('Judul:', n.title);
+        console.log('Pesan:', n.message);
+        console.log('Repeat:', n.repeatInterval);
+        console.log('Waktu:', waktu ? waktu.toString() : 'Tidak ada waktu');
+        console.log('=====================================');
+      });
+
+      console.log(list);
     });
   };
 }

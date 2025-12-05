@@ -489,16 +489,6 @@ const FaceScan2 = ({ navigation }) => {
                   >
                     ✖ Coconut Oil
                   </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFEAEA',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✖ AHA/BHA
-                  </Text>
                 </View>
               </View>
             </View>

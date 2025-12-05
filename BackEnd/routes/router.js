@@ -111,12 +111,8 @@ router.get("/weekly-tips", validateToken, getWeeklyTip);
 router.get("/routine-progress", validateToken, getRoutineProgress);
 
 //Notification
-router.get("/reminder-times/notif", validateToken, getReminderNotifications);
-router.get(
-  "/expiry-product/notif",
-  validateToken,
-  getRoutineProductNotifications
-);
+router.get("/reminder-times/notif", getReminderNotifications);
+router.get("/expiry-product/notif", getRoutineProductNotifications);
 
 // Profile Page
 router.get("/profile/view", validateToken, getProfile);

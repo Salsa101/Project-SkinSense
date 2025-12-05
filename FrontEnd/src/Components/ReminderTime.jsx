@@ -10,6 +10,7 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format, parse } from 'date-fns';
 import api from '../api';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const ReminderTime = ({ timeOfDay, reminder, fetchReminders }) => {
   const [reminderTime, setReminderTime] = useState(null);
@@ -92,11 +93,31 @@ const ReminderTime = ({ timeOfDay, reminder, fetchReminders }) => {
 
         <Text style={styles.labelText}>
           {timeOfDay === 'morning'
-            ? 'Wake up & ready for skincare'
-            : 'Night skincare reminder'}
+            ? 'Your morning skincare time'
+            : 'Your night skincare time'}
         </Text>
       </TouchableOpacity>
-      <Switch value={enabled} onValueChange={toggleEnabled} />
+
+      {/* Icon Edit */}
+      <TouchableOpacity
+        onPress={() => setShowPicker(true)}
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: 30,
+          padding: 7,
+          shadowColor: 'rgba(95, 52, 52, 1)',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
+      >
+        <Icon name="clock" size={18} color="#E07C8E" />
+      </TouchableOpacity>
+
       <DateTimePickerModal
         isVisible={showPicker}
         mode="time"
@@ -117,7 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 15,
     marginBottom: 10,
-    backgroundColor: '#F8D3D5',
+    backgroundColor: '#FDE5EB',
     borderRadius: 10,
     shadowColor: '#AB8C8C',
     shadowOffset: { width: 0, height: 4 },

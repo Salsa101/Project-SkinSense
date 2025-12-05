@@ -3,6 +3,21 @@ import { notification } from './Notification';
 
 export const fetchAndScheduleNotifications = async () => {
   try {
+    const profileRes = await api.get('/profile/view');
+
+    console.log('HASIL PROFIL:', profileRes.data);
+    console.log('enabledNotif:', profileRes.data?.user?.enabledNotif);
+
+    const enabled = profileRes.data?.user?.enabledNotif;
+
+    if (!enabled) {
+      console.log('🔕 Notifikasi OFF');
+      notification.cancelAllNotifications();
+      return;
+    }
+
+    notification.cancelAllNotifications();
+
     // === Reminder morning/night ===
     const reminderRes = await api.get('/reminder-times/notif');
     console.log('Reminder response:', reminderRes.data);
@@ -26,10 +41,16 @@ export const fetchAndScheduleNotifications = async () => {
 
         console.log(`Scheduling ${rem.timeOfDay} reminder at`, time.toString());
         notification.buatChannel(`${rem.id}`);
+
+        const timeOfDayCap =
+          rem.timeOfDay.charAt(0).toUpperCase() + rem.timeOfDay.slice(1);
+
+        const emoji = rem.timeOfDay === 'morning' ? '🌞' : '🌙';
+
         notification.kirimNotifikasiJadwal(
           `${rem.id}`,
-          `Skincare ${rem.timeOfDay}`,
-          `Waktunya skincare ${rem.timeOfDay}! 💧`,
+          `${timeOfDayCap} Skincare`,
+          `It's time for ${rem.timeOfDay} skincare ${emoji}`,
           time,
         );
       });
@@ -44,16 +65,18 @@ export const fetchAndScheduleNotifications = async () => {
         const expDate = new Date(p.expirationDate);
         const pesan = `${
           p.Product.productName
-        } akan kedaluwarsa pada ${expDate.toDateString()}`;
+        } will expire on ${expDate.toDateString()}`;
         console.log('Sending notification for expired:', pesan);
 
         notification.kirimNotifikasi(
           `${p.id}`,
-          'Produk hampir kedaluwarsa ⚠️',
+          'Product is almost expired ⚠️',
           pesan,
         );
       });
     }
+
+    notification.cekSemuaNotifikasi();
   } catch (err) {
     console.error('Gagal ambil data notifikasi:', err);
   }

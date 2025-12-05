@@ -101,7 +101,7 @@ const getScanQuizDetail = async (req, res) => {
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
         // === AVOID INGREDIENTS (dummy dulu) ===
-        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil", "AHA/BHA"],
+        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil"],
 
         // === PRODUCTS ===
         products: scan.products.map((p) => ({

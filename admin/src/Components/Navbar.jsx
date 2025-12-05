@@ -98,7 +98,7 @@ const Navbar = () => {
                 Category
               </a>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <a
                 className={`nav-link ${
                   location.pathname.startsWith("/admin/analytics")
@@ -109,7 +109,7 @@ const Navbar = () => {
               >
                 Analytics
               </a>
-            </li>
+            </li> */}
           </ul>
 
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">

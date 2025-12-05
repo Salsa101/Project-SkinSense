@@ -176,10 +176,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
+    color: '#000000',
   },
   inputWrapper: {
     position: 'relative',
-    marginBottom: 15,
+    marginBottom: 5,
   },
   eyeIcon: {
     position: 'absolute',
