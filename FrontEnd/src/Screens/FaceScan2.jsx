@@ -28,7 +28,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const BRIGHTNESS_LOW = 50;
+const BRIGHTNESS_LOW = 100;
 const BRIGHTNESS_HIGH = 200;
 
 const FaceScan2 = ({ navigation }) => {
@@ -685,8 +685,8 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   overlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   faceCircle: {
-    width: 250,
-    height: 360,
+    width: 340,
+    height: 480,
     borderRadius: 400,
     borderWidth: 4,
     borderStyle: 'dashed',

@@ -51,38 +51,38 @@ const getRecommendedIngredients = async (req, res) => {
     const scoreMap = {
       // Q1 – Skin Type
       Normal: 95,
-      Oily: 60,
-      Dry: 40,
-      Combination: 70,
-      "I don’t know": 50,
+      Oily: 70,
+      Dry: 70,
+      Combination: 75,
+      "I don’t know": 40,
 
       // Q2 – Oily T-zone
-      Yes_q2: 60,
-      Sometimes_q2: 50,
+      Yes_q2: 40,
+      Sometimes_q2: 87,
       No_q2: 95,
 
       // Q3 – Skin after moisturizer
-      "Tight and dry": 40,
+      "Tight and dry": 60,
       Normal_q3: 95,
-      "Greasy and Heavy": 50,
+      "Greasy and Heavy": 60,
 
       // Q4 – Acne triggers
       Yes_q4: 40,
-      Sometimes_q4: 60,
+      Sometimes_q4: 87,
       No_q4: 95,
 
       // Q5 – Frequency breakout
       "Very Often": 40,
-      Often: 50,
-      Sometimes_q5: 60,
+      Often: 55,
+      Sometimes_q5: 80,
       Rarely: 95,
 
       // Q6 – Age
-      "12 or Younger": 80,
-      "13-22": 80,
-      "23-29": 95,
-      "30-39": 75,
-      "40 or Older": 65,
+      "12 or Younger": 95,
+      "13-22": 95,
+      "23-29": 90,
+      "30-39": 85,
+      "40 or Older": 80,
 
       // Q7 – Skincare routine frequency
       Everyday: 95,
@@ -90,12 +90,12 @@ const getRecommendedIngredients = async (req, res) => {
       "I don't use Skincare": 40,
 
       // Q8 – Sensitive skin?
-      Yes_q8: 40,
+      Yes_q8: 70,
       No_q8: 95,
 
       // Q10 – Sunscreen usage
       Yes_q10: 95,
-      No_q10: 50,
+      No_q10: 70,
     };
 
     // Make lookup by question
@@ -182,8 +182,8 @@ const getRecommendedIngredients = async (req, res) => {
 
     if (acneCount === 0) acneScore = 95;
     else if (acneCount <= 5) acneScore = 80;
-    else if (acneCount <= 15) acneScore = 60;
-    else if (acneCount <= 30) acneScore = 40;
+    else if (acneCount <= 10) acneScore = 60;
+    else if (acneCount <= 15) acneScore = 40;
     else acneScore = 20;
 
     const sum = q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q10 + acneScore;
