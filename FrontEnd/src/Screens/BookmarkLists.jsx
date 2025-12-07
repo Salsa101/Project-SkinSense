@@ -94,7 +94,7 @@ const BookmarkLists = ({ route, navigation }) => {
                   <Image
                     source={
                       news.newsImage
-                        ? { uri: `${api.defaults.baseURL}${news.newsImage}` }
+                        ? { uri: news.newsImage }
                         : require('../../assets/category-admin.jpg')
                     }
                     style={styles.image}

@@ -2,6 +2,8 @@ const { RoutineProduct, Product } = require("../models");
 const { Op } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
+const { uploadToCloudinary } = require("../Middlewares/UploadImage");
+const cloudinary = require("cloudinary").v2;
 
 const shelfLifeDefaults = {
   cleanser: 12,
@@ -21,7 +23,6 @@ const addProductToRoutine = async (req, res) => {
       productName,
       productBrand,
       productType,
-      productImage,
       productStep,
       dateOpened,
       isOpened,
@@ -44,9 +45,18 @@ const addProductToRoutine = async (req, res) => {
       }
     }
 
-    const imageUrl = req.file
-      ? `/uploads/${userId}/products/${req.file.filename}`
-      : productImage || null;
+    // --- Cloudinary upload ---
+    let imageUrl = null;
+    let publicId = null;
+
+    if (req.file) {
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        `${userId}/products`
+      );
+      imageUrl = result.secure_url; // <-- simpan URL Cloudinary
+      publicId = result.public_id;
+    }
 
     let finalProductId = productId;
     let existingProduct = null;
@@ -289,6 +299,7 @@ const updateRoutineProduct = async (req, res) => {
     });
     if (!routine) return res.status(404).json({ message: "Not found" });
 
+    // --- handle dayOfWeek dan customDate ---
     let dayOfWeek = routine.dayOfWeek;
     if (req.body.dayOfWeek) {
       const parsed = JSON.parse(req.body.dayOfWeek);
@@ -302,11 +313,11 @@ const updateRoutineProduct = async (req, res) => {
       customDate = null;
     }
 
-    // update RoutineProduct (selalu boleh diubah)
+    // --- update RoutineProduct ---
     await routine.update({
       productStep: req.body.productStep || routine.productStep,
       routineType: req.body.routineType || routine.routineType,
-      dayOfWeek: dayOfWeek,
+      dayOfWeek,
       customDate,
       timeOfDay: req.body.timeOfDay || routine.timeOfDay,
       dateOpened: req.body.dateOpened || routine.dateOpened,
@@ -319,7 +330,7 @@ const updateRoutineProduct = async (req, res) => {
           : routine.paoMonths,
     });
 
-    // cek verifikasi sebelum update Product
+    // --- update Product jika ada dan belum verified ---
     if (routine.Product && !routine.Product.isVerified) {
       const updateData = {
         productName: req.body.productName || routine.Product.productName,
@@ -328,20 +339,26 @@ const updateRoutineProduct = async (req, res) => {
       };
 
       if (req.file) {
-        // hapus file lama kalau ada
+        // hapus file lama di Cloudinary kalau ada
         if (routine.Product.productImage) {
-          const oldPath = path.join(
-            __dirname,
-            "..",
-            routine.Product.productImage
-          );
-          if (fs.existsSync(oldPath)) {
-            fs.unlinkSync(oldPath);
-          }
+          const parts = routine.Product.productImage.split("/upload/");
+          const publicIdWithExt = parts[1];
+          const publicId = publicIdWithExt
+            .split("/")
+            .slice(1)
+            .join("/")
+            .split(".")[0];
+
+          await cloudinary.uploader.destroy(publicId);
         }
 
-        // set file baru
-        updateData.productImage = `/uploads/${req.user.id}/products/${req.file.filename}`;
+        // upload file baru dari buffer
+        const result = await uploadToCloudinary(
+          req.file.buffer,
+          `${req.user.id}/products`
+        );
+        updateData.productImage = result.secure_url;
+        updateData.productImagePublicId = result.public_id;
       }
 
       await routine.Product.update(updateData);

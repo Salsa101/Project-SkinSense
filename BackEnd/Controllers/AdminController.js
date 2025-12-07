@@ -7,6 +7,8 @@ const { validationResult } = require("express-validator");
 const fs = require("fs");
 const path = require("path");
 const { Op } = require("sequelize");
+const { uploadToCloudinary } = require("../Middlewares/UploadImage");
+const cloudinary = require("cloudinary").v2;
 
 const deleteFile = (filePath) => {
   try {
@@ -110,14 +112,21 @@ const addProduct = async (req, res) => {
       req.body;
     const ingredients = JSON.parse(req.body.ingredients);
 
+    // --- Cloudinary upload ---
+    let imageUrl = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        `${req.user.id}/products`
+      );
+      imageUrl = result.secure_url;
+    }
+
     const newProduct = await Product.create({
       productName,
       productBrand,
       productType,
-      shelf_life_months: shelf_life_months ? Number(shelf_life_months) : null,
-      productImage: req.file
-        ? `/uploads/${req.user.id}/products/${req.file.filename}`
-        : null,
+      productImage: imageUrl,
       userId: req.user.id,
     });
 
@@ -144,7 +153,21 @@ const deleteAdminProduct = async (req, res) => {
       return res.status(404).json({ message: "Produk tidak ditemukan" });
     }
 
-    deleteFile(product.productImage);
+    // Hapus gambar dari Cloudinary
+    if (product.productImage) {
+      const parts = product.productImage.split("/upload/");
+      const publicIdWithExt = parts[1];
+      const publicId = publicIdWithExt
+        .replace(/^v\d+\//, "")
+        .replace(/\.[^/.]+$/, "");
+
+      try {
+        await cloudinary.uploader.destroy(publicId);
+        console.log("Gambar Cloudinary dihapus:", publicId);
+      } catch (err) {
+        console.error("Gagal hapus gambar dari Cloudinary:", err);
+      }
+    }
 
     // hapus produk
     await product.destroy();
@@ -196,17 +219,38 @@ const updateProduct = async (req, res) => {
     const product = await Product.findByPk(id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
+    // Update fields
     if (productName) product.productName = productName;
     if (productBrand) product.productBrand = productBrand;
     if (productType) product.productType = productType;
     if (shelf_life_months) product.shelf_life_months = shelf_life_months;
 
     if (req.file) {
-      // hapus file lama
-      deleteFile(product.productImage);
-      product.productImage = `/uploads/${req.user.id}/products/${req.file.filename}`;
+      if (product.productImage) {
+        // ekstrak publicId dari URL Cloudinary
+        const parts = product.productImage.split("/upload/");
+        const publicIdWithExt = parts[1]; // vXXX/.../filename.jpg
+        const publicId = publicIdWithExt
+          .replace(/^v\d+\//, "")
+          .replace(/\.[^/.]+$/, "");
+
+        try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log("Gambar lama dihapus:", publicId);
+        } catch (err) {
+          console.error("Gagal hapus gambar lama:", err);
+        }
+      }
+
+      // Upload gambar baru
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        `${req.user.id}/products`
+      );
+      product.productImage = result.secure_url;
     }
 
+    // Update ingredients
     if (req.body.ingredients) {
       const ingredientIds = JSON.parse(req.body.ingredients);
       await product.setIngredients(ingredientIds);
@@ -216,6 +260,7 @@ const updateProduct = async (req, res) => {
 
     res.json({ message: "Product updated successfully", product });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -275,17 +320,22 @@ const getNews = async (req, res) => {
 const addNews = async (req, res) => {
   try {
     let { title, content, categoryIds, isActive } = req.body;
-    if (isActive === undefined) isActive = true; // fallback default
+    if (isActive === undefined) isActive = true; // default
 
-    const newsImage = req.file
-      ? `/uploads/${req.user.id}/news/${req.file.filename}`
-      : null;
+    // --- Cloudinary upload ---
+    let newsImage = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        `${req.user.id}/news`
+      );
+      newsImage = result.secure_url; // URL untuk frontend
+    }
 
     if (!title || !content || !categoryIds)
       return res.status(400).json({ message: "All fields are required" });
 
     if (!Array.isArray(categoryIds)) categoryIds = [categoryIds];
-
     categoryIds = categoryIds.map((id) => parseInt(id));
 
     const news = await News.create({
@@ -339,18 +389,40 @@ const editNews = async (req, res) => {
     const news = await News.findByPk(id);
     if (!news) return res.status(404).json({ message: "News not found" });
 
+    // Update field
     if (title) news.title = title;
     if (content) news.content = content;
     if (typeof isActive !== "undefined") news.isActive = isActive;
 
+    // Update gambar jika ada file baru
     if (req.file) {
-      // hapus gambar lama
-      deleteFile(news.newsImage);
-      news.newsImage = `/uploads/${req.user.id}/news/${req.file.filename}`;
+      if (news.newsImage) {
+        // ambil publicId dari URL
+        const parts = news.newsImage.split("/upload/");
+        const publicIdWithExt = parts[1];
+        const publicId = publicIdWithExt
+          .replace(/^v\d+\//, "")
+          .replace(/\.[^/.]+$/, "");
+
+        try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log("Gambar lama News dihapus:", publicId);
+        } catch (err) {
+          console.error("Gagal hapus gambar lama News:", err);
+        }
+      }
+
+      // upload gambar baru
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        `${req.user.id}/news`
+      );
+      news.newsImage = result.secure_url; // URL untuk frontend
     }
 
     await news.save();
 
+    // Update categories jika ada
     if (categoryIds && Array.isArray(categoryIds)) {
       const validCategories = await Category.findAll({
         where: { id: categoryIds },
@@ -362,7 +434,7 @@ const editNews = async (req, res) => {
       include: [{ model: Category, attributes: ["id", "name"] }],
     });
 
-    res.json(updatedNews);
+    res.json({ message: "News updated successfully", news: updatedNews });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -377,8 +449,23 @@ const deleteNews = async (req, res) => {
     const news = await News.findByPk(id);
     if (!news) return res.status(404).json({ message: "News not found" });
 
-    deleteFile(news.newsImage);
+    // Hapus gambar dari Cloudinary jika ada
+    if (news.newsImage) {
+      const parts = news.newsImage.split("/upload/");
+      const publicIdWithExt = parts[1];
+      const publicId = publicIdWithExt
+        .replace(/^v\d+\//, "")
+        .replace(/\.[^/.]+$/, "");
 
+      try {
+        await cloudinary.uploader.destroy(publicId);
+        console.log("Gambar News dihapus dari Cloudinary:", publicId);
+      } catch (err) {
+        console.error("Gagal hapus gambar News dari Cloudinary:", err);
+      }
+    }
+
+    // Hapus news dari DB
     await news.destroy();
 
     res.json({ message: "News deleted successfully" });
@@ -514,11 +601,6 @@ const isActiveCategory = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-// const getIngredients = async (req, res) => {
-//   const ingredients = await Ingredient.findAll({ order: [["name", "ASC"]] });
-//   res.json(ingredients);
-// };
 
 const getIngredients = async (req, res) => {
   const search = req.query.search || "";

@@ -272,7 +272,7 @@ const HomeScreen = ({ navigation }) => {
                 {latestScan?.imagePath ? (
                   <Image
                     source={{
-                      uri: `${api.defaults.baseURL}${latestScan.imagePath}`,
+                      uri: latestScan.imagePath,
                     }}
                     style={[styles.scanImage, { height: infoHeight }]}
                     resizeMode="cover"
@@ -549,7 +549,7 @@ const HomeScreen = ({ navigation }) => {
                   source={
                     weeklyNews.newsImage
                       ? {
-                          uri: `${api.defaults.baseURL}${weeklyNews.newsImage}`,
+                          uri: weeklyNews.newsImage,
                         }
                       : require('../../assets/category-admin.jpg')
                   }

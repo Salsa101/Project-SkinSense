@@ -260,7 +260,7 @@ const News = ({ navigation }) => {
                   <Image
                     source={
                       news.newsImage
-                        ? { uri: `${api.defaults.baseURL}${news.newsImage}` }
+                        ? { uri: news.newsImage }
                         : require('../../assets/category-admin.jpg')
                     }
                     style={styles.image}
@@ -402,7 +402,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F4B4C0',
   },
-  categoryText: { fontSize: 12, color: '#E07C8E', fontFamily: 'Poppins-SemiBold' },
+  categoryText: {
+    fontSize: 12,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-SemiBold',
+  },
   bookmarkButton: {
     width: 40,
     height: 40,

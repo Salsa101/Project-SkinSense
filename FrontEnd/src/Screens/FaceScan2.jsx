@@ -282,9 +282,7 @@ const FaceScan2 = ({ navigation }) => {
             {/* Modal Zoom */}
             <Modal visible={visible} transparent={true}>
               <ImageViewer
-                imageUrls={[
-                  { url: `${api.defaults.baseURL}${aiResult.imagePath}` },
-                ]}
+                imageUrls={[{ url: aiResult.imagePath }]}
                 enableSwipeDown
                 onSwipeDown={() => setVisible(false)}
               />
@@ -293,7 +291,7 @@ const FaceScan2 = ({ navigation }) => {
             {/* Image Preview */}
             <TouchableOpacity onPress={() => setVisible(true)}>
               <Image
-                source={{ uri: `${api.defaults.baseURL}${aiResult.imagePath}` }}
+                source={{ uri: aiResult.imagePath }}
                 style={{
                   width: SCREEN_WIDTH - 40,
                   height: SCREEN_WIDTH - 40,
@@ -544,7 +542,7 @@ const FaceScan2 = ({ navigation }) => {
                             source={
                               product.productImage
                                 ? {
-                                    uri: `${api.defaults.baseURL}${product.productImage}`,
+                                    uri: product.productImage,
                                   }
                                 : require('../../assets/product-placeholder.jpg')
                             }

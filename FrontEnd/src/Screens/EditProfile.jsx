@@ -39,14 +39,14 @@ const EditProfile = ({ navigation }) => {
 
         if (user.profileImage) {
           setProfileImage({
-            uri: `${api.defaults.baseURL}${user.profileImage}`,
+            uri: user.profileImage,
             name: 'profile.jpg',
             type: 'image/jpeg',
           });
         }
         if (user.bannerImage) {
           setBannerImage({
-            uri: `${api.defaults.baseURL}${user.bannerImage}`,
+            uri: user.bannerImage,
             name: 'banner.jpg',
             type: 'image/jpeg',
           });

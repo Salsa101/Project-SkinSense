@@ -149,7 +149,7 @@ const JournalDetail = ({ route, navigation }) => {
               <Image
                 source={
                   journal?.journal_image && journal.journal_image.trim() !== ''
-                    ? { uri: `${api.defaults.baseURL}${journal.journal_image}` }
+                    ? { uri: journal.journal_image }
                     : require('../../assets/journal-detail.jpg')
                 }
                 style={styles.image}
@@ -161,7 +161,7 @@ const JournalDetail = ({ route, navigation }) => {
               <ImageViewer
                 imageUrls={[
                   journal?.journal_image && journal.journal_image.trim() !== ''
-                    ? { url: `${api.defaults.baseURL}${journal.journal_image}` }
+                    ? { url: journal.journal_image }
                     : {
                         props: {
                           source: require('../../assets/journal-detail.jpg'),
@@ -205,7 +205,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
   },
   editBtn: { width: 40, alignItems: 'flex-end' },
-  editText: { color: '#E07C8E', fontSize: 14, fontFamily: 'Poppins-Medium' , marginRight: 10, marginTop: 15},
+  editText: {
+    color: '#E07C8E',
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    marginRight: 10,
+    marginTop: 15,
+  },
   scrollContent: { paddingBottom: 16 },
   card: {
     backgroundColor: '#fff',
@@ -229,7 +235,12 @@ const styles = StyleSheet.create({
   },
   metaText: { marginLeft: 10 },
   dateText: { color: '#B67F89', fontSize: 12, fontFamily: 'Poppins-Regular' },
-  moodText: { color: '#FF9FB3', fontSize: 12, marginTop: 2, fontFamily: 'Poppins-Medium' },
+  moodText: {
+    color: '#FF9FB3',
+    fontSize: 12,
+    marginTop: 2,
+    fontFamily: 'Poppins-Medium',
+  },
   divider: { height: 1, backgroundColor: '#F0E3E6', marginVertical: 12 },
   title: {
     fontSize: 18,
@@ -238,6 +249,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   image: { width: '100%', height: 200, borderRadius: 10, marginBottom: 12 },
-  bodyText: { color: '#B67F89', fontSize: 14, lineHeight: 20, fontFamily: 'Poppins-Regular' },
+  bodyText: {
+    color: '#B67F89',
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: 'Poppins-Regular',
+  },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });

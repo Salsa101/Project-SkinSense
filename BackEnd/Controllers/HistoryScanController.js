@@ -11,6 +11,8 @@ const {
 } = require("../models");
 const fs = require("fs");
 const path = require("path");
+const { uploadToCloudinary } = require("../Middlewares/UploadImage");
+const cloudinary = require("cloudinary").v2;
 
 const deleteFile = (filePath) => {
   try {
@@ -155,12 +157,18 @@ const deleteScan = async (req, res) => {
     }
 
     if (scan.imagePath) {
-      const filePath = path.join(
-        __dirname,
-        "..",
-        scan.imagePath.replace("/uploads", "uploads")
-      );
-      deleteFile(filePath);
+      // Hapus gambar dari Cloudinary
+      const parts = scan.imagePath.split("/upload/");
+      const publicIdWithExt = parts[1];
+      const publicId = publicIdWithExt
+        .replace(/^v\d+\//, "")
+        .replace(/\.[^/.]+$/, "");
+
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error("Gagal hapus gambar dari Cloudinary:", err);
+      }
     }
 
     await ResultScanQuizUserAnswer.destroy({ where: { resultScanId: id } });

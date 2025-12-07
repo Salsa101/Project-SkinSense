@@ -108,10 +108,7 @@ const NewsDetail = ({ route, navigation }) => {
 
       {/* Gambar utama */}
       <View>
-        <Image
-          source={{ uri: `${api.defaults.baseURL}${news.newsImage}` }}
-          style={styles.mainImage}
-        />
+        <Image source={{ uri: news.newsImage }} style={styles.mainImage} />
         <View style={styles.overlay} />
       </View>
 

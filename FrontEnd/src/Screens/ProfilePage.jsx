@@ -170,7 +170,7 @@ const ProfilPage = ({ navigation }) => {
             <Image
               source={
                 user?.bannerImage
-                  ? { uri: `${api.defaults.baseURL}${user.bannerImage}` }
+                  ? { uri: user.bannerImage }
                   : require('../../assets/banner-profile.png')
               }
               style={styles.bannerImage}
@@ -179,7 +179,7 @@ const ProfilPage = ({ navigation }) => {
               <Image
                 source={
                   user?.profileImage
-                    ? { uri: `${api.defaults.baseURL}${user.profileImage}` }
+                    ? { uri: user.profileImage }
                     : require('../../assets/profile-pic.png')
                 }
                 style={styles.profileImage}
