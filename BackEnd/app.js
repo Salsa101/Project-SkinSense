@@ -1,15 +1,12 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 require("dotenv").config();
 
 const routes = require("./routes/router");
 const adminRoutes = require("./routes/adminRouter");
-const path = require("path");
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //Middleware
 app.use(express.json());
@@ -44,5 +41,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
