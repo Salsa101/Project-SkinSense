@@ -13,12 +13,21 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS
+const allowedOrigins = [
+  "https://skinsense-admin-bgmy4888j-salsa101s-projects.vercel.app", // vercel admin
+  "https://skinsense-admin.vercel.app", // deploy nanti
+];
+
 app.use(
   cors({
-    origin: [
-      "https://https://skinsense-admin.vercel.app/",
-      "https://https://skinsense-admin.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ Blocked CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
