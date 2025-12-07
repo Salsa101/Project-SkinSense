@@ -18,17 +18,22 @@ const allowedOrigins = [
   "https://skinsense-admin.vercel.app", // deploy nanti
 ];
 
+// CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      console.log("Incoming origin:", origin); // <--- log semua origin
+      if (!origin) {
+        // Jika request tidak punya origin (misal Postman atau server-to-server)
         callback(null, true);
+      } else if (allowedOrigins.includes(origin)) {
+        callback(null, true); // origin valid
       } else {
-        console.log("❌ Blocked CORS:", origin);
+        console.warn("❌ Blocked CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
+    credentials: true, // agar cookie bisa dikirim
   })
 );
 
