@@ -15,8 +15,11 @@ app.use(cookieParser());
 // CORS
 app.use(
   cors({
-    origin: true, // otomatis menerima origin dari request
-    credentials: true, // izinkan cookie
+    origin: [
+      "https://https://skinsense-admin.vercel.app/",
+      "https://https://skinsense-admin.vercel.app",
+    ],
+    credentials: true,
   })
 );
 

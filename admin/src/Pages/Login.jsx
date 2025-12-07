@@ -10,7 +10,11 @@ function Login() {
     e.preventDefault();
 
     try {
-      await api.post("/admin/login", { username, password });
+      await api.post(
+        "/admin/login",
+        { username, password },
+        { withCredentials: true }
+      );
       window.location.href = "/admin/dashboard"; // redirect
     } catch (err) {
       setError(err.response?.data?.message || "Login gagal");

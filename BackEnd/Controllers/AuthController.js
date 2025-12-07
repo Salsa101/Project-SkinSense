@@ -93,6 +93,7 @@ const loginController = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: true,
       sameSite: "none",
+      path: "/",
     });
 
     res.json({
