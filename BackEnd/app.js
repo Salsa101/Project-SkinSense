@@ -13,24 +13,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS
-const whitelist = process.env.CORS_WHITELIST
-  ? process.env.CORS_WHITELIST.split(",")
-  : [];
+app.use(
+  cors({
+    origin: true, // otomatis menerima origin dari request
+    credentials: true, // izinkan cookie
+  })
+);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (whitelist.length === 0 || whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log("Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 app.use("/", routes);
 app.use("/admin", adminRoutes);
 

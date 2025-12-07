@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'project-skinsense-production.up.railway.app',
-  withCredentials: true, 
+  baseURL: "https://project-skinsense-production.up.railway.app",
+  withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
