@@ -210,7 +210,7 @@ const AddProduct = ({ navigation }) => {
     setProductValue(product.productType);
 
     if (product.productImage) {
-      setImageUri(`${api.defaults.baseURL}${product.productImage}`);
+      setImageUri(product.productImage);
     } else {
       setImageUri(null);
     }

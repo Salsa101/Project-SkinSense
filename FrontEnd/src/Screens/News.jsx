@@ -252,7 +252,7 @@ const News = ({ navigation }) => {
                   <Image
                     source={
                       news.newsImage
-                        ? { uri: `${api.defaults.baseURL}${news.newsImage}` }
+                        ? { uri: news.newsImage }
                         : require('../../assets/category-admin.jpg')
                     }
                     style={styles.image}
@@ -378,7 +378,12 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   content: { padding: 12, backgroundColor: '#FFEFF1' },
-  title: { fontSize: 14, fontFamily: 'Poppins-Bold', color: '#E07C8E', marginBottom: 8 },
+  title: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: '#E07C8E',
+    marginBottom: 8,
+  },
   categoryContainer: { flexDirection: 'row', gap: 8 },
   categoryBadge: {
     backgroundColor: '#fff',
@@ -388,7 +393,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F4B4C0',
   },
-  categoryText: { fontSize: 12, color: '#E07C8E', fontFamily: 'Poppins-SemiBold' },
+  categoryText: {
+    fontSize: 12,
+    color: '#E07C8E',
+    fontFamily: 'Poppins-SemiBold',
+  },
   bookmarkButton: {
     width: 40,
     height: 40,

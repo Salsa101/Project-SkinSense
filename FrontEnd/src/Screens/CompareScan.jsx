@@ -326,7 +326,7 @@ const CompareScan = ({ navigation }) => {
                 <View style={{ alignItems: 'center', marginBottom: 16 }}>
                   <Image
                     source={{
-                      uri: `${api.defaults.baseURL}${currentItem.imagePath}`,
+                      uri: currentItem.imagePath,
                     }}
                     style={{
                       width: SCREEN_WIDTH - 40,
@@ -571,7 +571,7 @@ const CompareScan = ({ navigation }) => {
                               source={
                                 product.image
                                   ? {
-                                      uri: `${api.defaults.baseURL}${product.image}`,
+                                      uri: product.image,
                                     }
                                   : require('../../assets/product-placeholder.jpg')
                               }

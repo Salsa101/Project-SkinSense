@@ -10,6 +10,8 @@ const {
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const { uploadToCloudinary } = require("../Middlewares/UploadImage");
+const cloudinary = require("cloudinary").v2;
 
 const deleteFolderRecursive = (folderPath) => {
   if (fs.existsSync(folderPath)) {
@@ -78,37 +80,30 @@ const updateProfile = async (req, res) => {
     const { username, age, date_of_birth } = req.body;
 
     const oldUser = await User.findByPk(userId);
-
     if (!oldUser) return res.status(404).json({ message: "User not found" });
 
+    // validasi username
     if (username && username !== oldUser.username) {
       const existingUser = await User.findOne({ where: { username } });
-      if (existingUser) {
+      if (existingUser)
         return res.status(400).json({ message: "Username sudah digunakan" });
-      }
     }
 
     const profileImage = req.files?.profileImage?.[0] || null;
     const bannerImage = req.files?.bannerImage?.[0] || null;
 
+    // upload ke Cloudinary jika ada file baru
     const profileImageUrl = profileImage
-      ? `/uploads/${userId}/profile/${profileImage.filename}`
+      ? (await uploadToCloudinary(profileImage.buffer, `${userId}/profile`))
+          .secure_url
       : oldUser.profileImage;
 
     const bannerImageUrl = bannerImage
-      ? `/uploads/${userId}/profile/${bannerImage.filename}`
+      ? (await uploadToCloudinary(bannerImage.buffer, `${userId}/profile`))
+          .secure_url
       : oldUser.bannerImage;
 
-    if (profileImage && oldUser.profileImage) {
-      const oldPath = path.join(__dirname, "..", oldUser.profileImage);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-
-    if (bannerImage && oldUser.bannerImage) {
-      const oldPath = path.join(__dirname, "..", oldUser.bannerImage);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-
+    // siapkan data update
     const updateData = {
       username,
       profileImage: profileImageUrl,
@@ -125,8 +120,9 @@ const updateProfile = async (req, res) => {
       date_of_birth &&
       date_of_birth.trim() !== "" &&
       !isNaN(new Date(date_of_birth))
-    )
+    ) {
       updateData.date_of_birth = new Date(date_of_birth);
+    }
 
     await User.update(updateData, { where: { id: userId } });
 
@@ -200,8 +196,14 @@ const deleteAccount = async (req, res) => {
       RoutineProduct.destroy({ where: { userId } }),
     ]);
 
-    const userUploadFolder = path.join(__dirname, "../uploads", String(userId));
-    deleteFolderRecursive(userUploadFolder);
+    // --- Hapus semua file user di Cloudinary ---
+    try {
+      const result = await cloudinary.api.delete_resources_by_prefix(
+        `${userId}/`
+      );
+    } catch (err) {
+      console.error("Gagal hapus file user di Cloudinary:", err);
+    }
 
     await user.destroy();
 
@@ -229,8 +231,14 @@ const deleteData = async (req, res) => {
       RoutineProduct.destroy({ where: { userId } }),
     ]);
 
-    const userUploadFolder = path.join(__dirname, "../uploads", String(userId));
-    deleteFolderRecursive(userUploadFolder);
+    // --- Hapus semua file user di Cloudinary ---
+    try {
+      const result = await cloudinary.api.delete_resources_by_prefix(
+        `${userId}/`
+      );
+    } catch (err) {
+      console.error("Gagal hapus file user di Cloudinary:", err);
+    }
 
     await User.update(
       { profileImage: null, bannerImage: null, age: null, date_of_birth: null },

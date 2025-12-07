@@ -28,7 +28,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const BRIGHTNESS_LOW = 100;
+const BRIGHTNESS_LOW = 70;
 const BRIGHTNESS_HIGH = 200;
 
 const FaceScan2 = ({ navigation }) => {
@@ -276,9 +276,7 @@ const FaceScan2 = ({ navigation }) => {
             {/* Modal Zoom */}
             <Modal visible={visible} transparent={true}>
               <ImageViewer
-                imageUrls={[
-                  { url: `${api.defaults.baseURL}${aiResult.imagePath}` },
-                ]}
+                imageUrls={[{ url: aiResult.imagePath }]}
                 enableSwipeDown
                 onSwipeDown={() => setVisible(false)}
               />
@@ -287,7 +285,7 @@ const FaceScan2 = ({ navigation }) => {
             {/* Image Preview */}
             <TouchableOpacity onPress={() => setVisible(true)}>
               <Image
-                source={{ uri: `${api.defaults.baseURL}${aiResult.imagePath}` }}
+                source={{ uri: aiResult.imagePath }}
                 style={{
                   width: SCREEN_WIDTH - 40,
                   height: SCREEN_WIDTH - 40,
@@ -539,7 +537,7 @@ const FaceScan2 = ({ navigation }) => {
                           source={
                             product.productimage
                               ? {
-                                  uri: `${api.defaults.baseURL}${product.productimage}`,
+                                  uri: product.productimage,
                                 } // pakai productimage
                               : require('../../assets/product-placeholder.jpg') // fallback
                           }

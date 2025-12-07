@@ -156,7 +156,7 @@ function Products() {
                 <td>
                   {p.productImage ? (
                     <img
-                      src={`http://localhost:3000${p.productImage}`}
+                      src={p.productImage}
                       alt={p.productName}
                       style={{
                         width: "100px",

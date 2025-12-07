@@ -43,7 +43,7 @@ const {
 } = require("../Controllers/AnalyticsController");
 
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
-const upload = require("../Middlewares/UploadImage");
+const { upload } = require("../Middlewares/UploadImage");
 
 //Auth Admin
 router.get("/check-auth", validateToken, (req, res) => {
@@ -58,7 +58,7 @@ router.post(
   "/add-product",
   validateToken,
   isAdmin,
-  upload("products").single("productImage"),
+  upload.single("productImage"),
   addProduct
 );
 router.delete("/delete-product", validateToken, isAdmin, deleteAdminProduct);
@@ -67,7 +67,7 @@ router.put(
   "/products/update/:id",
   validateToken,
   isAdmin,
-  upload("products").single("productImage"),
+  upload.single("productImage"),
   updateProduct
 );
 router.put("/products/:id/verify", validateToken, isAdmin, verifiedProduct);
@@ -78,7 +78,7 @@ router.post(
   "/news/add",
   validateToken,
   isAdmin,
-  upload("news").single("newsImage"),
+  upload.single("newsImage"),
   addNews
 );
 router.get("/news/:id", validateToken, isAdmin, getNewsDetail);
@@ -86,7 +86,7 @@ router.put(
   "/news/edit/:id",
   validateToken,
   isAdmin,
-  upload("news").single("newsImage"),
+  upload.single("newsImage"),
   editNews
 );
 router.delete("/news/delete/:id", validateToken, isAdmin, deleteNews);

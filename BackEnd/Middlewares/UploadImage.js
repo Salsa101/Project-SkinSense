@@ -1,22 +1,28 @@
 const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
+const { Readable } = require("stream");
 
-const getStorage = (type) =>
-  multer.diskStorage({
-    destination: (req, file, cb) => {
-      const userId = req.user.id;
-      const uploadPath = path.join("uploads", `${userId}`, type);
+// pakai memory storage agar file tidak tersimpan di server
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-      fs.mkdirSync(uploadPath, { recursive: true });
+// fungsi upload ke Cloudinary
+const uploadToCloudinary = (fileBuffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder },
+      (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      }
+    );
 
-      cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
-    },
+    const readable = new Readable();
+    readable._read = () => {};
+    readable.push(fileBuffer);
+    readable.push(null);
+    readable.pipe(stream);
   });
+};
 
-const upload = (type) => multer({ storage: getStorage(type) });
-
-module.exports = upload;
+module.exports = { upload, uploadToCloudinary };
