@@ -122,7 +122,7 @@ const getRoutineProgress = async (req, res) => {
       where: { timeOfDay: "night", userId },
     });
     const nightDone = await RoutineProduct.count({
-      where: { timeOfDay: "night", doneStatus: true, useId },
+      where: { timeOfDay: "night", doneStatus: true, userId },
     });
 
     return res.json({
