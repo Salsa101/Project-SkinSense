@@ -500,16 +500,20 @@ const HomeScreen = ({ navigation }) => {
               </View>
             ))
           ) : (
-            <Text
-              style={{
-                color: '#999',
-                fontSize: 13,
-                marginTop: 5,
-                textAlign: 'center',
-              }}
-            >
-              No upcoming expired products 🎉
-            </Text>
+            <View style={styles.emptyBox}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.emptyTitle}>You're all set!</Text>
+                <Text style={styles.emptyDesc}>
+                  There are no products nearing expiry
+                </Text>
+              </View>
+
+              <Image
+                source={require('../../assets/expiry-placeholder.png')}
+                style={styles.emptyImageExpiry}
+                resizeMode="contain"
+              />
+            </View>
           )}
         </View>
 
@@ -889,6 +893,30 @@ const styles = StyleSheet.create({
   scanButtonText: {
     color: '#fff',
     fontFamily: 'Poppins-SemiBold',
+  },
+  emptyBox: {
+    backgroundColor: '#FCE6E9',
+    flexDirection: 'row',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#DE576F',
+    marginBottom: 3,
+  },
+  emptyDesc: {
+    fontSize: 12,
+    color: '#555',
+    maxWidth: '90%',
+  },
+  emptyImageExpiry: {
+    width: 60,
+    height: 60,
+    marginLeft: 10,
   },
 });
 
