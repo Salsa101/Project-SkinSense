@@ -112,9 +112,77 @@ const AddProduct = ({ navigation }) => {
     setLoading(true);
 
     try {
-      if (!routineValue || !timeDayValue) {
-        Alert.alert('Error', 'Please select routine type and time of day');
+      if (!routineValue) {
+        Alert.alert('Error', 'Routine type must be selected');
         return;
+      }
+
+      if (!timeDayValue) {
+        Alert.alert('Error', 'Time of day must be selected');
+        return;
+      }
+
+      if (!productStep) {
+        Alert.alert('Error', 'Product step is required');
+        return;
+      }
+
+      if (!selectedProductId) {
+        // Kalau manual input produk baru
+        if (!productName) {
+          Alert.alert('Error', 'Product name is required');
+          return;
+        }
+        if (!productBrand) {
+          Alert.alert('Error', 'Product brand is required');
+          return;
+        }
+        if (!productValue) {
+          Alert.alert('Error', 'Product type must be selected');
+          return;
+        }
+      }
+
+      if (hasPAO !== 'yes' && hasPAO !== 'no') {
+        Alert.alert('Error', 'Please select if product has PAO');
+        return;
+      }
+
+      if (hasPAO === 'yes' && (!paoMonths || paoMonths <= 0)) {
+        Alert.alert('Error', 'Please enter PAO months');
+        return;
+      }
+
+      if (isOpened !== 'yes' && isOpened !== 'no') {
+        Alert.alert('Error', 'Please select whether product is opened');
+        return;
+      }
+
+      if (isOpened === 'yes' && !dateOpened) {
+        Alert.alert('Error', 'Please select opened date');
+        return;
+      }
+
+      if (isOpened === 'no' && !expirationDate) {
+        Alert.alert('Error', 'Please select expiration date');
+        return;
+      }
+
+      if (routineValue === 'weekly') {
+        if (!routineValueDay || routineValueDay.length === 0) {
+          Alert.alert(
+            'Error',
+            'Please select at least one day for weekly routine',
+          );
+          return;
+        }
+      }
+
+      if (routineValue === 'custom') {
+        if (!(customDate instanceof Date) || isNaN(customDate)) {
+          Alert.alert('Error', 'Please select custom date');
+          return;
+        }
       }
 
       const payload = new FormData();
