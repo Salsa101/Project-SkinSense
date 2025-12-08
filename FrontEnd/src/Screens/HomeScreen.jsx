@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
     color: '#E07C8E',
     marginBottom: 8,
   },
-  categoryContainer: { flexDirection: 'row', gap: 8 },
+  categoryContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   categoryBadge: {
     backgroundColor: '#fff',
     borderRadius: 15,
