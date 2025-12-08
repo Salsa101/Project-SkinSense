@@ -124,10 +124,6 @@ const Calendar = ({ navigation }) => {
     };
 
     fetchProgress();
-
-    const interval = setInterval(fetchProgress, 5000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const hour = new Date().getHours();

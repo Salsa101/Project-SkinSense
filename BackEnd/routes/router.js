@@ -112,8 +112,12 @@ router.get("/weekly-tips", validateToken, getWeeklyTip);
 router.get("/routine-progress", validateToken, getRoutineProgress);
 
 //Notification
-router.get("/reminder-times/notif", getReminderNotifications);
-router.get("/expiry-product/notif", getRoutineProductNotifications);
+router.get("/reminder-times/notif", validateToken, getReminderNotifications);
+router.get(
+  "/expiry-product/notif",
+  validateToken,
+  getRoutineProductNotifications
+);
 
 // Profile Page
 router.get("/profile/view", validateToken, getProfile);
@@ -138,11 +142,7 @@ router.post(
   upload.single("productImage"),
   addProductToRoutine
 );
-router.post(
-  "/upload-product",
-  upload.single("productImage"),
-  uploadProduct
-);
+router.post("/upload-product", upload.single("productImage"), uploadProduct);
 router.get(
   "/routine-products/view/:routineType/:timeOfDay",
   validateToken,

@@ -3,7 +3,9 @@ const { Op } = require("sequelize");
 
 const getReminderNotifications = async (req, res) => {
   try {
+    const userId = req.user.id;
     const reminders = await ReminderTime.findAll({
+      where: { userId },
       attributes: ["id", "timeOfDay", "reminderTime"],
       order: [["reminderTime", "ASC"]],
     });
@@ -17,12 +19,14 @@ const getReminderNotifications = async (req, res) => {
 
 const getRoutineProductNotifications = async (req, res) => {
   try {
+    const userId = req.user.id; 
     const now = new Date();
     const twoWeeksLater = new Date();
     twoWeeksLater.setDate(now.getDate() + 14);
 
     const products = await RoutineProduct.findAll({
       where: {
+        userId,
         expirationDate: {
           [Op.lte]: twoWeeksLater,
           [Op.gt]: now,
