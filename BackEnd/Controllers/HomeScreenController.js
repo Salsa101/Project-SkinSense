@@ -109,18 +109,20 @@ const getWeeklyTip = async (req, res) => {
 
 const getRoutineProgress = async (req, res) => {
   try {
+    const userId = req.user.id;
+
     const morningTotal = await RoutineProduct.count({
-      where: { timeOfDay: "morning" },
+      where: { timeOfDay: "morning", userId },
     });
     const morningDone = await RoutineProduct.count({
-      where: { timeOfDay: "morning", doneStatus: true },
+      where: { timeOfDay: "morning", doneStatus: true, userId },
     });
 
     const nightTotal = await RoutineProduct.count({
-      where: { timeOfDay: "night" },
+      where: { timeOfDay: "night", userId },
     });
     const nightDone = await RoutineProduct.count({
-      where: { timeOfDay: "night", doneStatus: true },
+      where: { timeOfDay: "night", doneStatus: true, useId },
     });
 
     return res.json({
