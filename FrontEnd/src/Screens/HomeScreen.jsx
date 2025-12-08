@@ -115,6 +115,9 @@ const HomeScreen = ({ navigation }) => {
               {
                 title: product.Product.productName,
                 desc: product.Product.productType || '',
+                timeOfDay: product.timeOfDay,
+                routineType: product.routineType,
+                id: product.id,
               },
             ],
           }));
@@ -469,32 +472,44 @@ const HomeScreen = ({ navigation }) => {
                   ]}
                 >
                   {section.items.map((item, itemIndex) => (
-                    <View key={itemIndex} style={styles.expiredCard}>
-                      <View style={styles.row}>
-                        <View style={{ flexShrink: 1, marginRight: 15 }}>
-                          <Text
-                            style={styles.expiredTitle}
-                            numberOfLines={2}
-                            ellipsizeMode="tail"
-                          >
-                            {item.title}
-                          </Text>
-                          <Text
-                            style={styles.desc}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {item.desc.charAt(0).toUpperCase() +
-                              item.desc.slice(1)}
-                          </Text>
+                    <TouchableOpacity
+                      key={item.id || itemIndex}
+                      onPress={() => {
+                        console.log('ITEM DATA =>', item);
+                        navigation.navigate('EditRoutine', {
+                          targetTab: item.timeOfDay,
+                          targetRoutine: item.routineType,
+                          productId: item.id,
+                        });
+                      }}
+                    >
+                      <View key={itemIndex} style={styles.expiredCard}>
+                        <View style={styles.row}>
+                          <View style={{ flexShrink: 1, marginRight: 15 }}>
+                            <Text
+                              style={styles.expiredTitle}
+                              numberOfLines={2}
+                              ellipsizeMode="tail"
+                            >
+                              {item.title}
+                            </Text>
+                            <Text
+                              style={styles.desc}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {item.desc.charAt(0).toUpperCase() +
+                                item.desc.slice(1)}
+                            </Text>
+                          </View>
+                          <Icon2
+                            name="prescription-bottle"
+                            size={18}
+                            color="#DE576F"
+                          />
                         </View>
-                        <Icon2
-                          name="prescription-bottle"
-                          size={18}
-                          color="#DE576F"
-                        />
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   ))}
                 </View>
               </View>
@@ -503,7 +518,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.emptyBox}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.emptyTitle}>You're all set!</Text>
-                <Text style={styles.emptyDesc}>
+                <Text style={styles.emptyDescExpiry}>
                   There are no products nearing expiry
                 </Text>
               </View>
@@ -761,7 +776,8 @@ const styles = StyleSheet.create({
   },
 
   expiredUpcoming: {
-    marginVertical: 20,
+    marginTop: 15,
+    marginBottom: 25,
   },
   expiredUpcomingTitle: {
     fontFamily: 'Poppins-Bold',
@@ -813,7 +829,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   desc: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: '#A77B7B',
   },
@@ -900,7 +916,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 10,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   emptyTitle: {
     fontSize: 15,
@@ -908,14 +928,16 @@ const styles = StyleSheet.create({
     color: '#DE576F',
     marginBottom: 3,
   },
-  emptyDesc: {
-    fontSize: 12,
-    color: '#555',
+  emptyDescExpiry: {
     maxWidth: '90%',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#777',
+    marginVertical: 5,
   },
   emptyImageExpiry: {
-    width: 60,
-    height: 60,
+    width: 65,
+    height: 65,
     marginLeft: 10,
   },
 });
