@@ -28,6 +28,8 @@ import {
 import { launchImageLibrary } from 'react-native-image-picker';
 
 const AddProduct = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+
   // Product Type
   const [productValue, setProductValue] = useState(null);
   const [productItems, setProductItems] = useState([
@@ -107,6 +109,8 @@ const AddProduct = ({ navigation }) => {
   };
 
   const handleSave = async () => {
+    setLoading(true);
+
     try {
       if (!routineValue || !timeDayValue) {
         Alert.alert('Error', 'Please select routine type and time of day');
@@ -180,6 +184,8 @@ const AddProduct = ({ navigation }) => {
         'Error',
         err.response?.data?.message || err.message || 'Something went wrong',
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -731,8 +737,14 @@ const AddProduct = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Text style={styles.saveBtnText}>Save</Text>
+            <TouchableOpacity
+              style={[styles.saveBtn, loading && { opacity: 0.6 }]}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              <Text style={styles.saveBtnText}>
+                {loading ? 'Saving...' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

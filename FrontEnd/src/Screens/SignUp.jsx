@@ -26,8 +26,11 @@ const SignUp = ({ navigation }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [formHeight, setFormHeight] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    setLoading(true);
+
     try {
       const response = await api.post('/register', {
         username,
@@ -47,6 +50,8 @@ const SignUp = ({ navigation }) => {
         error.response?.data?.message || 'Terjadi kesalahan saat registrasi.';
       Alert.alert('Error', msg);
       console.log('Register error:', error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,8 +147,14 @@ const SignUp = ({ navigation }) => {
               <Text style={styles.errorText}>{errorMessage}</Text>
             )}
 
-            <TouchableOpacity style={styles.signUpBtn} onPress={handleRegister}>
-              <Text style={styles.signUpText}>Sign Up</Text>
+            <TouchableOpacity
+              style={[styles.signUpBtn, loading && { opacity: 0.6 }]}
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              <Text style={styles.signUpText}>
+                {loading ? 'Signing up...' : 'Sign Up'}
+              </Text>
             </TouchableOpacity>
 
             <Text style={styles.signupText}>

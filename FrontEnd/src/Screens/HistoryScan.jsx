@@ -35,6 +35,7 @@ const HistoryScan = ({ navigation, route }) => {
   const [currentQuiz, setCurrentQuiz] = useState(null);
 
   const [zoomVisible, setZoomVisible] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const sheetRef = useRef(null);
   const quizSheetRef = useRef(null);
@@ -93,6 +94,8 @@ const HistoryScan = ({ navigation, route }) => {
           style: 'destructive',
           onPress: async () => {
             try {
+              setLoadingDelete(true);
+
               await api.delete(`/scan-detail/${currentItem.id}`);
 
               const updatedData = { ...scanData };
@@ -110,6 +113,8 @@ const HistoryScan = ({ navigation, route }) => {
               sheetRef.current?.close();
             } catch (err) {
               console.error('Failed to delete scan:', err);
+            } finally {
+              setLoadingDelete(false);
             }
           },
         },
@@ -720,11 +725,13 @@ const HistoryScan = ({ navigation, route }) => {
                     borderRadius: 30,
                     alignItems: 'center',
                     marginBottom: 10,
+                    opacity: loadingDelete ? 0.6 : 1,
                   }}
                   onPress={handleDeleteScan}
+                  disabled={loadingDelete}
                 >
                   <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                    Delete
+                    {loadingDelete ? 'Deleting...' : 'Delete'}
                   </Text>
                 </TouchableOpacity>
               </>
