@@ -17,11 +17,12 @@ import { useCustomBackHandler } from '../Handler/CustomBackHandler';
 
 import ReminderTimePicker from '../Components/ReminderTime';
 
-const EditRoutine = ({ navigation }) => {
+const EditRoutine = ({ navigation, route }) => {
   const [active, setActive] = useState('Calendar');
   const [activeTab, setActiveTab] = useState('Morning');
   const [activeRoutineTab, setActiveRoutineTab] = useState('Daily');
   const [routineData, setRoutineData] = useState([]);
+  const { targetTab, targetRoutine, productId } = route.params || {};
 
   const [reminderTimes, setReminderTimes] = useState({
     morning: null,
@@ -141,6 +142,17 @@ const EditRoutine = ({ navigation }) => {
   useEffect(() => {
     fetchReminderTimes();
   }, []);
+
+  useEffect(() => {
+    if (targetTab) {
+      setActiveTab(targetTab.charAt(0).toUpperCase() + targetTab.slice(1)); // morning → Morning
+    }
+    if (targetRoutine) {
+      setActiveRoutineTab(
+        targetRoutine.charAt(0).toUpperCase() + targetRoutine.slice(1),
+      );
+    }
+  }, [targetTab, targetRoutine]);
 
   const renderCard = item => (
     <View key={item.id} style={[styles.card, item.done && styles.cardDone]}>
