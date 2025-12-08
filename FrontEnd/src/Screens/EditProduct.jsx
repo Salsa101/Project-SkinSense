@@ -32,6 +32,7 @@ const EditProduct = ({ route, navigation }) => {
   const [productStep, setProductStep] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Product Type
   const [openProduct, setOpenProduct] = useState(false);
@@ -176,6 +177,8 @@ const EditProduct = ({ route, navigation }) => {
 
   // UPDATE product
   const handleUpdate = async () => {
+    setLoading(true);
+
     try {
       const payload = new FormData();
       payload.append('productName', productName);
@@ -230,6 +233,8 @@ const EditProduct = ({ route, navigation }) => {
         'Error',
         err.response?.data?.message || 'Gagal update produk',
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -718,8 +723,14 @@ const EditProduct = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.saveBtn} onPress={handleUpdate}>
-              <Text style={styles.saveBtnText}>Update</Text>
+            <TouchableOpacity
+              style={[styles.saveBtn, loading && { opacity: 0.6 }]}
+              onPress={handleUpdate}
+              disabled={loading}
+            >
+              <Text style={styles.saveBtnText}>
+                {loading ? 'Updating...' : 'Update'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

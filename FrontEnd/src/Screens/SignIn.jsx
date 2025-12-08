@@ -22,8 +22,11 @@ const SignIn = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
+
     try {
       await api.post('/login', { username, password });
 
@@ -41,6 +44,8 @@ const SignIn = ({ navigation }) => {
       const msg = error.response?.data?.message || 'Login gagal.';
       Alert.alert('Error', msg);
       console.log('Login error:', error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,8 +113,14 @@ const SignIn = ({ navigation }) => {
               <Text style={styles.errorText}>{errorMessage}</Text>
             )}
 
-            <TouchableOpacity style={styles.signInBtn} onPress={handleLogin}>
-              <Text style={styles.signInText}>Sign In</Text>
+            <TouchableOpacity
+              style={[styles.signInBtn, loading && { opacity: 0.6 }]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              <Text style={styles.signInText}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Text>
             </TouchableOpacity>
 
             <Text style={styles.signinText}>

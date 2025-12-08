@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
@@ -22,6 +21,7 @@ const EditJournal = ({ navigation, route }) => {
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState(null);
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { date } = route.params || {};
   const [journalDate, setJournalDate] = useState(
@@ -58,9 +58,7 @@ const EditJournal = ({ navigation, route }) => {
         setTitle(j.title);
         setEntry(j.description);
         setMood(moodMap.indexOf(j.mood));
-        setImage(
-          j.journal_image ? j.journal_image : null,
-        );
+        setImage(j.journal_image ? j.journal_image : null);
         setJournalDate(j.journal_date);
       } catch (err) {
         console.error('Error fetching journal detail:', err);
@@ -75,6 +73,8 @@ const EditJournal = ({ navigation, route }) => {
       alert('Please fill in title and entry!');
       return;
     }
+
+    setLoading(true);
 
     const formData = new FormData();
     formData.append('title', title);
@@ -112,6 +112,8 @@ const EditJournal = ({ navigation, route }) => {
     } catch (err) {
       console.error(err);
       alert('Error updating journal: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,7 +166,18 @@ const EditJournal = ({ navigation, route }) => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Journal</Text>
           <TouchableOpacity style={styles.editBtn} onPress={handleDelete}>
-            <Text style={[styles.editText, { color: '#E07C8E', fontFamily: 'Poppins-Semi-Bold', fontSize: 12 }]}>Delete</Text>
+            <Text
+              style={[
+                styles.editText,
+                {
+                  color: '#E07C8E',
+                  fontFamily: 'Poppins-Semi-Bold',
+                  fontSize: 12,
+                },
+              ]}
+            >
+              Delete
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -254,8 +267,12 @@ const EditJournal = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-        <Text style={styles.saveText}>SAVE</Text>
+      <TouchableOpacity
+        style={[styles.saveBtn, loading && { opacity: 0.6 }]}
+        onPress={handleSave}
+        disabled={loading}
+      >
+        <Text style={styles.saveText}>{loading ? 'Saving...' : 'Save'}</Text>
       </TouchableOpacity>
     </View>
   );

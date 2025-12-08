@@ -22,6 +22,7 @@ const ChangePassword = ({ navigation }) => {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -32,6 +33,8 @@ const ChangePassword = ({ navigation }) => {
       Alert.alert('Error', 'Password baru tidak cocok!');
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await api.put('/change-password', {
@@ -44,6 +47,8 @@ const ChangePassword = ({ navigation }) => {
       const msg =
         err.response?.data?.message || 'Gagal mengubah password. Coba lagi.';
       Alert.alert('Error', msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,8 +151,14 @@ const ChangePassword = ({ navigation }) => {
 
         {/* Tombol Save tetap di bawah */}
         <View style={styles.saveButtonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
+          <TouchableOpacity
+            style={[styles.saveButton, loading && { opacity: 0.6 }]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            <Text style={styles.saveButtonText}>
+              {loading ? 'Saving...' : 'Save'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

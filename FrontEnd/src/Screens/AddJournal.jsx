@@ -21,6 +21,7 @@ const AddJournal = ({ navigation, route }) => {
   const [entry, setEntry] = useState('');
   const [mood, setMood] = useState(null);
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { date } = route.params || {};
   const [journalDate, setJournalDate] = useState(
@@ -52,6 +53,8 @@ const AddJournal = ({ navigation, route }) => {
       alert('Please fill in title and entry!');
       return;
     }
+
+    setLoading(true);
 
     const formData = new FormData();
     formData.append('title', title);
@@ -92,6 +95,8 @@ const AddJournal = ({ navigation, route }) => {
     } catch (err) {
       console.error(err);
       alert('Error adding journal: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -191,8 +196,12 @@ const AddJournal = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-        <Text style={styles.saveText}>SAVE</Text>
+      <TouchableOpacity
+        style={[styles.saveBtn, loading && { opacity: 0.6 }]}
+        onPress={handleSave}
+        disabled={loading}
+      >
+        <Text style={styles.saveText}>{loading ? 'Saving...' : 'Save'}</Text>
       </TouchableOpacity>
     </View>
   );
