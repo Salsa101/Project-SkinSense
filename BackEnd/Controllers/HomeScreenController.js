@@ -111,31 +111,53 @@ const getRoutineProgress = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    const today = new Date();
+    const todayDay = today
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
+
+    const todayDate = today.toISOString().split("T")[0];
+
+    // Kondisi rutin yang berlaku hari ini
+    const todayCondition = {
+      [Op.or]: [
+        { routineType: "daily" },
+        { routineType: "weekly", dayOfWeek: { [Op.contains]: [todayDay] } },
+        { routineType: "custom", customDate: todayDate },
+      ],
+    };
+
     const morningTotal = await RoutineProduct.count({
-      where: { timeOfDay: "morning", userId },
+      where: { userId, timeOfDay: "morning", ...todayCondition },
     });
+
     const morningDone = await RoutineProduct.count({
-      where: { timeOfDay: "morning", doneStatus: true, userId },
+      where: {
+        userId,
+        timeOfDay: "morning",
+        doneStatus: true,
+        ...todayCondition,
+      },
     });
 
     const nightTotal = await RoutineProduct.count({
-      where: { timeOfDay: "night", userId },
+      where: { userId, timeOfDay: "night", ...todayCondition },
     });
+
     const nightDone = await RoutineProduct.count({
-      where: { timeOfDay: "night", doneStatus: true, userId },
+      where: {
+        userId,
+        timeOfDay: "night",
+        doneStatus: true,
+        ...todayCondition,
+      },
     });
 
     return res.json({
       success: true,
       data: {
-        morning: {
-          done: morningDone,
-          total: morningTotal,
-        },
-        night: {
-          done: nightDone,
-          total: nightTotal,
-        },
+        morning: { done: morningDone, total: morningTotal },
+        night: { done: nightDone, total: nightTotal },
       },
     });
   } catch (error) {
