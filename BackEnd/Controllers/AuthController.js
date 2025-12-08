@@ -41,7 +41,10 @@ const registerController = async (req, res) => {
       password: hashedPassword,
     });
 
-    await sendWelcomeEmail(newUser);
+    // await sendWelcomeEmail(newUser);
+    sendWelcomeEmail(newUser).catch((err) =>
+      console.error("Failed to send email:", err)
+    );
 
     res.status(201).json({
       message: "User berhasil terdaftar.",
