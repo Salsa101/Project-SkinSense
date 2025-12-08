@@ -20,11 +20,12 @@ module.exports = (sequelize, DataTypes) => {
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        unique: "user_time_unique",
       },
       timeOfDay: {
         type: DataTypes.ENUM("morning", "night"),
         allowNull: false,
-        unique: true,
+        unique: "user_time_unique",
       },
       reminderTime: {
         type: DataTypes.TIME,

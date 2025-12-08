@@ -18,11 +18,12 @@ module.exports = {
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
+        unique: "user_time_unique", 
       },
       timeOfDay: {
         type: Sequelize.ENUM("morning", "night"),
         allowNull: false,
-        unique: true,
+        unique: "user_time_unique", 
       },
       reminderTime: {
         type: Sequelize.TIME,
