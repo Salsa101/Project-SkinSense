@@ -4,7 +4,7 @@ const { User } = require("../models");
 const { validationResult } = require("express-validator");
 
 const { jwtSecret } = require("../config/config");
-const { sendWelcomeEmail } = require("../Utils/sendEmail");
+const { sendWelcomeEmail } = require("../Utils/email");
 
 const registerController = async (req, res) => {
   const errors = validationResult(req);
