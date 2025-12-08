@@ -219,12 +219,20 @@ const News = ({ navigation }) => {
           </TouchableOpacity>
 
           {/* Category News */}
-          <View style={{ marginBottom: 10 }}>
-            <View style={styles.categoryContainer}>
-              {categories.map(category => (
+          <View style={{ marginBottom: 10, marginHorizontal: -25 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categoryContainerScroll}
+            >
+              {categories.map((category, index) => (
                 <TouchableOpacity
                   key={category.id}
-                  style={styles.categoryBadge}
+                  style={[
+                    styles.categoryBadge,
+                    index === 0 && { marginLeft: 25 },
+                    index === categories.length - 1 && { marginRight: 25 },
+                  ]}
                   onPress={() =>
                     navigation.navigate('CategoryNews', {
                       categoryId: category.id,
@@ -235,7 +243,7 @@ const News = ({ navigation }) => {
                   <Text style={styles.categoryText}>{category.name}</Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           </View>
 
           {newsList.length > 0 ? (
@@ -384,7 +392,8 @@ const styles = StyleSheet.create({
     color: '#E07C8E',
     marginBottom: 8,
   },
-  categoryContainer: { flexDirection: 'row', gap: 8 },
+  categoryContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  categoryContainerScroll: { flexDirection: 'row', gap: 8 },
   categoryBadge: {
     backgroundColor: '#fff',
     borderRadius: 15,
