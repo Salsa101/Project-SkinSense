@@ -34,9 +34,6 @@ const forgotPassword = async (req, res) => {
 
     const htmlContent = `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-        <!-- Logo -->
-        <img src="cid:app-logo" alt="App Logo" style="width: 100%; height: auto; margin-bottom: 20px;" />
-
         <!-- Title -->
         <h2>One Time Password (OTP)</h2>
         <p>Gunakan kode berikut untuk memvalidasi email kamu. Berlaku 10 menit.</p>
@@ -55,14 +52,7 @@ const forgotPassword = async (req, res) => {
     await sendEmail(
       user.email,
       "Kode OTP Reset Password SkinSense",
-      htmlContent,
-      [
-        {
-          filename: "logo.png",
-          path: logoPath,
-          cid: "app-logo",
-        },
-      ]
+      htmlContent
     );
 
     res
