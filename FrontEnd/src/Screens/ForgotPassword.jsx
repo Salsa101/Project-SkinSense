@@ -16,9 +16,7 @@ const ForgotPassword = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleForgotPassword = async () => {
-    if (!email.trim()) return Alert.alert('Peringatan', 'Email harus diisi!');
-
-    console.log('Mengirim email ke backend:', email);
+    if (!email.trim()) return Alert.alert('Error', 'Email must be filled!');
 
     try {
       setLoading(true);
@@ -29,29 +27,33 @@ const ForgotPassword = ({ navigation }) => {
       navigation.navigate('ResetPassword', { email });
     } catch (err) {
       console.error(err);
-      Alert.alert('Error', 'Gagal mengirim OTP reset password.');
+
+      if (err.response && err.response.status === 404) {
+        return Alert.alert('Error', 'Email not registered!');
+      }
+
+      Alert.alert('Error', 'Failed to send OTP.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 30 }}
-      >
-        <Text style={styles.title}>Forgot Password</Text>
-        <Text style={styles.subtitle}>
-          Enter your email to receive a password reset link.
-        </Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
+      <Text style={styles.title}>Forgot Password</Text>
+      <Text style={styles.subtitle}>
+        Enter your email to receive a password reset link.
+      </Text>
 
-        <View style={styles.decorContainer}>
-          <Image
-            source={require('../../assets/phonepw.png')}
-            style={styles.decorImage}
-          />
-        </View>
+      <View style={styles.decorContainer}>
+        <Image
+          source={require('../../assets/phonepw.png')}
+          style={styles.decorImage}
+        />
+      </View>
 
       <TextInput
         style={styles.input}
@@ -72,8 +74,7 @@ const ForgotPassword = ({ navigation }) => {
           {loading ? 'Mengirim...' : 'Send Email Reset'}
         </Text>
       </TouchableOpacity>
-      </ScrollView>
-      
+    </ScrollView>
   );
 };
 
