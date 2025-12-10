@@ -105,7 +105,7 @@ const EditJournal = ({ navigation, route }) => {
       });
 
       if (response.status === 200) {
-        Alert.alert('Journal updated successfully!');
+        Alert.alert('Success', 'Journal updated successfully!');
         navigation.navigate('JournalDetail', { id });
       } else {
         Alert.alert('Failed to update journal: ' + response.data.message);
@@ -139,14 +139,17 @@ const EditJournal = ({ navigation, route }) => {
               });
 
               if (res.status === 200) {
-                Alert.alert('Journal deleted successfully!');
+                Alert.alert('Success', 'Journal deleted successfully!');
                 navigation.navigate('Calendar');
               } else {
-                Alert.alert('Failed to delete journal: ' + res.data.message);
+                Alert.alert(
+                  'Error',
+                  'Failed to delete journal: ' + res.data.message,
+                );
               }
             } catch (err) {
               console.error(err);
-              Alert.alert('Error deleting journal: ' + err.message);
+              Alert.alert('Error', 'Error deleting journal: ' + err.message);
             }
           },
         },
