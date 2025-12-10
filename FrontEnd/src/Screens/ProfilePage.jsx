@@ -325,7 +325,7 @@ const ProfilPage = ({ navigation }) => {
               <Text
                 style={{ marginLeft: 10, color: '#E07C8E', fontWeight: 'bold' }}
               >
-                Hapus Data
+                Delete Data
               </Text>
             </TouchableOpacity>
 
@@ -347,7 +347,7 @@ const ProfilPage = ({ navigation }) => {
                   fontWeight: 'bold',
                 }}
               >
-                Hapus Akun
+                Delete Account
               </Text>
             </TouchableOpacity>
           </BottomSheetScrollView>
