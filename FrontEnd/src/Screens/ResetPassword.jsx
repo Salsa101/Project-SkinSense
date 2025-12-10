@@ -25,14 +25,11 @@ const ResetPassword = ({ route, navigation }) => {
 
   const handleResetPassword = async () => {
     if (!otp.trim() || !newPassword.trim() || !confirmPassword.trim()) {
-      return Alert.alert('Peringatan', 'Semua field harus diisi!');
+      return Alert.alert('Error', 'All fields must be filled!');
     }
 
     if (newPassword !== confirmPassword) {
-      return Alert.alert(
-        'Peringatan',
-        'Password baru dan konfirmasi tidak sama!',
-      );
+      return Alert.alert('Error', 'Passwords do not match!');
     }
 
     try {
@@ -43,13 +40,13 @@ const ResetPassword = ({ route, navigation }) => {
         newPassword,
       });
 
-      Alert.alert('Berhasil', res.data.message);
+      Alert.alert('Password reset successful', res.data.message);
       navigation.navigate('SignIn');
     } catch (err) {
       console.error(err);
       Alert.alert(
         'Error',
-        err.response?.data?.message || 'Gagal mereset password.',
+        err.response?.data?.message || 'Failed to reset password.',
       );
     } finally {
       setLoading(false);

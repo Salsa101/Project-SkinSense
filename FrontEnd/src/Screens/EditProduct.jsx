@@ -293,7 +293,7 @@ const EditProduct = ({ route, navigation }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      Alert.alert('Success', 'Produk berhasil diupdate', [
+      Alert.alert('Success', 'Product update successfull', [
         { text: 'OK', onPress: () => navigation.navigate('EditRoutine') },
       ]);
       console.log('Updated:', res.data);
@@ -301,7 +301,7 @@ const EditProduct = ({ route, navigation }) => {
       console.error(err);
       Alert.alert(
         'Error',
-        err.response?.data?.message || 'Gagal update produk',
+        err.response?.data?.message || 'Failed to update product',
       );
     } finally {
       setLoading(false);

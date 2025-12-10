@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Modal,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {
@@ -168,6 +169,10 @@ const FaceScan2 = ({ navigation }) => {
     } catch (e) {
       console.log('Error taking or uploading photo:', e);
       setScanning(false);
+      Alert.alert(
+        'Error',
+        'Failed to process your face scan. Please try again.',
+      );
     }
   };
 
@@ -188,6 +193,7 @@ const FaceScan2 = ({ navigation }) => {
       }
     } catch (err) {
       console.log('Fetch scans error:', err);
+      Alert.alert('Error', 'Failed to load scan data. Please try again.');
     }
   };
 

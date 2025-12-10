@@ -250,7 +250,7 @@ const AddProduct = ({ navigation }) => {
       console.error(err);
       Alert.alert(
         'Error',
-        err.response?.data?.message || err.message || 'Something went wrong',
+        err.response?.data?.message || err.message || 'Failed to add product',
       );
     } finally {
       setLoading(false);

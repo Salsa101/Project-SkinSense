@@ -52,8 +52,8 @@ const EditProfile = ({ navigation }) => {
           });
         }
       } catch (err) {
-        console.error('Gagal mengambil profil:', err);
-        Alert.alert('Error', 'Gagal mengambil data profil.');
+        console.error('Failed to fetch profile data:', err);
+        Alert.alert('Error', 'Failed to load profile data.');
       }
     };
 
@@ -116,11 +116,11 @@ const EditProfile = ({ navigation }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      Alert.alert('Sukses', 'Profil berhasil diperbarui!');
+      Alert.alert('Success', 'Profile updated successfully!');
       navigation.navigate('Profile');
     } catch (err) {
-      console.error('Gagal update profil:', err);
-      Alert.alert('Error', 'Gagal memperbarui profil.');
+      console.error('Failed to update profile:', err);
+      Alert.alert('Error', 'Failed to update profile.');
     }
   };
 

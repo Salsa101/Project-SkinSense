@@ -64,13 +64,14 @@ const SkinQuiz = ({ navigation }) => {
 
       await api.post('/answer', { answers: payload });
 
-      Alert.alert('Sukses', 'Jawaban tersimpan!', [
+      Alert.alert('Success', 'Answer has been saved!', [
         {
           text: 'OK',
           onPress: () => navigation.navigate('FaceScan1'),
         },
       ]);
     } catch (err) {
+      Alert.alert('Error', 'Failed to submit');
       console.log('Gagal submit:', err);
     }
   };
@@ -251,7 +252,11 @@ const styles = StyleSheet.create({
     borderColor: '#DDD',
     marginRight: 15,
   },
-  optionTitle: { fontFamily: 'Poppins-Bold', marginBottom: 2, color: '#E68390' },
+  optionTitle: {
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 2,
+    color: '#E68390',
+  },
   optionDesc: {
     color: '#E68390',
     fontSize: 12,
@@ -296,8 +301,7 @@ const styles = StyleSheet.create({
   },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   optionLeft: { justifyContent: 'flex-start' },
-  optionCenter: { justifyContent: 'center'
-  },
+  optionCenter: { justifyContent: 'center' },
   textLeft: { textAlign: 'left' },
   textCenter: { textAlign: 'center' },
 });
