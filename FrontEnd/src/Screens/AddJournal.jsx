@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
@@ -94,7 +95,7 @@ const AddJournal = ({ navigation, route }) => {
       }
     } catch (err) {
       console.error(err);
-      alert('Error adding journal: ' + err.message);
+      Alert.alert('Error', 'Error adding journal');
     } finally {
       setLoading(false);
     }
