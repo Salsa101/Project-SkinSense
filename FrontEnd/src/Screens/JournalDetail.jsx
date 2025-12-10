@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Modal,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
@@ -40,6 +41,7 @@ const JournalDetail = ({ route, navigation }) => {
         setJournal(res.data);
       } catch (err) {
         console.error('Error fetching journal:', err);
+        Alert.alert('Error', 'Failed to load journal data. Please try again.');
       } finally {
         setLoading(false);
       }

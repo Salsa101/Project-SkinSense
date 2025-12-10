@@ -41,7 +41,8 @@ const ProfilPage = ({ navigation }) => {
         setUser(res.data.user);
         setIsPushEnabled(res.data.user.enabledNotif);
       } catch (err) {
-        console.error('Gagal ambil profil:', err);
+        console.error('Failed to fetch profile:', err);
+        Alert.alert('Error', 'Failed to load profile data. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -54,14 +55,15 @@ const ProfilPage = ({ navigation }) => {
       setIsPushEnabled(value);
       await api.put('/profile/notif', { enabledNotif: value });
     } catch (err) {
-      console.error('Gagal update notif:', err);
+      console.error('Failed to update notification:', err);
+      Alert.alert('Error', 'Failed to update notification.');
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert('Konfirmasi Logout', 'Yakin ingin logout?', [
+    Alert.alert('Confirmation', 'Are you sure you want to logout?', [
       {
-        text: 'Batal',
+        text: 'Cancel',
         style: 'cancel',
       },
       {
@@ -70,11 +72,11 @@ const ProfilPage = ({ navigation }) => {
         onPress: async () => {
           try {
             await api.post('/logout', {});
-            Alert.alert('Sukses', 'Logout berhasil.');
+            Alert.alert('Success', 'Logged out successfully.');
             navigation.navigate('AccountOption');
           } catch (error) {
             console.error('Logout error:', error);
-            Alert.alert('Error', 'Gagal logout.');
+            Alert.alert('Error', 'Failed to logout.');
           }
         },
       },
@@ -83,12 +85,12 @@ const ProfilPage = ({ navigation }) => {
 
   const handleDeleteAccount = async () => {
     Alert.alert(
-      'Konfirmasi',
-      'Apakah kamu yakin ingin menghapus akun ini? Tindakan ini tidak bisa dibatalkan.',
+      'Confirmation',
+      'Are you sure you want to delete this account? This action cannot be undone.',
       [
-        { text: 'Batal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Hapus Akun',
+          text: 'Delete Account',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -96,11 +98,14 @@ const ProfilPage = ({ navigation }) => {
                 data: {},
                 withCredentials: true,
               });
-              Alert.alert('Sukses', 'Akun berhasil dihapus.');
+              Alert.alert('Success', 'Account deleted successfully.');
               navigation.replace('AccountOption');
             } catch (error) {
-              console.error('Gagal menghapus akun:', error);
-              Alert.alert('Error', 'Gagal menghapus akun. Silakan coba lagi.');
+              console.error('Failed to delete account:', error);
+              Alert.alert(
+                'Error',
+                'Failed to delete account. Please try again.',
+              );
             }
           },
         },
@@ -110,12 +115,12 @@ const ProfilPage = ({ navigation }) => {
 
   const handleDeleteData = async () => {
     Alert.alert(
-      'Konfirmasi',
-      'Apakah kamu yakin ingin menghapus data? Tindakan ini tidak bisa dibatalkan.',
+      'Confirmation',
+      'Are you sure you want to delete this data? This action cannot be undone.',
       [
-        { text: 'Batal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Hapus Data',
+          text: 'Delete Data',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -123,11 +128,11 @@ const ProfilPage = ({ navigation }) => {
                 data: {},
                 withCredentials: true,
               });
-              Alert.alert('Sukses', 'Data berhasil dihapus.');
+              Alert.alert('Success', 'Data deleted successfully.');
               navigation.replace('Profile');
             } catch (error) {
-              console.error('Gagal menghapus data:', error);
-              Alert.alert('Error', 'Gagal menghapus data. Silakan coba lagi.');
+              console.error('Failed to delete data:', error);
+              Alert.alert('Error', 'Failed to delete data. Please try again.');
             }
           },
         },

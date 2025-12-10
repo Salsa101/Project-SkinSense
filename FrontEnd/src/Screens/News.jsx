@@ -116,7 +116,7 @@ const News = ({ navigation }) => {
       }
     } catch (err) {
       console.error(err);
-      alert('Gagal update bookmark ❌');
+      alert('Failed to update bookmark');
     }
   };
 

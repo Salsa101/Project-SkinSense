@@ -55,7 +55,7 @@ const forgotPassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "If the email is registered, an OTP has been sent." });
+      .json({ message: "OTP has been sent." });
   } catch (err) {
     console.error("Error forgot-password:", err);
     return res.status(500).json({ message: "Server error" });

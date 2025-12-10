@@ -73,6 +73,7 @@ const HistoryScan = ({ navigation, route }) => {
         }
       } catch (err) {
         console.error('Error fetching scan+quiz data:', err);
+        Alert.alert('Error', 'Failed to load scan data. Please try again.');
       }
     };
     fetchData();
@@ -113,6 +114,7 @@ const HistoryScan = ({ navigation, route }) => {
               sheetRef.current?.close();
             } catch (err) {
               console.error('Failed to delete scan:', err);
+              Alert.alert('Error', 'Failed to delete scan. Please try again.');
             } finally {
               setLoadingDelete(false);
             }

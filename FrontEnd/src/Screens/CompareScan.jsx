@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Feather';
@@ -52,6 +53,7 @@ const CompareScan = ({ navigation }) => {
           setScanData(res.data.data);
         }
       } catch (err) {
+        Alert.alert('Error', 'Failed to load scan data');
         console.error('Error fetching scan data:', err);
       }
     };
@@ -78,7 +80,7 @@ const CompareScan = ({ navigation }) => {
       setSelectedItems(prev => prev.filter(i => i !== id));
     } else {
       if (selectedItems.length >= 2) {
-        alert('Item yang diselect hanya boleh 2');
+        Alert.alert('Only 2 items can be selected');
         return;
       }
       setSelectedItems(prev => [...prev, id]);
@@ -111,7 +113,7 @@ const CompareScan = ({ navigation }) => {
 
   const handleCompare = async () => {
     if (selectedItems.length !== 2) {
-      alert('Harus pilih 2 scan untuk dibandingkan!');
+      Alert.alert('You must select 2 scans to compare!');
       return;
     }
 
@@ -134,7 +136,7 @@ const CompareScan = ({ navigation }) => {
       }
     } catch (err) {
       console.error('Compare error:', err);
-      alert('Gagal membandingkan scan, coba lagi.');
+      Alert.alert('Failed to compare scans, please try again.');
     }
   };
 

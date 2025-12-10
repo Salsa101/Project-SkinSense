@@ -26,11 +26,11 @@ const ChangePassword = ({ navigation }) => {
 
   const handleSave = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Semua field harus diisi!');
+      Alert.alert('Error', 'All fields must be filled!');
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Password baru tidak cocok!');
+      Alert.alert('Error', 'Password do not match.');
       return;
     }
 
@@ -41,11 +41,12 @@ const ChangePassword = ({ navigation }) => {
         currentPassword,
         newPassword,
       });
-      Alert.alert('Sukses', res.data.message || 'Password berhasil diubah!');
+      Alert.alert('Sukses', res.data.message || 'Password update successfull!');
       navigation.goBack();
     } catch (err) {
       const msg =
-        err.response?.data?.message || 'Gagal mengubah password. Coba lagi.';
+        err.response?.data?.message ||
+        'Failed to update password. Please try again.';
       Alert.alert('Error', msg);
     } finally {
       setLoading(false);

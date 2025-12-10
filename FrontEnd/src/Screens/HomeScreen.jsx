@@ -69,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
         setUserData(response.data);
       } catch (err) {
         console.error(err);
-        setError('Gagal mengambil data user. Silakan login kembali.');
+        setError('Failed to retrieve user data. Please log in again.');
       } finally {
         setLoading(false);
       }

@@ -97,6 +97,10 @@ const EditRoutine = ({ navigation, route }) => {
               fetchRoutine();
             } catch (err) {
               console.error(err);
+              Alert.alert(
+                'Error',
+                'Failed to delete product. Please try again.',
+              );
             }
           },
         },
