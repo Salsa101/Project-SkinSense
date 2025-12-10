@@ -77,6 +77,7 @@ class Notification {
       date: waktu,
       allowWhileIdle: true,
       repeatType: 'day',
+      repeatTime: '1',
     });
   };
 
@@ -89,6 +90,7 @@ class Notification {
       date: waktu, // in 60 secs\
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
       repeatType: 'day', // (optional) Increment of configured repeatType. Check 'Repeating Notifications' section for more info.
+      repeatTime: '1',
     });
   };
 
@@ -102,7 +104,7 @@ class Notification {
       });
     });
   };
-  
+
   cekSemuaNotifikasi = () => {
     PushNotification.getScheduledLocalNotifications(list => {
       console.log('=== DAFTAR NOTIF TERJADWAL ===');

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
@@ -72,7 +73,7 @@ const EditJournal = ({ navigation, route }) => {
 
   const handleSave = async () => {
     if (!title || !entry) {
-      alert('Please fill in title and entry!');
+      Alert.alert('Please fill in title and entry!');
       return;
     }
 
@@ -106,14 +107,14 @@ const EditJournal = ({ navigation, route }) => {
       });
 
       if (response.status === 200) {
-        alert('Journal updated successfully!');
+        Alert.alert('Journal updated successfully!');
         navigation.navigate('JournalDetail', { id });
       } else {
-        alert('Failed to update journal: ' + response.data.message);
+        Alert.alert('Failed to update journal: ' + response.data.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Error updating journal: ' + err.message);
+      Alert.alert('Error updating journal: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -140,14 +141,14 @@ const EditJournal = ({ navigation, route }) => {
               });
 
               if (res.status === 200) {
-                alert('Journal deleted successfully!');
+                Alert.alert('Journal deleted successfully!');
                 navigation.navigate('Calendar');
               } else {
-                alert('Failed to delete journal: ' + res.data.message);
+                Alert.alert('Failed to delete journal: ' + res.data.message);
               }
             } catch (err) {
               console.error(err);
-              alert('Error deleting journal: ' + err.message);
+              Alert.alert('Error deleting journal: ' + err.message);
             }
           },
         },

@@ -16,21 +16,21 @@ const registerController = async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
 
     if (!username || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "Semua field harus diisi." });
+      return res.status(400).json({ message: "All fields must be filled." });
     }
 
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Password tidak cocok." });
+      return res.status(400).json({ message: "Password do not match." });
     }
 
     const existingUsername = await User.findOne({ where: { username } });
     if (existingUsername) {
-      return res.status(400).json({ message: "Username sudah digunakan." });
+      return res.status(400).json({ message: "Username is already taken." });
     }
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email sudah digunakan." });
+      return res.status(400).json({ message: "Email is already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,7 +44,7 @@ const registerController = async (req, res) => {
     await sendWelcomeEmail(newUser);
 
     res.status(201).json({
-      message: "User berhasil terdaftar.",
+      message: "User registered successfully.",
       user: {
         id: newUser.id,
         username: newUser.username,
@@ -53,7 +53,7 @@ const registerController = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Terjadi kesalahan saat registrasi." });
+    res.status(500).json({ message: "An error occurred during registration." });
   }
 };
 
@@ -68,12 +68,12 @@ const loginController = async (req, res) => {
 
     const user = await User.findOne({ where: { username } });
     if (!user) {
-      return res.status(401).json({ message: "Username tidak ditemukan." });
+      return res.status(401).json({ message: "Username not found." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Password salah." });
+      return res.status(401).json({ message: "Incorrect password." });
     }
 
     const token = jwt.sign(
@@ -96,7 +96,7 @@ const loginController = async (req, res) => {
     });
 
     res.json({
-      message: "Login berhasil.",
+      message: "Login successful.",
       token,
       user: {
         id: user.id,
@@ -106,13 +106,13 @@ const loginController = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Terjadi kesalahan saat login." });
+    res.status(500).json({ message: "An error occurred during login." });
   }
 };
 
 const logoutController = async (req, res) => {
   res.clearCookie("token");
-  res.json({ message: "Logout berhasil" });
+  res.json({ message: "Logout successful" });
 };
 
 const getUser = async (req, res) => {
@@ -123,7 +123,7 @@ const getUser = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User tidak ditemukan" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
@@ -131,7 +131,7 @@ const getUser = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Terjadi kesalahan saat mengambil data user" });
+      .json({ message: "Failed to retrieve user data" });
   }
 };
 
@@ -140,7 +140,7 @@ const finishBoarding = async (req, res) => {
 
   await User.update({ inOnBoard: true }, { where: { id: userId } });
 
-  res.json({ message: "Onboarding selesai" });
+  res.json({ message: "Onboarding completed" });
 };
 
 module.exports = {

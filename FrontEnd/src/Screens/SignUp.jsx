@@ -29,6 +29,31 @@ const SignUp = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    if (!username && !email && !password && !confirmPassword) {
+      Alert.alert('Error', 'All fields must be filled!');
+      return;
+    }
+
+    if (!username) {
+      Alert.alert('Error', 'Username must be filled!');
+      return;
+    }
+
+    if (!email) {
+      Alert.alert('Error', 'Email must be filled!');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Error', 'Password must be filled!');
+      return;
+    }
+
+    if (!confirmPassword) {
+      Alert.alert('Error', 'Confirm password must be filled!');
+      return;
+    }
+
     setLoading(true);
 
     try {

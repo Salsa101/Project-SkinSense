@@ -25,6 +25,21 @@ const SignIn = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!username && !password) {
+      Alert.alert('Error', 'Username and password must be filled!');
+      return;
+    }
+
+    if (!username) {
+      Alert.alert('Error', 'Username must be filled!');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Error', 'Password must be filled!');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,7 +48,7 @@ const SignIn = ({ navigation }) => {
       const userResponse = await api.get('/user');
       const inOnBoard = userResponse.data?.inOnBoard || false;
 
-      Alert.alert('Sukses', 'Login berhasil.');
+      Alert.alert('Sukses', 'Login successfully.');
 
       if (!inOnBoard) {
         navigation.navigate('LandingPage');
@@ -41,7 +56,7 @@ const SignIn = ({ navigation }) => {
         navigation.navigate('Home');
       }
     } catch (error) {
-      const msg = error.response?.data?.message || 'Login gagal.';
+      const msg = error.response?.data?.message || 'Login error.';
       Alert.alert('Error', msg);
       console.log('Login error:', error.response?.data || error.message);
     } finally {
