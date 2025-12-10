@@ -7,14 +7,12 @@ const logoPath = path.join(__dirname, "../Utils/Logo.png");
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email diperlukan" });
+    if (!email) return res.status(400).json({ message: "Email is required" });
 
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res
-        .status(200)
-        .json({ message: "Jika email terdaftar, OTP telah dikirim." });
+      return res.status(404).json({ message: "Email not registered" });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -29,7 +27,7 @@ const forgotPassword = async (req, res) => {
         used: false,
       });
     } catch (err) {
-      console.error("Gagal simpan OTP:", err);
+      console.error("Failed to save OTP", err);
     }
 
     const htmlContent = `
@@ -57,7 +55,7 @@ const forgotPassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Jika email terdaftar, OTP telah dikirim." });
+      .json({ message: "If the email is registered, an OTP has been sent." });
   } catch (err) {
     console.error("Error forgot-password:", err);
     return res.status(500).json({ message: "Server error" });
@@ -69,17 +67,14 @@ const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
 
     const user = await User.findOne({ where: { email } });
-    if (!user)
-      return res.status(400).json({ message: "Email tidak ditemukan" });
+    if (!user) return res.status(400).json({ message: "Email not found" });
 
     const otpEntry = await PasswordReset.findOne({
       where: { userId: user.id, otp: otp.trim(), used: false },
     });
 
     if (!otpEntry || otpEntry.expiresAt.getTime() < Date.now()) {
-      return res
-        .status(400)
-        .json({ message: "OTP tidak valid atau sudah kadaluarsa" });
+      return res.status(400).json({ message: "OTP is invalid or has expired" });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -89,7 +84,7 @@ const resetPassword = async (req, res) => {
     otpEntry.used = true;
     await otpEntry.save();
 
-    res.status(200).json({ message: "Password berhasil diubah!" });
+    res.status(200).json({ message: "Password changed successfully!" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
