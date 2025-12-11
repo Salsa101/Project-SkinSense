@@ -82,9 +82,60 @@ const adminLogoutController = async (req, res) => {
 // ========== Product Page ==========
 
 //View Product
+// const getAllProducts = async (req, res) => {
+//   try {
+//     const products = await Product.findAll({
+//       include: [
+//         {
+//           model: User,
+//           as: "user",
+//           attributes: ["id", "username", "email", "role"],
+//         },
+//         {
+//           model: Ingredient,
+//           as: "Ingredients",
+//           attributes: ["id", "name", "tags"],
+//           through: { attributes: [] },
+//         },
+//       ],
+//       order: [["id", "DESC"]],
+//     });
+
+//     res.json(products);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Gagal mengambil data produk" });
+//   }
+// };
+
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { search, brand, type, verified } = req.query;
+
+    const where = {};
+
+    if (search) {
+      where.productName = { [Op.like]: `%${search}%` };
+    }
+    if (brand) {
+      where.productBrand = brand;
+    }
+    if (type) {
+      where.productType = type;
+    }
+    if (verified === "true") {
+      where.isVerified = true;
+    }
+    if (verified === "false") {
+      where.isVerified = false;
+    }
+
+    const { rows, count } = await Product.findAndCountAll({
+      where,
       include: [
         {
           model: User,
@@ -99,9 +150,16 @@ const getAllProducts = async (req, res) => {
         },
       ],
       order: [["id", "DESC"]],
+      limit,
+      offset,
     });
 
-    res.json(products);
+    res.json({
+      products: rows,
+      total: count,
+      currentPage: page,
+      totalPages: Math.ceil(count / limit),
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gagal mengambil data produk" });
