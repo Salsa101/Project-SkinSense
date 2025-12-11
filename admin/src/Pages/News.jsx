@@ -174,7 +174,7 @@ function News() {
                           );
                         } catch (err) {
                           console.error(err);
-                          alert("Gagal update status active ❌");
+                          alert("Failed to update active status.");
                         }
                       }}
                     />
