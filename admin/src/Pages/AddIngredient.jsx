@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
+import CreatableSelect from "react-select/creatable";
 
 function AddIngredient() {
   const navigate = useNavigate();
+  const [tags, setTags] = useState([]);
+  const [existingTags, setExistingTags] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -13,6 +16,39 @@ function AddIngredient() {
     skinTypes: [],
     tags: "",
   });
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await api.get("/admin/ingredients");
+
+        const allIngredients = res.data;
+
+        const allTags = allIngredients.flatMap((i) => {
+          if (!i.tags) return [];
+
+          // jika format Postgres: "{a,b,c}"
+          if (typeof i.tags === "string") {
+            return i.tags
+              .replace("{", "")
+              .replace("}", "")
+              .split(",")
+              .map((t) => t.trim());
+          }
+
+          return i.tags;
+        });
+
+        const uniqueTags = [...new Set(allTags)];
+
+        setExistingTags(uniqueTags);
+      } catch (err) {
+        console.error("Failed to fetch tags:", err);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -56,17 +92,19 @@ function AddIngredient() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.skinTypes || form.skinTypes.length === 0) {
+      alert("Please select at least one skin type!");
+      return;
+    }
+
     try {
       const payload = {
         ...form,
-        tags: form.tags
-          .split(",")
-          .map((t) => t.trim())
-          .filter((t) => t.length > 0),
+        tags: tags,
       };
 
       await api.post("/admin/ingredients/add", payload);
-      alert("Ingredient added!");
+      alert("Ingredient added successfully.");
       navigate("/admin/ingredients");
     } catch (err) {
       console.error(err);
@@ -166,14 +204,13 @@ function AddIngredient() {
 
         {/* TAGS (text input) */}
         <div className="mb-3">
-          <label className="form-label">Tags (pisahkan dengan koma)</label>
-          <input
-            type="text"
-            name="tags"
-            className="form-control"
-            placeholder="cth: hydrating, anti-acne, niacinamide"
-            value={form.tags}
-            onChange={handleChange}
+          <label className="form-label">Tags</label>
+          <CreatableSelect
+            isMulti
+            options={existingTags.map((t) => ({ label: t, value: t }))}
+            value={tags.map((t) => ({ label: t, value: t }))}
+            onChange={(selected) => setTags(selected.map((s) => s.value))}
+            placeholder="Pilih atau tambahkan tag..."
           />
 
           <small className="text-danger d-block mt-1">

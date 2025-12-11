@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
+import CreatableSelect from "react-select/creatable";
 
 function EditIngredient() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [tags, setTags] = useState([]);
+  const [existingTags, setExistingTags] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -14,8 +17,35 @@ function EditIngredient() {
     isOily: false,
     weight: "",
     skinTypes: [],
-    tags: "",
   });
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await api.get("/admin/ingredients");
+
+        const allTags = res.data.flatMap((i) => {
+          if (!i.tags) return [];
+
+          if (typeof i.tags === "string") {
+            return i.tags
+              .replace("{", "")
+              .replace("}", "")
+              .split(",")
+              .map((t) => t.trim());
+          }
+
+          return i.tags;
+        });
+
+        setExistingTags([...new Set(allTags)]);
+      } catch (err) {
+        console.error("Failed to fetch tags:", err);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   useEffect(() => {
     const fetchIngredient = async () => {
@@ -33,11 +63,11 @@ function EditIngredient() {
                 return s.charAt(0).toUpperCase() + s.slice(1);
               })
             : [],
-          tags: res.data.tags ? res.data.tags.join(", ") : "",
         });
+        setTags(res.data.tags || []);
       } catch (err) {
         console.error(err);
-        alert("Gagal mengambil data ingredient.");
+        alert("Failed to load ingredient data.");
       } finally {
         setLoading(false);
       }
@@ -99,29 +129,29 @@ function EditIngredient() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.skinTypes || form.skinTypes.length === 0) {
+      alert("Please select at least one skin type!");
+      return;
+    }
+
     const payload = {
       ...form,
       skinTypes: form.skinTypes.map((st) => {
         if (st === "All Skin Types") return "all";
         return st.toLowerCase();
       }),
-      tags: form.tags
-        .split(",")
-        .map((t) => t.trim().toLowerCase())
-        .filter((t) => t.length > 0),
+      tags,
     };
 
     try {
       await api.put(`/admin/ingredients/update/${id}`, payload);
-      alert("Ingredient updated!");
+      alert("Ingredient updated successfully!");
       navigate("/admin/ingredients");
     } catch (err) {
       console.error(err);
-      alert("Gagal update ingredient.");
+      alert("Failed to update ingredient. Please try again.");
     }
   };
-
-  if (loading) return <p className="text-center mt-4">Loading...</p>;
 
   return (
     <div className="container my-4">
@@ -210,14 +240,13 @@ function EditIngredient() {
 
         {/* TAGS */}
         <div className="mb-3">
-          <label className="form-label">Tags (pisahkan dengan koma)</label>
-          <input
-            type="text"
-            name="tags"
-            className="form-control"
-            placeholder="cth: hydrating, anti-acne"
-            value={form.tags}
-            onChange={handleChange}
+          <label className="form-label">Tags</label>
+          <CreatableSelect
+            isMulti
+            options={existingTags.map((t) => ({ label: t, value: t }))}
+            value={tags.map((t) => ({ label: t, value: t }))}
+            onChange={(selected) => setTags(selected.map((s) => s.value))}
+            placeholder="Pilih atau tambahkan tag..."
           />
           <small className="text-danger d-block mt-1">
             ⚠️ Gunakan huruf kecil semua dan pakai strip (-) untuk 2 kata.

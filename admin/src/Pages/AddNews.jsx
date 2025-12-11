@@ -23,6 +23,7 @@ function AddNews() {
         setCategories(res.data);
       } catch (err) {
         console.error(err);
+        alert("Failed to load category data.");
       }
     };
     fetchCategories();
@@ -59,12 +60,12 @@ function AddNews() {
       navigate("/admin/news");
     } catch (err) {
       console.error(err);
-      alert("Failed to add news.");
+      alert("Failed to add news. Please try again.");
     }
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Add News</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         {/* Title */}
@@ -88,6 +89,7 @@ function AddNews() {
             value={form.content}
             onChange={(value) => setForm({ ...form, content: value })}
             style={{ height: "200px", marginBottom: "50px" }}
+            required
           />
         </div>
 
@@ -112,6 +114,7 @@ function AddNews() {
                         : [...form.categoryIds, id],
                     });
                   }}
+                  required
                 />
                 <label className="form-check-label">{c.name}</label>
               </div>

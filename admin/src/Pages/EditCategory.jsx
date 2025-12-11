@@ -17,7 +17,7 @@ function EditCategory() {
         setForm({ name: res.data.name });
       } catch (err) {
         console.error(err);
-        alert("Gagal mengambil data category.");
+        alert("Failed to load category data.");
       }
     };
 
@@ -33,16 +33,16 @@ function EditCategory() {
 
     try {
       await api.put(`/admin/categories/edit/${id}`, form);
-      alert("Category berhasil diupdate!");
+      alert("Category updated successfully!");
       navigate("/admin/categories");
     } catch (err) {
       console.error(err);
-      alert("Gagal update category.");
+      alert("Failed to update category. Please try again.");
     }
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Edit Category</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         <div className="mb-3">

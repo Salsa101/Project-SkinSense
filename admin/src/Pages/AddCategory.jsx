@@ -19,7 +19,7 @@ function AddCategory() {
     try {
       await api.post("/admin/categories/add", form);
       alert("Category added successfully!");
-      navigate("/admin/categories"); // redirect ke halaman list category
+      navigate("/admin/categories");
     } catch (err) {
       console.error(err);
       alert("Failed to add category.");
@@ -27,7 +27,7 @@ function AddCategory() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Add Category</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         <div className="mb-3">

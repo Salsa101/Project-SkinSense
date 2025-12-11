@@ -23,7 +23,14 @@ function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <p>Checking authentication...</p>
       </div>
     );
@@ -31,7 +38,14 @@ function ProtectedRoute({ children }) {
 
   if (!isAuth) {
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <p>You are not authorized. Redirecting to login...</p>
         <Navigate to="/admin/login" replace />
       </div>
