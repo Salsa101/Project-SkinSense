@@ -38,13 +38,12 @@ const adminLoginController = async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ where: { username } });
 
-    if (!user)
-      return res.status(401).json({ message: "Username tidak ditemukan." });
+    if (!user) return res.status(401).json({ message: "Username not found." });
     if (user.role !== "admin")
-      return res.status(403).json({ message: "Hanya admin yang bisa login." });
+      return res.status(403).json({ message: "Only admin can login." });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Password salah." });
+    if (!isMatch) return res.status(401).json({ message: "Wrong password." });
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
@@ -59,12 +58,13 @@ const adminLoginController = async (req, res) => {
     });
 
     res.json({
-      message: "Login admin berhasil",
+      message: "Admin login successfull",
+      token,
       user: { id: user.id, username: user.username, role: user.role },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Terjadi kesalahan login admin" });
+    res.status(500).json({ message: "An admin login error occurred" });
   }
 };
 
