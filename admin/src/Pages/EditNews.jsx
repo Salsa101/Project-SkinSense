@@ -24,6 +24,7 @@ function EditNews() {
         setCategories(res.data.filter((c) => c.isActive));
       } catch (err) {
         console.error(err);
+        alert("Failed to load category data.");
       }
     };
     fetchCategories();
@@ -40,7 +41,7 @@ function EditNews() {
         });
       } catch (err) {
         console.error(err);
-        alert("Gagal mengambil data news.");
+        alert("Failed to load news data.");
       }
     };
     fetchNews();
@@ -78,16 +79,16 @@ function EditNews() {
       await api.put(`/admin/news/edit/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("News berhasil diupdate!");
+      alert("News updated successfully!");
       navigate("/admin/news");
     } catch (err) {
       console.error(err);
-      alert("Gagal update news.");
+      alert("Failed to update news. Please try again.");
     }
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Edit News</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         <div className="mb-3">
@@ -109,6 +110,7 @@ function EditNews() {
             value={form.content}
             onChange={(value) => setForm({ ...form, content: value })}
             style={{ height: "200px", marginBottom: "50px" }}
+            required
           />
         </div>
 
@@ -124,6 +126,7 @@ function EditNews() {
                   value={c.id}
                   checked={form.categoryIds.includes(c.id)}
                   onChange={(e) => handleCheckboxChange(c.id, e.target.checked)}
+                  required
                 />
                 <label className="form-check-label" htmlFor={`cat-${c.id}`}>
                   {c.name}

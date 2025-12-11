@@ -53,6 +53,12 @@ function AddProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (selectedIngredients.length === 0) {
+      alert("Please select at least one ingredient!");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("productName", form.productName);
     formData.append("productBrand", form.productBrand);
@@ -99,6 +105,7 @@ function AddProduct() {
             className="form-control"
             value={form.productBrand}
             onChange={handleChange}
+            required
           />
         </div>
         <div className="mb-3">
@@ -108,6 +115,7 @@ function AddProduct() {
             className="form-control"
             value={form.productType}
             onChange={handleChange}
+            required
           >
             <option value="">-- Pilih Type --</option>
             <option value="cleanser">Cleanser</option>
@@ -137,6 +145,7 @@ function AddProduct() {
             value={ingredientSearch}
             onChange={handleSearchIngredient}
             placeholder="Search ingredient..."
+            required
           />
 
           {/* SEARCH RESULT */}

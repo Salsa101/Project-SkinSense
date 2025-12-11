@@ -3,12 +3,14 @@ import api from "../api/api";
 import Navbar from "../Components/Navbar";
 
 import productImg from "../assets/product-admin.jpg";
+import ingredientImg from "../assets/ingredients-admin.jpg";
 import newsImg from "../assets/news-admin.jpg";
 import categoryImg from "../assets/category-admin.jpg";
 
 function Dashboard() {
   const [stats, setStats] = useState({
     products: 0,
+    ingredients: 0,
     news: 0,
     categories: 0,
   });
@@ -16,14 +18,17 @@ function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [resProducts, resNews, resCategories] = await Promise.all([
-          api.get("/admin/products"),
-          api.get("/admin/news"),
-          api.get("/admin/categories"),
-        ]);
+        const [resProducts, resIngredients, resNews, resCategories] =
+          await Promise.all([
+            api.get("/admin/products"),
+            api.get("/admin/ingredients"),
+            api.get("/admin/news"),
+            api.get("/admin/categories"),
+          ]);
 
         setStats({
           products: resProducts.data.length,
+          ingredients: resIngredients.data.length,
           news: resNews.data.length,
           categories: resCategories.data.filter((c) => c.isActive).length,
         });
@@ -40,9 +45,9 @@ function Dashboard() {
       <Navbar />
       <div className="container mt-4">
         <h2>Welcome, admin</h2>
-        <div className="row mt-4">
+        <div className="row mt-5">
           {/* Products Card */}
-          <div className="col-md-4 mb-3">
+          <div className="col-md-3 mb-3">
             <div className="card text-center shadow-sm">
               <img src={productImg} className="card-img-top" alt="Products" />
               <div className="card-body">
@@ -55,8 +60,26 @@ function Dashboard() {
             </div>
           </div>
 
+          {/* Ingredients Card */}
+          <div className="col-md-3 mb-3">
+            <div className="card text-center shadow-sm">
+              <img
+                src={ingredientImg}
+                className="card-img-top"
+                alt="Ingredients"
+              />
+              <div className="card-body">
+                <h5 className="card-title">Ingredients</h5>
+                <p className="card-text display-6">{stats.ingredients}</p>
+                <a href="/admin/ingredients" className="btn btn-info w-100">
+                  Go to Ingredients
+                </a>
+              </div>
+            </div>
+          </div>
+
           {/* News Card */}
-          <div className="col-md-4 mb-3">
+          <div className="col-md-3 mb-3">
             <div className="card text-center shadow-sm">
               <img src={newsImg} className="card-img-top" alt="News" />
               <div className="card-body">
@@ -70,7 +93,7 @@ function Dashboard() {
           </div>
 
           {/* Categories Card */}
-          <div className="col-md-4 mb-3">
+          <div className="col-md-3 mb-3">
             <div className="card text-center shadow-sm">
               <img
                 src={categoryImg}

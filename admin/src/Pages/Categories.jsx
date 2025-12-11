@@ -16,6 +16,7 @@ function Categories() {
         setCategories(res.data);
       } catch (err) {
         console.error(err);
+        alert("Failed to load category data.");
       } finally {
         setLoading(false);
       }
@@ -24,23 +25,19 @@ function Categories() {
     fetchCategories();
   }, []);
 
-  if (loading) return <p>Loading categories...</p>;
-
-  const toggleActive = async (id, currentStatus) => {
-    try {
-      await api.put(`/admin/categories/toggle/${id}`, {
-        isActive: !currentStatus,
-      });
-      setCategories(
-        categories.map((c) =>
-          c.id === id ? { ...c, isActive: !currentStatus } : c
-        )
-      );
-    } catch (err) {
-      console.error(err);
-      alert("Gagal mengubah status kategori ❌");
-    }
-  };
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading categories...
+      </div>
+    );
 
   const filteredCategories = categories.filter((c) =>
     search ? c.name.toLowerCase().includes(search.toLowerCase()) : true
@@ -72,6 +69,7 @@ function Categories() {
         <table className="table table-striped table-bordered">
           <thead className="table-dark">
             <tr>
+              <th>No</th>
               <th>ID</th>
               <th>Name</th>
               <th>Is Active</th>
@@ -79,8 +77,9 @@ function Categories() {
             </tr>
           </thead>
           <tbody>
-            {filteredCategories.map((c) => (
+            {filteredCategories.map((c, index) => (
               <tr key={c.id}>
+                <td>{filteredCategories.length - index}</td>
                 <td>{c.id}</td>
                 <td>{c.name}</td>
                 <td>
@@ -104,7 +103,9 @@ function Categories() {
                           );
                         } catch (err) {
                           console.error(err);
-                          alert("Gagal update status kategori ❌");
+                          alert(
+                            "Failed to update category status. Please try again."
+                          );
                         }
                       }}
                     />

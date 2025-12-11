@@ -21,6 +21,7 @@ function News() {
         setNewsList(res.data);
       } catch (err) {
         console.error(err);
+        alert("Failed to load news data.");
       } finally {
         setLoading(false);
       }
@@ -29,16 +30,29 @@ function News() {
     fetchNews();
   }, []);
 
-  if (loading) return <p>Loading news...</p>;
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading news...
+      </div>
+    );
 
   const handleDelete = async () => {
     try {
       await api.delete(`/admin/news/delete/${selectedId}`);
       setNewsList(newsList.filter((n) => n.id !== selectedId));
       setShowModal(false);
+      alert("News deleted successfully!");
     } catch (err) {
       console.error(err);
-      alert("Gagal menghapus news ❌");
+      alert("Failed to delete news. Please try again.");
     }
   };
 
@@ -103,6 +117,7 @@ function News() {
         <table className="table table-striped table-bordered">
           <thead className="table-dark">
             <tr>
+              <th>No</th>
               <th>ID</th>
               <th>Image</th>
               <th>Title</th>
@@ -113,8 +128,9 @@ function News() {
             </tr>
           </thead>
           <tbody>
-            {filteredNews.map((n) => (
+            {filteredNews.map((n, index) => (
               <tr key={n.id}>
+                <td>{filteredNews.length - index}</td>
                 <td>{n.id}</td>
                 <td>
                   {n.newsImage ? (
@@ -187,39 +203,55 @@ function News() {
                   </button>
 
                   {showModal && (
-                    <div className="modal show d-block" tabIndex="-1">
-                      <div className="modal-dialog">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h5 className="modal-title">Konfirmasi Hapus</h5>
-                            <button
-                              type="button"
-                              className="btn-close"
-                              onClick={() => setShowModal(false)}
-                            ></button>
-                          </div>
-                          <div className="modal-body">
-                            <p>Apakah kamu yakin ingin menghapus news ini?</p>
-                          </div>
-                          <div className="modal-footer">
-                            <button
-                              type="button"
-                              className="btn btn-secondary"
-                              onClick={() => setShowModal(false)}
-                            >
-                              Batal
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-danger"
-                              onClick={handleDelete}
-                            >
-                              Hapus
-                            </button>
+                    <>
+                      {/* Overlay gelap */}
+                      <div
+                        className="modal-backdrop fade show"
+                        style={{
+                          zIndex: 1040,
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        }}
+                        onClick={() => setShowModal(false)}
+                      ></div>
+                      <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog">
+                          <div className="modal-content">
+                            <div className="modal-header">
+                              <h5 className="modal-title">
+                                Delete Confirmation
+                              </h5>
+                              <button
+                                type="button"
+                                className="btn-close"
+                                onClick={() => setShowModal(false)}
+                              ></button>
+                            </div>
+                            <div className="modal-body">
+                              <p>
+                                Are you sure you want to delete this news? This
+                                action cannot be undone.
+                              </p>
+                            </div>
+                            <div className="modal-footer">
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowModal(false)}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={handleDelete}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </td>
               </tr>

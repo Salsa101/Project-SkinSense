@@ -34,7 +34,7 @@ function EditProduct() {
         setSelectedIngredients(res.data.Ingredients || []);
       } catch (err) {
         console.error(err);
-        alert("Gagal mengambil data produk.");
+        alert("Failed to load product data.");
       }
     };
 
@@ -81,6 +81,11 @@ function EditProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (selectedIngredients.length === 0) {
+      alert("Please select at least one ingredient!");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("productName", form.productName);
     formData.append("productBrand", form.productBrand);
@@ -97,16 +102,16 @@ function EditProduct() {
       await api.put(`/admin/products/update/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Produk berhasil diupdate!");
+      alert("Product updated successfully!");
       navigate("/admin/products");
     } catch (err) {
       console.error(err);
-      alert("Gagal update produk.");
+      alert("Failed to update product. Please try again.");
     }
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <h2>Edit Product</h2>
       <form onSubmit={handleSubmit} className="mt-3">
         <div className="mb-3">

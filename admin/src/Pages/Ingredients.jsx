@@ -8,6 +8,9 @@ function Ingredients() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  const [sensitiveFilter, setSensitiveFilter] = useState("");
+  const [skinTypeFilter, setSkinTypeFilter] = useState("");
+
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -18,6 +21,7 @@ function Ingredients() {
         setIngredients(res.data);
       } catch (err) {
         console.error(err);
+        alert("Failed to load ingredient data.");
       } finally {
         setLoading(false);
       }
@@ -26,7 +30,19 @@ function Ingredients() {
     fetchIngredients();
   }, []);
 
-  if (loading) return <p>Loading ingredients...</p>;
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading ingredients...
+      </div>
+    );
 
   const handleDelete = async () => {
     try {
@@ -35,15 +51,37 @@ function Ingredients() {
       });
       setIngredients(ingredients.filter((i) => i.id !== selectedId));
       setShowModal(false);
+      alert("Ingredient deleted successfully!");
     } catch (err) {
       console.error(err);
-      alert("Gagal menghapus ingredient ❌");
+      alert("Failed to delete ingredient. Please try again.");
     }
   };
 
-  const filteredIngredients = ingredients.filter((i) =>
-    i.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const uniqueSkinTypes = [
+    ...new Set(ingredients.flatMap((i) => i.skinTypes || [])),
+  ];
+
+  // Filter ingredients
+  const filteredIngredients = ingredients.filter((i) => {
+    const searchLower = search.toLowerCase();
+
+    const matchSearch =
+      i.name.toLowerCase().includes(searchLower) ||
+      (i.tags?.some((t) => t.toLowerCase().includes(searchLower)) ?? false);
+
+    const matchSensitive =
+      sensitiveFilter === ""
+        ? true
+        : sensitiveFilter === "true"
+        ? i.isSensitive
+        : !i.isSensitive;
+
+    const matchSkinType =
+      skinTypeFilter === "" ? true : i.skinTypes?.includes(skinTypeFilter);
+
+    return matchSearch && matchSensitive && matchSkinType;
+  });
 
   return (
     <div>
@@ -56,25 +94,52 @@ function Ingredients() {
           </a>
         </div>
 
+        {/* Search & Filter */}
         <div className="row mb-3">
           <div className="col-md-4">
             <input
               type="text"
               className="form-control"
-              placeholder="Search ingredient..."
+              placeholder="Search ingredient or tag..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={sensitiveFilter}
+              onChange={(e) => setSensitiveFilter(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="true">Sensitive</option>
+              <option value="false">Not Sensitive</option>
+            </select>
+          </div>
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={skinTypeFilter}
+              onChange={(e) => setSkinTypeFilter(e.target.value)}
+            >
+              <option value="">All Skin Types</option>
+              {uniqueSkinTypes.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <table className="table table-striped table-bordered">
           <thead className="table-dark">
             <tr>
+              <th>No</th>
               <th>ID</th>
               <th>Name</th>
               <th>For Sensitive?</th>
-              <th>Texture Oily?</th>
+              <th>For Oily?</th>
               <th>Weight</th>
               <th>Skin Types</th>
               <th>Tags</th>
@@ -83,8 +148,9 @@ function Ingredients() {
             </tr>
           </thead>
           <tbody>
-            {filteredIngredients.map((ing) => (
+            {filteredIngredients.map((ing, index) => (
               <tr key={ing.id}>
+                <td>{filteredIngredients.length - index}</td>
                 <td>{ing.id}</td>
                 <td>{ing.name}</td>
                 <td>{ing.isSensitive ? "Yes" : "No"}</td>
@@ -124,39 +190,55 @@ function Ingredients() {
                     </button>
 
                     {showModal && (
-                      <div className="modal show d-block" tabIndex="-1">
-                        <div className="modal-dialog">
-                          <div className="modal-content">
-                            <div className="modal-header">
-                              <h5 className="modal-title">Konfirmasi Hapus</h5>
-                              <button
-                                type="button"
-                                className="btn-close"
-                                onClick={() => setShowModal(false)}
-                              ></button>
-                            </div>
-                            <div className="modal-body">
-                              <p>Yakin ingin menghapus ingredient ini?</p>
-                            </div>
-                            <div className="modal-footer">
-                              <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => setShowModal(false)}
-                              >
-                                Batal
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={handleDelete}
-                              >
-                                Hapus
-                              </button>
+                      <>
+                        {/* Overlay gelap */}
+                        <div
+                          className="modal-backdrop fade show"
+                          style={{
+                            zIndex: 1040,
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                          onClick={() => setShowModal(false)}
+                        ></div>
+                        <div className="modal show d-block" tabIndex="-1">
+                          <div className="modal-dialog">
+                            <div className="modal-content">
+                              <div className="modal-header">
+                                <h5 className="modal-title">
+                                  Delete Confirmation
+                                </h5>
+                                <button
+                                  type="button"
+                                  className="btn-close"
+                                  onClick={() => setShowModal(false)}
+                                ></button>
+                              </div>
+                              <div className="modal-body">
+                                <p>
+                                  Are you sure you want to delete this
+                                  ingredient? This action cannot be undone.
+                                </p>
+                              </div>
+                              <div className="modal-footer">
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary"
+                                  onClick={() => setShowModal(false)}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-danger"
+                                  onClick={handleDelete}
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </>
                     )}
                   </div>
                 </td>

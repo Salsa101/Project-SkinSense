@@ -23,6 +23,7 @@ function Products() {
         setProducts(res.data);
       } catch (err) {
         console.error(err);
+        alert("Failed to load product data.");
       } finally {
         setLoading(false);
       }
@@ -31,7 +32,19 @@ function Products() {
     fetchProducts();
   }, []);
 
-  if (loading) return <p>Loading products...</p>;
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading products...
+      </div>
+    );
 
   const handleDelete = async () => {
     try {
@@ -40,9 +53,10 @@ function Products() {
       });
       setProducts(products.filter((p) => p.id !== selectedId));
       setShowModal(false);
+      alert("Product deleted successfully!");
     } catch (err) {
       console.error(err);
-      alert("Gagal menghapus produk ❌");
+      alert("Failed to delete product");
     }
   };
 
@@ -138,6 +152,7 @@ function Products() {
         <table className="table table-striped table-bordered">
           <thead className="table-dark">
             <tr>
+              <th>No</th>
               <th>ID</th>
               <th>Image</th>
               <th>Name</th>
@@ -150,8 +165,9 @@ function Products() {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map((p) => (
+            {filteredProducts.map((p, index) => (
               <tr key={p.id}>
+                <td>{filteredProducts.length - index}</td>
                 <td>{p.id}</td>
                 <td>
                   {p.productImage ? (
@@ -206,7 +222,9 @@ function Products() {
                           );
                         } catch (err) {
                           console.error(err);
-                          alert("Gagal update status verified ❌");
+                          alert(
+                            "Failed to update status verified. Please try again."
+                          );
                         }
                       }}
                     />
@@ -234,39 +252,55 @@ function Products() {
                   </button>
 
                   {showModal && (
-                    <div className="modal show d-block" tabIndex="-1">
-                      <div className="modal-dialog">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h5 className="modal-title">Konfirmasi Hapus</h5>
-                            <button
-                              type="button"
-                              className="btn-close"
-                              onClick={() => setShowModal(false)}
-                            ></button>
-                          </div>
-                          <div className="modal-body">
-                            <p>Apakah kamu yakin ingin menghapus produk ini?</p>
-                          </div>
-                          <div className="modal-footer">
-                            <button
-                              type="button"
-                              className="btn btn-secondary"
-                              onClick={() => setShowModal(false)}
-                            >
-                              Batal
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-danger"
-                              onClick={handleDelete}
-                            >
-                              Hapus
-                            </button>
+                    <>
+                      {/* Overlay gelap */}
+                      <div
+                        className="modal-backdrop fade show"
+                        style={{
+                          zIndex: 1040,
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        }}
+                        onClick={() => setShowModal(false)}
+                      ></div>
+                      <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog">
+                          <div className="modal-content">
+                            <div className="modal-header">
+                              <h5 className="modal-title">
+                                Delete Confirmation
+                              </h5>
+                              <button
+                                type="button"
+                                className="btn-close"
+                                onClick={() => setShowModal(false)}
+                              ></button>
+                            </div>
+                            <div className="modal-body">
+                              <p>
+                                Are you sure you want to delete this product?
+                                This action cannot be undone.
+                              </p>
+                            </div>
+                            <div className="modal-footer">
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowModal(false)}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={handleDelete}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </td>
               </tr>
