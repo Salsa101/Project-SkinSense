@@ -82,65 +82,9 @@ const adminLogoutController = async (req, res) => {
 // ========== Product Page ==========
 
 //View Product
-// const getAllProducts = async (req, res) => {
-//   try {
-//     const products = await Product.findAll({
-//       include: [
-//         {
-//           model: User,
-//           as: "user",
-//           attributes: ["id", "username", "email", "role"],
-//         },
-//         {
-//           model: Ingredient,
-//           as: "Ingredients",
-//           attributes: ["id", "name", "tags"],
-//           through: { attributes: [] },
-//         },
-//       ],
-//       order: [["id", "DESC"]],
-//     });
-
-//     res.json(products);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Gagal mengambil data produk" });
-//   }
-// };
-
 const getAllProducts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-
-    const { search, brand, type, verified } = req.query;
-
-    const where = {};
-
-    if (search) {
-      where[Op.and] = Sequelize.where(
-        Sequelize.fn("LOWER", Sequelize.col("productName")),
-        {
-          [Op.like]: `%${search.toLowerCase()}%`,
-        }
-      );
-    }
-    if (brand) {
-      where.productBrand = brand;
-    }
-    if (type) {
-      where.productType = type;
-    }
-    if (verified === "true") {
-      where.isVerified = true;
-    }
-    if (verified === "false") {
-      where.isVerified = false;
-    }
-
-    const { rows, count } = await Product.findAndCountAll({
-      where,
+    const products = await Product.findAll({
       include: [
         {
           model: User,
@@ -155,16 +99,9 @@ const getAllProducts = async (req, res) => {
         },
       ],
       order: [["id", "DESC"]],
-      limit,
-      offset,
     });
 
-    res.json({
-      products: rows,
-      total: count,
-      currentPage: page,
-      totalPages: Math.ceil(count / limit),
-    });
+    res.json(products);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gagal mengambil data produk" });
@@ -349,82 +286,18 @@ const verifiedProduct = async (req, res) => {
 // ========== News Page ==========
 
 //Get News
-// const getNews = async (req, res) => {
-//   try {
-//     const news = await News.findAll({
-//       include: [
-//         {
-//           model: Category,
-//           attributes: ["id", "name"],
-//           through: { attributes: [] },
-//           where: { isActive: true },
-//           required: false,
-//         },
-//       ],
-//       attributes: [
-//         "id",
-//         "title",
-//         "content",
-//         "newsImage",
-//         "isActive",
-//         "createdAt",
-//       ],
-//       order: [["id", "DESC"]],
-//     });
-
-//     res.json(news);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 const getNews = async (req, res) => {
   try {
-    // 📌 Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-
-    // 📌 Filters
-    const { search, category } = req.query;
-
-    const where = {};
-
-    // 🔍 Search by title (case-insensitive)
-    if (search) {
-      where[Op.and] = Sequelize.where(
-        Sequelize.fn("LOWER", Sequelize.col("title")),
+    const news = await News.findAll({
+      include: [
         {
-          [Op.like]: `%${search.toLowerCase()}%`,
-        }
-      );
-    }
-
-    // 📌 Category filter
-    const categoryFilter = category
-      ? {
-          model: Category,
-          attributes: ["id", "name"],
-          through: { attributes: [] },
-          where: {
-            id: category,
-            isActive: true,
-          },
-          required: true,
-        }
-      : {
           model: Category,
           attributes: ["id", "name"],
           through: { attributes: [] },
           where: { isActive: true },
           required: false,
-        };
-
-    // 📌 Query + Count
-    const { rows, count } = await News.findAndCountAll({
-      where,
-      include: [categoryFilter],
+        },
+      ],
       attributes: [
         "id",
         "title",
@@ -434,17 +307,9 @@ const getNews = async (req, res) => {
         "createdAt",
       ],
       order: [["id", "DESC"]],
-      limit,
-      offset,
     });
 
-    // 📌 Response
-    res.json({
-      news: rows,
-      total: count,
-      currentPage: page,
-      totalPages: Math.ceil(count / limit),
-    });
+    res.json(news);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -647,49 +512,13 @@ const addCategory = async (req, res) => {
 };
 
 //Get Category
-// const getCategory = async (req, res) => {
-//   try {
-//     const categories = await Category.findAll({
-//       attributes: ["id", "name", "isActive"],
-//       order: [["id", "DESC"]],
-//     });
-//     res.json(categories);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 const getCategory = async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 10 } = req.query;
-
-    const offset = (page - 1) * limit;
-
-    const where = {};
-
-    // SEARCH BY NAME
-    if (search) {
-      where.name = { [Op.iLike]: `%${search}%` };
-    }
-
-    const { rows, count } = await Category.findAndCountAll({
-      where,
+    const categories = await Category.findAll({
       attributes: ["id", "name", "isActive"],
-      limit: Number(limit),
-      offset,
       order: [["id", "DESC"]],
     });
-
-    res.json({
-      data: rows,
-      pagination: {
-        total: count,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(count / limit),
-      },
-    });
+    res.json(categories);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -773,75 +602,19 @@ const isActiveCategory = async (req, res) => {
   }
 };
 
-// const getIngredients = async (req, res) => {
-//   const search = req.query.search || "";
-
-//   const ingredients = await Ingredient.findAll({
-//     where: {
-//       name: {
-//         [Op.iLike]: `%${search}%`,
-//       },
-//     },
-//     order: [["id", "DESC"]],
-//   });
-
-//   res.json(ingredients);
-// };
-
 const getIngredients = async (req, res) => {
-  try {
-    const {
-      search = "",
-      tag = "",
-      isSensitive,
-      skinType = "",
-      page = 1,
-      limit = 10,
-    } = req.query;
+  const search = req.query.search || "";
 
-    const offset = (page - 1) * limit;
-
-    let where = {};
-
-    // SEARCH NAME
-    if (search) {
-      where.name = { [Op.iLike]: `%${search}%` };
-    }
-
-    // SEARCH TAG (diasumsikan column "tags" = string atau array)
-    if (tag) {
-      where.tags = { [Op.iLike]: `%${tag}%` };
-    }
-
-    // FILTER SENSITIVE (true/false)
-    if (isSensitive === "true") where.isSensitive = true;
-    if (isSensitive === "false") where.isSensitive = false;
-
-    // FILTER SKIN TYPE (diasumsikan column "skinTypes" = ARRAY di DB)
-    if (skinType) {
-      where.skinTypes = { [Op.contains]: [skinType] };
-    }
-
-    const { rows, count } = await Ingredient.findAndCountAll({
-      where,
-      limit: Number(limit),
-      offset,
-      order: [["id", "DESC"]],
-    });
-
-    return res.json({
-      data: rows,
-      pagination: {
-        total: count,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(count / limit),
+  const ingredients = await Ingredient.findAll({
+    where: {
+      name: {
+        [Op.iLike]: `%${search}%`,
       },
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch ingredients" });
-  }
+    },
+    order: [["id", "DESC"]],
+  });
+
+  res.json(ingredients);
 };
 
 const addIngredient = async (req, res) => {
