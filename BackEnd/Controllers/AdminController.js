@@ -6,7 +6,7 @@ const { jwtSecret } = require("../config/config");
 const { validationResult } = require("express-validator");
 const fs = require("fs");
 const path = require("path");
-const { Op } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 const { uploadToCloudinary } = require("../Middlewares/UploadImage");
 const cloudinary = require("cloudinary").v2;
 
