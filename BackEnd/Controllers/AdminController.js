@@ -98,7 +98,7 @@ const getAllProducts = async (req, res) => {
           through: { attributes: [] },
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["id", "DESC"]],
     });
 
     res.json(products);
@@ -306,6 +306,7 @@ const getNews = async (req, res) => {
         "isActive",
         "createdAt",
       ],
+      order: [["id", "DESC"]],
     });
 
     res.json(news);
@@ -515,6 +516,7 @@ const getCategory = async (req, res) => {
   try {
     const categories = await Category.findAll({
       attributes: ["id", "name", "isActive"],
+      order: [["id", "DESC"]],
     });
     res.json(categories);
   } catch (err) {
@@ -609,7 +611,7 @@ const getIngredients = async (req, res) => {
         [Op.iLike]: `%${search}%`,
       },
     },
-    order: [["id", "ASC"]],
+    order: [["id", "DESC"]],
   });
 
   res.json(ingredients);
