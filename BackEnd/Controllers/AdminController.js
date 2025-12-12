@@ -618,7 +618,8 @@ const getIngredients = async (req, res) => {
 
 const addIngredient = async (req, res) => {
   try {
-    const { name, isSensitive, isOily, weight, skinTypes, tags } = req.body;
+    const { name, isSensitive, isOily, weight, skinTypes, tags, description } =
+      req.body;
 
     const ingredient = await Ingredient.create({
       name,
@@ -627,6 +628,7 @@ const addIngredient = async (req, res) => {
       weight,
       skinTypes: skinTypes.map((s) => s.toLowerCase()),
       tags,
+      description,
     });
 
     res.json(ingredient);
@@ -678,7 +680,8 @@ const getIngredientById = async (req, res) => {
 const updateIngredient = async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, isSensitive, isOily, weight, skinTypes, tags } = req.body;
+    const { name, isSensitive, isOily, weight, skinTypes, tags, description } =
+      req.body;
 
     const ingredient = await Ingredient.findByPk(id);
     if (!ingredient) return res.status(404).json({ message: "Not found" });
@@ -689,6 +692,7 @@ const updateIngredient = async (req, res) => {
     ingredient.weight = weight;
     ingredient.skinTypes = skinTypes.map((s) => s.toLowerCase());
     ingredient.tags = tags;
+    ingredient.description = description;
 
     await ingredient.save();
 
