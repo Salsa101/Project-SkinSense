@@ -15,15 +15,18 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS
-const whitelist = process.env.CORS_WHITELIST
-  ? process.env.CORS_WHITELIST.split(",")
-  : [];
+const whitelist = [
+  "http://localhost:5173",
+  "http://10.0.2.2:3000",
+  // "http://YOUR_IP_ADDRESS:3000",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (whitelist.length === 0 || whitelist.indexOf(origin) !== -1) {
+    if (!origin) {
+      return callback(null, true);
+    }
+    if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log("Blocked by CORS:", origin);

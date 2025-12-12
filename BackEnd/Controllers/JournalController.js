@@ -2,8 +2,6 @@ const { Journal } = require("../models");
 const { Op } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
-const { uploadToCloudinary } = require("../Middlewares/UploadImage");
-const cloudinary = require("cloudinary").v2;
 
 const deleteFile = (filePath) => {
   try {
@@ -21,19 +19,9 @@ const addJournal = async (req, res) => {
     const { title, description, mood, journal_date } = req.body;
     const userId = req.user.id;
 
-    let imageUrl = null;
-    let imagePublicId = null;
-
-    if (req.file) {
-      const result = await uploadToCloudinary(
-        req.file.buffer,
-        `${userId}/journals`
-      );
-      imageUrl = result.secure_url;
-      imagePublicId = result.public_id;
-    } else if (req.body.journal_image) {
-      imageUrl = req.body.journal_image;
-    }
+    const imageUrl = req.file
+      ? `/uploads/${userId}/journals/${req.file.filename}`
+      : req.body.journal_image || null;
 
     const journal = await Journal.create({
       title,
@@ -153,47 +141,29 @@ const updateJournal = async (req, res) => {
       return res.status(404).json({ message: "Journal not found" });
     }
 
-    let updateData = {
-      title,
-      description,
-      mood,
-      journal_date,
-    };
+    let imageUrl = journal.journal_image;
 
     if (req.file) {
+      // hapus file lama
       if (journal.journal_image) {
-        // ambil public_id dari URL lama
-        const parts = journal.journal_image.split("/upload/");
-        const publicIdWithExt = parts[1];
-        const publicId = publicIdWithExt
-          .split("/")
-          .slice(1)
-          .join("/")
-          .split(".")[0];
-        await cloudinary.uploader.destroy(publicId);
+        const oldPath = path.join(
+          __dirname,
+          "..",
+          journal.journal_image.replace("/uploads", "uploads")
+        );
+        deleteFile(oldPath);
       }
 
-      const result = await uploadToCloudinary(
-        req.file.buffer,
-        `${req.user.id}/journals`
-      );
-      updateData.journal_image = result.secure_url;
-    } else if (journal_image) {
-      if (journal.journal_image) {
-        const parts = journal.journal_image.split("/upload/");
-        const publicIdWithExt = parts[1];
-        const publicId = publicIdWithExt
-          .split("/")
-          .slice(1)
-          .join("/")
-          .split(".")[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-
-      updateData.journal_image = journal_image;
+      imageUrl = `/uploads/${req.user.id}/journals/${req.file.filename}`;
     }
 
-    await journal.update(updateData);
+    await journal.update({
+      title,
+      description,
+      journal_image: imageUrl,
+      mood,
+      journal_date,
+    });
 
     res.json({ message: "Journal updated successfully", journal });
   } catch (err) {
@@ -216,27 +186,17 @@ const deleteJournal = async (req, res) => {
       return res.status(404).json({ message: "Journal not found" });
     }
 
-    // --- hapus file di Cloudinary kalau ada ---
+    // hapus file image
     if (journal.journal_image) {
-      try {
-        // ambil public_id dari URL
-        const parts = journal.journal_image.split("/upload/");
-        const publicIdWithExt = parts[1];
-        const publicId = publicIdWithExt
-          .split("/")
-          .slice(1)
-          .join("/")
-          .split(".")[0];
-
-        await cloudinary.uploader.destroy(publicId, { invalidate: true });
-      } catch (err) {
-        console.error("Failed to delete image from Cloudinary:", err.message);
-      }
+      const filePath = path.join(
+        __dirname,
+        "..",
+        journal.journal_image.replace("/uploads", "uploads")
+      );
+      deleteFile(filePath);
     }
 
-    // --- hapus journal dari DB ---
     await journal.destroy();
-
     res.json({ message: "Journal deleted successfully" });
   } catch (err) {
     console.error(err);

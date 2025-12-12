@@ -76,8 +76,7 @@ const {
   getReminderNotifications,
   getRoutineProductNotifications,
 } = require("../Controllers/NotificationController");
-// const upload = require("../Middlewares/UploadImage");
-const { upload } = require("../Middlewares/UploadImage");
+const upload = require("../Middlewares/UploadImage");
 
 //Admin Role
 const { isAdmin } = require("../Middlewares/AdminMiddleware");
@@ -121,10 +120,7 @@ router.put("/profile/notif", validateToken, notifToggle);
 router.put(
   "/profile/update",
   validateToken,
-  upload.fields([
-    { name: "profileImage", maxCount: 1 },
-    { name: "bannerImage", maxCount: 1 },
-  ]),
+  upload("profile").fields([{ name: "profileImage" }, { name: "bannerImage" }]),
   updateProfile
 );
 router.put("/change-password", validateToken, changePassword);
@@ -135,12 +131,12 @@ router.delete("/delete-data", validateToken, deleteData);
 router.post(
   "/add-routine-products",
   validateToken,
-  upload.single("productImage"),
+  upload("products").single("productImage"),
   addProductToRoutine
 );
 router.post(
   "/upload-product",
-  upload.single("productImage"),
+  upload("products").single("productImage"),
   uploadProduct
 );
 router.get(
@@ -160,7 +156,7 @@ router.get("/routine-products/:id", validateToken, getRoutineProduct); // Get de
 router.put(
   "/routine-products/:id",
   validateToken,
-  upload.single("productImage"),
+  upload("products").single("productImage"),
   updateRoutineProduct
 );
 
@@ -181,7 +177,7 @@ router.post("/answer", validateToken, submitAnswers);
 router.post(
   "/upload-face",
   validateToken,
-  upload.single("facePhoto"),
+  upload("faces").single("facePhoto"),
   uploadFaceController
 );
 router.get("/scans", validateToken, getFaceResultController);
@@ -195,14 +191,14 @@ router.get("/journal/month", validateToken, getJournalsByMonth);
 router.post(
   "/journal/add",
   validateToken,
-  upload.single("journal_image"),
+  upload("journals").single("journal_image"),
   addJournal
 );
 router.get("/journal/view/:id", validateToken, getJournalDetail);
 router.put(
   "/journal/update/:id",
   validateToken,
-  upload.single("journal_image"),
+  upload("journals").single("journal_image"),
   updateJournal
 );
 router.delete("/journal/delete/:id", validateToken, deleteJournal);

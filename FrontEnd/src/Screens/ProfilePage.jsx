@@ -111,7 +111,7 @@ const ProfilPage = ({ navigation }) => {
   const handleDeleteData = async () => {
     Alert.alert(
       'Konfirmasi',
-      'Apakah kamu yakin ingin menghapus data? Tindakan ini tidak bisa dibatalkan.',
+      'Apakah kamu yakin ingin menghapus data? Akun akan tetap ada.',
       [
         { text: 'Batal', style: 'cancel' },
         {
@@ -165,7 +165,7 @@ const ProfilPage = ({ navigation }) => {
             <Image
               source={
                 user?.bannerImage
-                  ? { uri: user.bannerImage }
+                  ? { uri: `${api.defaults.baseURL}${user.bannerImage}` }
                   : require('../../assets/banner-profile.png')
               }
               style={styles.bannerImage}
@@ -174,7 +174,7 @@ const ProfilPage = ({ navigation }) => {
               <Image
                 source={
                   user?.profileImage
-                    ? { uri: user.profileImage }
+                    ? { uri: `${api.defaults.baseURL}${user.profileImage}` }
                     : require('../../assets/profile-pic.png')
                 }
                 style={styles.profileImage}

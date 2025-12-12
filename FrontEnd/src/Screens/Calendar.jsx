@@ -226,7 +226,7 @@ const Calendar = ({ navigation }) => {
         <Image
           source={
             item.Product?.productImage
-              ? { uri: item.Product.productImage }
+              ? { uri: `${api.defaults.baseURL}${item.Product.productImage}` }
               : require('../../assets/product-placeholder.jpg')
           }
           style={styles.productImage}
@@ -383,7 +383,7 @@ const Calendar = ({ navigation }) => {
                   source={
                     journal?.journal_image
                       ? {
-                          uri: journal.journal_image,
+                          uri: `${api.defaults.baseURL}${journal.journal_image}`,
                         }
                       : require('../../assets/journal.png')
                   }

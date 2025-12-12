@@ -59,7 +59,7 @@ const EditJournal = ({ navigation, route }) => {
         setEntry(j.description);
         setMood(moodMap.indexOf(j.mood));
         setImage(
-          j.journal_image ? j.journal_image : null,
+          j.journal_image ? `${api.defaults.baseURL}${j.journal_image}` : null,
         );
         setJournalDate(j.journal_date);
       } catch (err) {

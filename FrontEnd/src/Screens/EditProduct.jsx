@@ -148,7 +148,7 @@ const EditProduct = ({ route, navigation }) => {
           }
 
           if (p.Product.productImage) {
-            setImageUri(p.Product.productImage);
+            setImageUri(`${api.defaults.baseURL}${p.Product.productImage}`);
           }
         }
       } catch (err) {

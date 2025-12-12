@@ -1,12 +1,35 @@
 const { spawn } = require("child_process");
-const fs = require("fs");
-const os = require("os");
 const path = require("path");
+const fs = require("fs");
 const { ResultScan, QuizUserAnswer, QuizOption } = require("../models");
-const { uploadToCloudinary } = require("../Middlewares/UploadImage");
 
-const runAI = (userId, inputPath, outputPath) => {
+const runAI = (userId, filename) => {
   return new Promise((resolve, reject) => {
+    const inputPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "AiMod",
+      "content",
+      "datacontent",
+      "test",
+      "images",
+      userId,
+      filename
+    );
+
+    const outputPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "AiMod",
+      "content",
+      "datacontent",
+      "result",
+      userId,
+      `${userId}_${filename.replace(/\.[^/.]+$/, "")}_output.jpg`
+    );
+
     const py = spawn("python", [
       path.join(__dirname, "..", "..", "AiMod", "predict.py"),
       userId,
@@ -15,14 +38,15 @@ const runAI = (userId, inputPath, outputPath) => {
     ]);
 
     let resultData = "";
-    py.stdout.on("data", (data) => (resultData += data.toString()));
-    py.stderr.on("data", (data) =>
-      console.error("Python error:", data.toString())
-    );
+    py.stdout.on("data", (data) => {
+      resultData += data.toString();
+    });
 
-    py.on("close", (code) => {
-      if (code !== 0)
-        return reject(new Error("Python process exited with error"));
+    py.stderr.on("data", (data) => {
+      console.error("Python error:", data.toString());
+    });
+
+    py.on("close", () => {
       const lastLine = resultData.trim().split("\n").pop();
       const [numAcne, severity] = lastLine.split("|");
       resolve({ numAcne, severity, outputPath });
@@ -31,76 +55,90 @@ const runAI = (userId, inputPath, outputPath) => {
 };
 
 const uploadFaceController = async (req, res) => {
+  const userId = req.user.id;
+  const filename = req.file.filename;
+
+  const srcPath = req.file.path;
+
+  const destDir = path.join(
+    __dirname,
+    "..",
+    "..",
+    "AiMod",
+    "content",
+    "datacontent",
+    "test",
+    "images",
+    userId.toString()
+  );
+  const destPath = path.join(destDir, filename);
+
   try {
-    const userId = req.user.id;
-    if (!req.file || !req.file.buffer)
-      return res.status(400).json({ error: "File tidak ada" });
+    fs.mkdirSync(destDir, { recursive: true });
 
-    // ▪ Buat temporary input file
-    const inputTempPath = path.join(
-      os.tmpdir(),
-      `${userId}_${Date.now()}_input.jpg`
-    );
-    fs.writeFileSync(inputTempPath, req.file.buffer);
+    fs.renameSync(srcPath, destPath);
 
-    // ▪ Buat temporary output file
-    const outputTempPath = path.join(
-      os.tmpdir(),
-      `${userId}_${Date.now()}_output.jpg`
-    );
+    const aiResult = await runAI(userId.toString(), filename);
 
-    // ▪ Jalankan AI
-    const aiResult = await runAI(
+    const uploadsDir = path.join(
+      __dirname,
+      "..",
+      "uploads",
       userId.toString(),
-      inputTempPath,
-      outputTempPath
+      "faces"
     );
+    fs.mkdirSync(uploadsDir, { recursive: true });
 
-    // ▪ Upload hasil ke Cloudinary
-    const cloudResult = await uploadToCloudinary(
-      fs.readFileSync(aiResult.outputPath),
-      `${userId}/faces`,
-      `${userId}_${Date.now()}_output`
-    );
+    const finalPath = path.join(uploadsDir, path.basename(aiResult.outputPath));
+    fs.copyFileSync(aiResult.outputPath, finalPath);
 
-    // ▪ Ambil skin type dari quiz
     const acneCount = parseInt(aiResult.numAcne, 10);
+
     const skinAnswer = await QuizUserAnswer.findOne({
       where: { userId, quizQuestionId: 1 },
-      include: [{ model: QuizOption, as: "quizOption", attributes: ["title"] }],
+      include: [
+        {
+          model: QuizOption,
+          as: "quizOption",
+          attributes: ["title"],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
+
     const skinType = skinAnswer ? skinAnswer.quizOption.title : "Unknown";
 
-    // ▪ Simpan ke DB
+    const lastQuiz = await QuizUserAnswer.findOne({
+      where: { userId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Save to DB
     const newScan = await ResultScan.create({
-      userId,
-      imagePath: cloudResult.secure_url,
-      skinType,
+      userId: userId,
+      imagePath: `/uploads/${userId}/faces/${path.basename(finalPath)}`,
+      skinType: skinType,
       severity: aiResult.severity,
       acneCount: isNaN(acneCount) ? 0 : acneCount,
     });
 
-    // ▪ Tambahkan quiz answers terakhir
     const lastQuizAnswers = await QuizUserAnswer.findAll({
       where: { userId },
       attributes: ["id", "quizQuestionId", "quizOptionId", "createdAt"],
       order: [["createdAt", "DESC"]],
     });
+
     const uniqueAnswers = Object.values(
       lastQuizAnswers.reduce((acc, ans) => {
         if (!acc[ans.quizQuestionId]) acc[ans.quizQuestionId] = ans;
         return acc;
       }, {})
     );
+
     await newScan.addQuizAnswers(uniqueAnswers.map((q) => q.id));
 
-    // ▪ Hapus file sementara
-    fs.unlinkSync(inputTempPath);
-    fs.unlinkSync(outputTempPath);
-
     res.json({
-      message: "Upload sukses & AI jalan, hasil tersimpan di Cloudinary",
+      message: "Upload sukses & AI jalan, data tersimpan di DB",
       scan: newScan,
     });
   } catch (err) {
@@ -112,6 +150,7 @@ const uploadFaceController = async (req, res) => {
 const getFaceResultController = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const scans = await ResultScan.findAll({
       where: { userId },
       order: [["createdAt", "DESC"]],
@@ -125,6 +164,7 @@ const getFaceResultController = async (req, res) => {
         "updatedAt",
       ],
     });
+
     res.json({ scans });
   } catch (err) {
     console.error("GetScans error:", err);

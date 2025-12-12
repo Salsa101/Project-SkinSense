@@ -94,7 +94,7 @@ const CompareResult = ({ route, navigation }) => {
               {/* Before Image */}
               <TouchableOpacity onPress={() => setZoomVisible(true)}>
                 <Image
-                  source={{ uri: before.imagePath }}
+                  source={{ uri: `${api.defaults.baseURL}${before.imagePath}` }}
                   style={[styles.image, styles.leftImage]}
                 />
               </TouchableOpacity>
@@ -104,7 +104,7 @@ const CompareResult = ({ route, navigation }) => {
               {/* After Image */}
               <TouchableOpacity onPress={() => setZoomVisible(true)}>
                 <Image
-                  source={{ uri: after.imagePath }}
+                  source={{ uri: `${api.defaults.baseURL}${after.imagePath}` }}
                   style={[styles.image, styles.rightImage]}
                 />
               </TouchableOpacity>
@@ -119,7 +119,10 @@ const CompareResult = ({ route, navigation }) => {
         {/* Modal Zoom */}
         <Modal visible={zoomVisible} transparent={true}>
           <ImageViewer
-            imageUrls={[{ url: before.imagePath }, { url: after.imagePath }]}
+            imageUrls={[
+              { url: `${api.defaults.baseURL}${before.imagePath}` },
+              { url: `${api.defaults.baseURL}${after.imagePath}` },
+            ]}
             enableSwipeDown
             onSwipeDown={() => setZoomVisible(false)}
             index={0} // mulai dari gambar Before

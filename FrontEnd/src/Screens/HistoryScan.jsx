@@ -410,7 +410,7 @@ const HistoryScan = ({ navigation, route }) => {
                   <TouchableOpacity onPress={() => setZoomVisible(true)}>
                     <Image
                       source={{
-                        uri: currentItem.imagePath,
+                        uri: `${api.defaults.baseURL}${currentItem.imagePath}`,
                       }}
                       style={{
                         width: SCREEN_WIDTH - 40,
@@ -426,7 +426,7 @@ const HistoryScan = ({ navigation, route }) => {
                   <ImageViewer
                     imageUrls={[
                       {
-                        url: currentItem.imagePath,
+                        url: `${api.defaults.baseURL}${currentItem.imagePath}`,
                       },
                     ]}
                     enableSwipeDown
@@ -666,7 +666,7 @@ const HistoryScan = ({ navigation, route }) => {
                               source={
                                 product.image
                                   ? {
-                                      uri: product.image,
+                                      uri: `${api.defaults.baseURL}${product.image}`,
                                     }
                                   : require('../../assets/product-placeholder.jpg')
                               }
