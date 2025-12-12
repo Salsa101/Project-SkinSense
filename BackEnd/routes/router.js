@@ -61,6 +61,7 @@ const {
 const {
   getScanQuizDetail,
   deleteScan,
+  getProductInfo,
 } = require("../Controllers/HistoryScanController");
 const {
   forgotPassword,
@@ -229,6 +230,7 @@ router.get(
 //HistoryScan
 router.get("/scan-quiz-detail", validateToken, getScanQuizDetail);
 router.delete("/scan-detail/:id", validateToken, deleteScan);
+router.get("/product-info/:id", validateToken, getProductInfo);
 
 //Admin Role
 router.get("/check-auth", validateToken, (req, res) => {
