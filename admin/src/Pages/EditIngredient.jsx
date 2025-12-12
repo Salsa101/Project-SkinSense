@@ -17,6 +17,8 @@ function EditIngredient() {
     isOily: false,
     weight: "",
     skinTypes: [],
+    tags: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -63,6 +65,8 @@ function EditIngredient() {
                 return s.charAt(0).toUpperCase() + s.slice(1);
               })
             : [],
+          tags: res.data.tags ? res.data.tags.join(", ") : "",
+          description: res.data.description,
         });
         setTags(res.data.tags || []);
       } catch (err) {
@@ -236,6 +240,19 @@ function EditIngredient() {
               <label className="form-check-label">{st}</label>
             </div>
           ))}
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            name="description"
+            className="form-control"
+            value={form.description}
+            onChange={handleChange}
+            required
+            rows={4}
+          />
         </div>
 
         {/* TAGS */}

@@ -15,6 +15,7 @@ function AddIngredient() {
     weight: "",
     skinTypes: [],
     tags: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -200,6 +201,19 @@ function AddIngredient() {
               <label className="form-check-label">{st}</label>
             </div>
           ))}
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            name="description"
+            className="form-control"
+            value={form.description}
+            onChange={handleChange}
+            required
+            rows={4} // bisa diubah sesuai tinggi yang diinginkan
+          />
         </div>
 
         {/* TAGS (text input) */}
