@@ -10,6 +10,7 @@ function EditProduct() {
     productName: "",
     productBrand: "",
     productType: "",
+    shelf_life_months: "",
   });
   const [file, setFile] = useState(null);
 
@@ -28,6 +29,7 @@ function EditProduct() {
           productName: res.data.productName,
           productBrand: res.data.productBrand,
           productType: res.data.productType,
+          shelf_life_months: res.data.shelf_life_months,
         });
 
         // SET SELECTED INGREDIENTS
@@ -90,6 +92,7 @@ function EditProduct() {
     formData.append("productName", form.productName);
     formData.append("productBrand", form.productBrand);
     formData.append("productType", form.productType);
+    formData.append("shelf_life_months", form.shelf_life_months);
 
     formData.append(
       "ingredients",
@@ -153,6 +156,19 @@ function EditProduct() {
             <option value="moisturizer">Moisturizer</option>
             <option value="mask">Mask</option>
           </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">PAO (months)</label>
+          <input
+            type="number"
+            name="shelf_life_months"
+            className="form-control"
+            value={form.shelf_life_months}
+            onChange={handleChange}
+            placeholder="ex: 12"
+            min="1"
+          />
         </div>
 
         <div className="mb-3">

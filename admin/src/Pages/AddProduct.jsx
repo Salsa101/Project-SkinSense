@@ -40,6 +40,7 @@ function AddProduct() {
     productName: "",
     productBrand: "",
     productType: "",
+    shelf_life_months: "",
   });
   const [file, setFile] = useState(null);
 
@@ -63,6 +64,7 @@ function AddProduct() {
     formData.append("productName", form.productName);
     formData.append("productBrand", form.productBrand);
     formData.append("productType", form.productType);
+    formData.append("shelf_life_months", form.shelf_life_months);
     formData.append(
       "ingredients",
       JSON.stringify(selectedIngredients.map((i) => i.id))
@@ -125,6 +127,18 @@ function AddProduct() {
             <option value="moisturizer">Moisturizer</option>
             <option value="mask">Mask</option>
           </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">PAO (months)</label>
+          <input
+            type="number"
+            name="shelf_life_months"
+            className="form-control"
+            value={form.shelf_life_months}
+            onChange={handleChange}
+            placeholder="ex: 12"
+            min="1"
+          />
         </div>
 
         <div className="mb-3">
