@@ -78,7 +78,7 @@ const ProductInformation = ({ navigation, route }) => {
         <View style={styles.productSection}>
           <Image
             source={{
-              uri: `${api.defaults.baseURL}${product.productImage}`,
+              uri: product.productImage,
             }}
             style={styles.productImage}
           />
