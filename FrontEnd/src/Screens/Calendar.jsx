@@ -233,7 +233,10 @@ const Calendar = ({ navigation }) => {
             {item.Product?.productType
               ? item.Product.productType.charAt(0).toUpperCase() +
                 item.Product.productType.slice(1)
-              : ''}
+              : ''}{' '}
+            •{' '}
+            {item.routineType.charAt(0).toUpperCase() +
+              item.routineType.slice(1)}
           </Text>
           <Text style={styles.product} numberOfLines={1} ellipsizeMode="tail">
             {item.Product?.productName}
