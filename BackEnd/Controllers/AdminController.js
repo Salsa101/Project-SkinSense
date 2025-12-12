@@ -106,13 +106,15 @@ const getAllProducts = async (req, res) => {
 //Add Product
 const addProduct = async (req, res) => {
   try {
-    const { productName, productBrand, productType } = req.body;
+    const { productName, productBrand, productType, shelf_life_months } =
+      req.body;
     const ingredients = JSON.parse(req.body.ingredients);
 
     const newProduct = await Product.create({
       productName,
       productBrand,
       productType,
+      shelf_life_months: shelf_life_months ? Number(shelf_life_months) : null,
       productImage: req.file
         ? `/uploads/${req.user.id}/products/${req.file.filename}`
         : null,
@@ -188,7 +190,8 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { productName, productBrand, productType } = req.body;
+    const { productName, productBrand, productType, shelf_life_months } =
+      req.body;
 
     const product = await Product.findByPk(id);
     if (!product) return res.status(404).json({ message: "Product not found" });
@@ -196,6 +199,7 @@ const updateProduct = async (req, res) => {
     if (productName) product.productName = productName;
     if (productBrand) product.productBrand = productBrand;
     if (productType) product.productType = productType;
+    if (shelf_life_months) product.shelf_life_months = shelf_life_months;
 
     if (req.file) {
       // hapus file lama

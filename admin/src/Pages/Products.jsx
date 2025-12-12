@@ -158,6 +158,7 @@ function Products() {
               <th>Name</th>
               <th>Brand</th>
               <th>Type</th>
+              <th>PAO (months)</th>
               <th>Ingredients</th>
               <th>Added By</th>
               <th>Verified</th>
@@ -187,6 +188,7 @@ function Products() {
                 <td>{p.productName}</td>
                 <td>{p.productBrand}</td>
                 <td>{p.productType}</td>
+                <td>{p.shelf_life_months}</td>
                 <td>
                   {p.Ingredients && p.Ingredients.length > 0 ? (
                     <ul style={{ paddingLeft: "15px", margin: 0 }}>
