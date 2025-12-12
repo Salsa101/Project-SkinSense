@@ -29,7 +29,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const BRIGHTNESS_LOW = 100;
+const BRIGHTNESS_LOW = 50;
 const BRIGHTNESS_HIGH = 200;
 
 const FaceScan2 = ({ navigation }) => {
@@ -176,12 +176,12 @@ const FaceScan2 = ({ navigation }) => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setAiResult(null);
-      setCameraActive(true);
-    }, []),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setAiResult(null);
+  //     setCameraActive(true);
+  //   }, []),
+  // );
 
   const fetchScans = async () => {
     try {
@@ -568,14 +568,20 @@ const FaceScan2 = ({ navigation }) => {
                         >
                           {product.productname}
                         </Text>
-                        <Text style={{ fontSize: 12, alignSelf: 'flex-start' }}>
-                          {product.productbrand}
-                        </Text>
-                        <Text style={{ fontSize: 12, alignSelf: 'flex-start' }}>
-                          {product.producttype
-                            ? product.producttype.charAt(0).toUpperCase() +
-                              product.producttype.slice(1)
-                            : ''}
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            marginTop: 8,
+                            alignSelf: 'flex-end',
+                            color: '#A77B7B',
+                          }}
+                          onPress={() =>
+                            navigation.navigate('ProductInformation', {
+                              productId: product.product_id,
+                            })
+                          }
+                        >
+                          See details →
                         </Text>
                       </View>
                     ),
