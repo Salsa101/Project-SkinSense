@@ -15,6 +15,7 @@ function EditIngredient() {
     weight: "",
     skinTypes: [],
     tags: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -34,6 +35,7 @@ function EditIngredient() {
               })
             : [],
           tags: res.data.tags ? res.data.tags.join(", ") : "",
+          description: res.data.description,
         });
       } catch (err) {
         console.error(err);
@@ -206,6 +208,19 @@ function EditIngredient() {
               <label className="form-check-label">{st}</label>
             </div>
           ))}
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            name="description"
+            className="form-control"
+            value={form.description}
+            onChange={handleChange}
+            required
+            rows={4}
+          />
         </div>
 
         {/* TAGS */}

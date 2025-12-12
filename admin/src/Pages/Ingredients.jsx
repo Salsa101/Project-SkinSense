@@ -78,6 +78,7 @@ function Ingredients() {
               <th>Weight</th>
               <th>Skin Types</th>
               <th>Tags</th>
+              <th>Description</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -91,6 +92,17 @@ function Ingredients() {
                 <td>{ing.weight}</td>
                 <td>{ing.skinTypes?.join(", ")}</td>
                 <td>{ing.tags?.join(", ")}</td>
+                <td
+                  style={{
+                    maxWidth: "200px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {ing.description}
+                </td>
+
                 <td>
                   <div className="d-flex align-items-center gap-1">
                     <a
