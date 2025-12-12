@@ -17,6 +17,7 @@ const getScanDetail = async (req, res) => {
           model: Product,
           as: "products",
           attributes: [
+            "id",
             "productName",
             "productBrand",
             "productType",
@@ -51,6 +52,7 @@ const getScanDetail = async (req, res) => {
         avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil"],
 
         products: scan.products.map((p) => ({
+          id: p.id,
           name: p.productName,
           brand: p.productBrand,
           type: p.productType,
@@ -172,7 +174,7 @@ const compareScans = async (req, res) => {
         severity: after.severity,
         acneCount: after.acneCount,
         score: after.score,
-        rating: afterScoreRating, 
+        rating: afterScoreRating,
       },
       difference: {
         acneChange:

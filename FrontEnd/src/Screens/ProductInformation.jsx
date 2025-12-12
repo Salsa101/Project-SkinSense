@@ -77,14 +77,22 @@ const ProductInformation = ({ navigation, route }) => {
         {/* Section 1: Product Info */}
         <View style={styles.productSection}>
           <Image
-            source={{
-              uri: product.productImage,
-            }}
+            source={
+              product.productimage
+                ? {
+                    uri: product.productimage,
+                  } // pakai productimage
+                : require('../../assets/product-placeholder.jpg') // fallback
+            }
             style={styles.productImage}
           />
           <Text style={styles.productName}>{product.productName}</Text>
           <Text style={styles.productBrand}>Brand: {product.productBrand}</Text>
-          <Text style={styles.productType}>Type: {product.productType}</Text>
+          <Text style={styles.productType}>
+            Type:{' '}
+            {product.productType.charAt(0).toUpperCase() +
+              product.productType.slice(1)}
+          </Text>
         </View>
 
         {/* Section 2: Ingredients */}

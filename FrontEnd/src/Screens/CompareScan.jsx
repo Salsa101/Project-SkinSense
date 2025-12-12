@@ -597,17 +597,19 @@ const CompareScan = ({ navigation }) => {
                               {product.name}
                             </Text>
                             <Text
-                              style={{ fontSize: 12, alignSelf: 'flex-start' }}
+                              style={{
+                                fontSize: 12,
+                                marginTop: 8,
+                                alignSelf: 'flex-end',
+                                color: '#A77B7B',
+                              }}
+                              onPress={() =>
+                                navigation.navigate('ProductInformation', {
+                                  productId: product.id,
+                                })
+                              }
                             >
-                              {product.brand}
-                            </Text>
-                            <Text
-                              style={{ fontSize: 12, alignSelf: 'flex-start' }}
-                            >
-                              {product.type
-                                ? product.type.charAt(0).toUpperCase() +
-                                  product.type.slice(1)
-                                : ''}
+                              See details →
                             </Text>
                           </View>
                         ))}
