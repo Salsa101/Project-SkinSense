@@ -36,6 +36,10 @@ module.exports = {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       isPregnancySafe: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

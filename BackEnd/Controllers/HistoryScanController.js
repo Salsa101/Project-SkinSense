@@ -58,6 +58,7 @@ const getScanQuizDetail = async (req, res) => {
           model: Product,
           as: "products",
           attributes: [
+            "id",
             "productName",
             "productBrand",
             "productType",
@@ -105,6 +106,7 @@ const getScanQuizDetail = async (req, res) => {
 
         // === PRODUCTS ===
         products: scan.products.map((p) => ({
+          id: p.id,
           name: p.productName,
           brand: p.productBrand,
           type: p.productType,
@@ -178,4 +180,39 @@ const deleteScan = async (req, res) => {
   }
 };
 
-module.exports = { getScanQuizDetail, deleteScan };
+// Product Information
+const getProductInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Ambil produk beserta ingredients yang diperlukan
+    const product = await Product.findOne({
+      where: { id },
+      attributes: [
+        "productImage",
+        "productName",
+        "productBrand",
+        "productType",
+      ], // hanya field yang dibutuhkan
+      include: [
+        {
+          model: Ingredient,
+          as: "Ingredients",
+          attributes: ["name", "description"], // hanya name dan description
+          through: { attributes: [] }, // hilangkan info junction table
+        },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { getScanQuizDetail, deleteScan, getProductInfo };

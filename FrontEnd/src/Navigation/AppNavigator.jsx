@@ -37,6 +37,7 @@ import EditProfile from '../Screens/EditProfile';
 import ChangePassword from '../Screens/ChangePassword';
 import ForgotPassword from '../Screens/ForgotPassword';
 import ResetPassword from '../Screens/ResetPassword';
+import ProductInformation from '../Screens/ProductInformation';
 
 const Stack = createNativeStackNavigator();
 
@@ -245,6 +246,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ProductInformation"
+          component={ProductInformation}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

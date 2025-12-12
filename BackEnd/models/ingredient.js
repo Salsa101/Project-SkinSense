@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
       },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
       isPregnancySafe: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
