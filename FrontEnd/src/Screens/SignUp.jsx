@@ -64,15 +64,16 @@ const SignUp = ({ navigation }) => {
         confirmPassword,
       });
 
-      if (response.data.message === 'User berhasil terdaftar.') {
-        Alert.alert('Sukses', 'Berhasil daftar! Silakan login.');
+      if (response.status === 201) {
+        Alert.alert('Success', 'Registration successful! Please login.');
         navigation.navigate('SignIn');
       } else {
-        Alert.alert('Gagal', response.data.message || 'Gagal mendaftar.');
+        Alert.alert('Error', response.data.message || 'Failed to register.');
       }
     } catch (error) {
       const msg =
-        error.response?.data?.message || 'Terjadi kesalahan saat registrasi.';
+        error.response?.data?.message ||
+        'An error occurred during registration.';
       Alert.alert('Error', msg);
       console.log('Register error:', error.response?.data || error.message);
     } finally {
