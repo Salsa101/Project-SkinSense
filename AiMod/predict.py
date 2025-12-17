@@ -15,7 +15,7 @@ MODEL_PATH = os.path.join(BASE_DIR, "content", "datacontent", "yolo_models", "be
 model = YOLO(MODEL_PATH)
 
 # Predict
-results = model.predict(source=input_image, conf=0.45, imgsz=640, verbose=False)
+results = model.predict(source=input_image, conf=0.25, imgsz=640, verbose=False)
 results = list(results)
 
 # Save output

@@ -465,36 +465,21 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  <Text
-                    style={{
-                      backgroundColor: '#FFEAEA',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✖ Alcohol
-                  </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFEAEA',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✖ Fragrance
-                  </Text>
-                  <Text
-                    style={{
-                      backgroundColor: '#FFEAEA',
-                      color: '#E07C8E',
-                      padding: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    ✖ Coconut Oil
-                  </Text>
+                  {recommendationData.recommendedIngredients?.flatMap(item =>
+                    item.matchedAvoidTags?.map((tag, index) => (
+                      <Text
+                        key={`${item.id}-avoid-${index}`}
+                        style={{
+                          backgroundColor: '#FFEAEA',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        ✖ {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                      </Text>
+                    )),
+                  )}
                 </View>
               </View>
             </View>
