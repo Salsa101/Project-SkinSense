@@ -211,7 +211,20 @@ const getRecommendedIngredients = async (req, res) => {
       "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
+    const concernAvoidTags = {
+      acne: ["comedogenic", "heavy"],
+      sensitive: ["fragrance", "alcohol", "essential-oil"],
+      dryness: ["fragrance", "alcohol"],
+      oily: ["heavy", "comedogenic"],
+      pregnancy: ["benzoyl peroxide", "retinol"],
+    };
+
     const concernTags = concernToTags[normalizedConcern] || [];
+    const avoidTags = [
+      ...(concernAvoidTags[normalizedConcern] || []),
+      ...(isPregnancy ? concernAvoidTags.pregnancy : []),
+      ...(isSensitive ? concernAvoidTags.sensitive : []),
+    ];
 
     // --- STEP 5: Build base ingredient query ---
     const ingredients = await Ingredient.findAll({
@@ -261,7 +274,19 @@ const getRecommendedIngredients = async (req, res) => {
         score += 3;
       if (usesSunscreen && ingredientTags.includes("spf")) score += 2;
 
-      return { ...ingredient, score };
+      const matchedAvoidTags = avoidTags.filter((t) =>
+        ingredientTags.includes(t)
+      );
+      if (matchedAvoidTags.length > 0) {
+        score -= matchedAvoidTags.length * 10;
+        console.log(
+          `Avoid tags matched [${matchedAvoidTags.join(", ")}] (-${
+            matchedAvoidTags.length * 10
+          })`
+        );
+      }
+
+      return { ...ingredient, score, matchedAvoidTags };
     });
 
     ingredientScores.sort((a, b) => b.score - a.score);
