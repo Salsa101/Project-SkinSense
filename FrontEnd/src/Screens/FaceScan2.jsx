@@ -418,7 +418,7 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  {recommendationData.recommended?.map(item => (
+                  {recommendationData.recommendedIngredients?.map(item => (
                     <Text
                       key={item.id}
                       style={{
@@ -525,7 +525,7 @@ const FaceScan2 = ({ navigation }) => {
                   {recommendationData.recommendedProducts?.map(
                     (product, index) => (
                       <View
-                        key={product.product_id}
+                        key={product.id}
                         style={{
                           alignItems: 'center',
                           width: 120,
@@ -564,7 +564,7 @@ const FaceScan2 = ({ navigation }) => {
                             color: '#E07C8E',
                           }}
                         >
-                          {product.productname}
+                          {product.productName}
                         </Text>
                         <Text
                           style={{
@@ -575,7 +575,7 @@ const FaceScan2 = ({ navigation }) => {
                           }}
                           onPress={() =>
                             navigation.navigate('ProductInformation', {
-                              productId: product.product_id,
+                              productId: product.id,
                             })
                           }
                         >
