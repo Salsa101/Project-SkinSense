@@ -3,7 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query(`TRUNCATE TABLE "QuizOptions" RESTART IDENTITY CASCADE;`);
+    await queryInterface.sequelize.query(
+      `TRUNCATE TABLE "QuizOptions" RESTART IDENTITY CASCADE;`
+    );
     await queryInterface.bulkInsert("QuizOptions", [
       {
         quizQuestionId: 1,
@@ -19,7 +21,7 @@ module.exports = {
         title: "Oily",
         description:
           "Shiny, especially on the T-zone. Prone to acne and large pores.",
-        weight: 1,        
+        weight: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -61,7 +63,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 2,
         title: "No",
         weight: 0,
@@ -75,63 +77,63 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 3,
         title: "Normal",
         weight: 0.5,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 3,
         title: "Greasy and Heavy",
         weight: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 4,
         title: "Yes",
         weight: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 4,
         title: "Sometimes",
         weight: 0.5,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 4,
         title: "No",
         weight: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 5,
         title: "Very Often",
         weight: 1.5,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 5,
         title: "Often",
         weight: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 5,
         title: "Sometimes",
         weight: 0.5,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-       {
+      {
         quizQuestionId: 5,
         title: "Rarely",
         weight: 0,
@@ -210,8 +212,15 @@ module.exports = {
       },
       {
         quizQuestionId: 9,
+        title: "Acne",
+        weight: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        quizQuestionId: 9,
         title: "Dull Skin",
-         weight: 1,
+        weight: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

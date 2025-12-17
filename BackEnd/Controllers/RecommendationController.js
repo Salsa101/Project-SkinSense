@@ -218,11 +218,12 @@ const getRecommendedIngredients = async (req, res) => {
 
     // console.log("normalizedConcern after adjustments:", normalizedConcern);
 
+    // Mapping main concern
     let normalizedConcern = [];
 
-    // Mapping main concern
     const mainNorm = normalize(mainConcern);
-    if (mainNorm.includes("acne scars")) normalizedConcern.push("acne");
+    if (mainNorm.includes("acne scars")) normalizedConcern.push("acne_scars");
+    if (mainNorm.includes("acne")) normalizedConcern.push("acne");
     else if (mainNorm.includes("dull skin")) normalizedConcern.push("dullness");
     else if (mainNorm.includes("wrinkles")) normalizedConcern.push("aging");
     else if (mainNorm.includes("hyperpigmentation"))
