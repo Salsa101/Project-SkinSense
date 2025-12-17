@@ -191,18 +191,55 @@ const getRecommendedIngredients = async (req, res) => {
       "isPregnancy:",
       isPregnancy,
       "mainConcern:",
-      mainConcern
+      mainConcern,
+      "normalizedSkinType:",
+      normalizedSkinType,
+      "ageRange:",
+      ageRange
     );
 
-    let normalizedConcern = normalize(mainConcern);
-    if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne";
-    else if (normalizedConcern.includes("Dull Skin"))
-      normalizedConcern = "dullness";
-    else if (normalizedConcern.includes("Wrinkles"))
-      normalizedConcern = "aging";
-    else if (normalizedConcern.includes("Hyperpigmentation"))
-      normalizedConcern = "pigmentation";
-    else normalizedConcern = "general";
+    // let normalizedConcern = normalize(mainConcern);
+    // if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne";
+    // else if (normalizedConcern.includes("Dull Skin"))
+    //   normalizedConcern = "dullness";
+    // else if (normalizedConcern.includes("Wrinkles"))
+    //   normalizedConcern = "aging";
+    // else if (normalizedConcern.includes("Hyperpigmentation"))
+    //   normalizedConcern = "pigmentation";
+    // else normalizedConcern = "general";
+
+    // if (ageRange.includes("40")) {
+    //   normalizedConcern = "aging";
+    // }
+
+    // if (usesSunscreen) {
+    //   normalizedConcern = "sunscreen";
+    // }
+
+    // console.log("normalizedConcern after adjustments:", normalizedConcern);
+
+    let normalizedConcern = [];
+
+    // Mapping main concern
+    const mainNorm = normalize(mainConcern);
+    if (mainNorm.includes("acne scars")) normalizedConcern.push("acne");
+    else if (mainNorm.includes("dull skin")) normalizedConcern.push("dullness");
+    else if (mainNorm.includes("wrinkles")) normalizedConcern.push("aging");
+    else if (mainNorm.includes("hyperpigmentation"))
+      normalizedConcern.push("pigmentation");
+    else normalizedConcern.push("general");
+
+    if (ageRange.includes("40")) {
+      normalizedConcern.push("aging");
+    }
+
+    if (usesSunscreen) {
+      normalizedConcern.push("sunscreen");
+    }
+
+    normalizedConcern = [...new Set(normalizedConcern)];
+
+    console.log("normalizedConcern after adjustments:", normalizedConcern);
 
     const concernToTags = {
       acne: [
@@ -226,6 +263,7 @@ const getRecommendedIngredients = async (req, res) => {
       sensitive: ["soothing", "fragrance-free"],
       pigmentation: ["brightening", "cell-turnover"],
       "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
+      sunscreen: ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
     const concernAvoidTags = {
@@ -242,6 +280,11 @@ const getRecommendedIngredients = async (req, res) => {
       Normal: [],
     };
 
+    const extraAvoidTags = {
+      usesSunscreen: ["spf-heavy"],
+      ageOver40: ["harsh-chemical", "retinol"],
+    };
+
     const concernTags = concernToTags[normalizedConcern] || [];
     const avoidTags = [
       ...(concernAvoidTags[normalizedConcern] || []),
@@ -250,6 +293,8 @@ const getRecommendedIngredients = async (req, res) => {
         : []),
       ...(isPregnancy ? concernAvoidTags.pregnancy : []),
       ...(isSensitive ? concernAvoidTags.sensitive : []),
+      ...(usesSunscreen ? extraAvoidTags.usesSunscreen : []),
+      ...(ageRange.includes("40") ? extraAvoidTags.ageOver40 : []),
     ];
 
     const uniqueAvoidTags = [...new Set(avoidTags)];
@@ -317,9 +362,17 @@ const getRecommendedIngredients = async (req, res) => {
       return { ...ingredient, score, matchedAvoidTags };
     });
 
-    ingredientScores.sort((a, b) => b.score - a.score);
+    // ingredientScores.sort((a, b) => b.score - a.score);
 
-    const recommendedIngredients = ingredientScores.slice(0, 5);
+    const filteredIngredients = ingredientScores.filter(
+      (ing) => ing.matchedAvoidTags.length === 0
+    );
+
+    // const recommendedIngredients = ingredientScores.slice(0, 5);
+    const recommendedIngredients = filteredIngredients
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
     const recommendedIds = recommendedIngredients.map((i) => i.id);
 
     await ResultScanIngredient.bulkCreate(
