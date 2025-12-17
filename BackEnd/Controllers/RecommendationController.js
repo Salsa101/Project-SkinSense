@@ -166,24 +166,41 @@ const getRecommendedIngredients = async (req, res) => {
     });
 
     const isSensitive =
-      answersMap[normalize("Do you have sensitive skin?")]?.includes("yes") ||
+      answersMap[normalize("do you have sensitive skin?")]?.includes("Yes") ||
       false;
     const usesSunscreen =
-      answersMap[normalize("Do you use sunscreen daily?")]?.includes("yes") ||
+      answersMap[normalize("do you use sunscreen daily?")]?.includes("Yes") ||
       false;
     const isPregnancy =
-      answersMap[normalize("Are you pregnant or breastfeeding?")]?.includes(
-        "yes"
-      ) || false;
-    const ageRange = answersMap[normalize("What’s your age range?")] || "";
+      answersMap[
+        normalize("are you currently pregnant and breastfeeding?")
+      ]?.includes("Yes") || false;
+    const normalizedSkinType = skinTypeFromScan
+      ? skinTypeFromScan.charAt(0).toUpperCase() +
+        skinTypeFromScan.slice(1).toLowerCase()
+      : null;
+
+    const ageRange = answersMap[normalize("what’s your age range?")] || "";
     let mainConcern =
-      answersMap[normalize("What is your main skin concern?")] || "General";
+      answersMap[normalize("what is your main skin concern?")] || "General";
+
+    console.log("answersMap:", answersMap);
+    console.log(
+      "isSensitive:",
+      isSensitive,
+      "isPregnancy:",
+      isPregnancy,
+      "mainConcern:",
+      mainConcern
+    );
 
     let normalizedConcern = normalize(mainConcern);
-    if (normalizedConcern.includes("acne")) normalizedConcern = "acne";
-    else if (normalizedConcern.includes("dull")) normalizedConcern = "dullness";
-    else if (normalizedConcern.includes("wrinkle")) normalizedConcern = "aging";
-    else if (normalizedConcern.includes("pigment"))
+    if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne";
+    else if (normalizedConcern.includes("Dull Skin"))
+      normalizedConcern = "dullness";
+    else if (normalizedConcern.includes("Wrinkles"))
+      normalizedConcern = "aging";
+    else if (normalizedConcern.includes("Hyperpigmentation"))
       normalizedConcern = "pigmentation";
     else normalizedConcern = "general";
 
@@ -213,18 +230,29 @@ const getRecommendedIngredients = async (req, res) => {
 
     const concernAvoidTags = {
       acne: ["comedogenic", "heavy"],
-      sensitive: ["fragrance", "alcohol", "essential-oil"],
       dryness: ["fragrance", "alcohol"],
       oily: ["heavy", "comedogenic"],
+      sensitive: ["fragrance", "alcohol", "essential-oil"],
       pregnancy: ["benzoyl peroxide", "retinol"],
+    };
+
+    const skinTypeAvoidTags = {
+      Dry: ["fragrance", "alcohol"],
+      Oily: ["heavy", "comedogenic"],
+      Normal: [],
     };
 
     const concernTags = concernToTags[normalizedConcern] || [];
     const avoidTags = [
       ...(concernAvoidTags[normalizedConcern] || []),
+      ...(normalizedSkinType
+        ? skinTypeAvoidTags[normalizedSkinType] || []
+        : []),
       ...(isPregnancy ? concernAvoidTags.pregnancy : []),
       ...(isSensitive ? concernAvoidTags.sensitive : []),
     ];
+
+    const uniqueAvoidTags = [...new Set(avoidTags)];
 
     // --- STEP 5: Build base ingredient query ---
     const ingredients = await Ingredient.findAll({
@@ -361,6 +389,7 @@ const getRecommendedIngredients = async (req, res) => {
       finalScore,
       recommendedIngredients,
       recommendedProducts: finalRecommendations,
+      uniqueAvoidTags,
     });
   } catch (err) {
     console.error(err);
