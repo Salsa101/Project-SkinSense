@@ -198,32 +198,12 @@ const getRecommendedIngredients = async (req, res) => {
       ageRange
     );
 
-    // let normalizedConcern = normalize(mainConcern);
-    // if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne";
-    // else if (normalizedConcern.includes("Dull Skin"))
-    //   normalizedConcern = "dullness";
-    // else if (normalizedConcern.includes("Wrinkles"))
-    //   normalizedConcern = "aging";
-    // else if (normalizedConcern.includes("Hyperpigmentation"))
-    //   normalizedConcern = "pigmentation";
-    // else normalizedConcern = "general";
-
-    // if (ageRange.includes("40")) {
-    //   normalizedConcern = "aging";
-    // }
-
-    // if (usesSunscreen) {
-    //   normalizedConcern = "sunscreen";
-    // }
-
-    // console.log("normalizedConcern after adjustments:", normalizedConcern);
-
     // Mapping main concern
     let normalizedConcern = [];
 
     const mainNorm = normalize(mainConcern);
     if (mainNorm.includes("acne scars")) normalizedConcern.push("acne_scars");
-    if (mainNorm.includes("acne")) normalizedConcern.push("acne");
+    else if (mainNorm.includes("acne")) normalizedConcern.push("acne");
     else if (mainNorm.includes("dull skin")) normalizedConcern.push("dullness");
     else if (mainNorm.includes("wrinkles")) normalizedConcern.push("aging");
     else if (mainNorm.includes("hyperpigmentation"))
@@ -423,11 +403,25 @@ const getRecommendedIngredients = async (req, res) => {
       nest: true,
     });
 
+    const filteredProducts = bestProducts.filter((prod) => {
+      const ingredientsInProduct = prod.Ingredients || [];
+
+      const ingredientTags = ingredientsInProduct.flatMap(
+        (ing) => ing.tags || []
+      );
+
+      const hasAvoidTag = ingredientTags.some((tag) =>
+        matchedAvoidTags.includes(tag)
+      );
+
+      return !hasAvoidTag;
+    });
+
     // --- STEP 8: Filter 1 produk per productType ---
     const selectedTypes = new Set();
     const finalRecommendations = [];
 
-    for (const prod of bestProducts) {
+    for (const prod of filteredProducts) {
       const type = prod.productType
         ? prod.productType.toLowerCase().trim()
         : `type-${prod.id}`;
