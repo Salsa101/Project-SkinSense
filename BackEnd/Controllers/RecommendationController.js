@@ -259,6 +259,13 @@ const getRecommendedIngredients = async (req, res) => {
         "bha",
       ],
       dullness: ["brightening", "aha", "exfoliation", "anti-oxidant"],
+      acne_scars: [
+        "retinol",
+        "collagen",
+        "acne-treatment",
+        "hydration",
+        "cell-turnover",
+      ],
       aging: ["anti-aging", "cell-turnover", "peptides", "collagen"],
       sensitive: ["soothing", "fragrance-free"],
       pigmentation: ["brightening", "cell-turnover"],
@@ -271,6 +278,7 @@ const getRecommendedIngredients = async (req, res) => {
       dryness: ["fragrance", "alcohol"],
       oily: ["heavy", "comedogenic"],
       sensitive: ["fragrance", "alcohol", "essential-oil"],
+      acne_scars: ["comedogenic", "essential-oil"],
       pregnancy: ["benzoyl peroxide", "retinol"],
     };
 
