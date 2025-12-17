@@ -321,6 +321,29 @@ const getRecommendedIngredients = async (req, res) => {
       "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
+  const concernToAvoidTags = {
+  acne: [
+    "comedogenic",
+    "heavy"
+  ],
+  sensitive: [
+    "fragrance",
+    "alcohol",
+    "essential-oil",
+  ],
+  dryness: [
+    "fragrance",
+    "alcohol",
+  ],
+  oily: [
+    "heavy",
+    "comedogenic",
+  ],
+  pregnancy: [
+    "benzoyl peroxide",
+    "retinol"
+  ],
+};
     // --- STEP 5: Build base ingredient query ---
     let ingredientQuery = `
       SELECT id, name, "isOily", "isSensitive", "weight", "skinTypes", "tags"
@@ -350,8 +373,12 @@ const getRecommendedIngredients = async (req, res) => {
     });
     const ingredients = ingredientsResult;
 
+
     // --- STEP 6: Score ingredients based on quiz + concern relevance ---
     const concernTags = concernToTags[normalizedConcern] || [];
+    const avoidTags = [
+    ...(concernToAvoidTags[normalizedConcern] || []),
+    ...(isPregnancy ? concernToAvoidTags.pregnancy : []),];
 
     console.log(`🧠 mainConcern: ${mainConcern}`);
     console.log(`🎯 normalizedConcern: ${normalizedConcern}`);
@@ -415,6 +442,18 @@ const getRecommendedIngredients = async (req, res) => {
         console.log(`  ✅ Sunscreen bonus (+2)`);
       }
 
+      const matchedAvoidTags = avoidTags.filter((t) =>
+      ingredient.tags?.map((tag) => tag.toLowerCase()).includes(t));
+
+      if (matchedAvoidTags.length > 0) {
+      score -= matchedAvoidTags.length * 10;
+      console.log(
+      `Avoid tags matched [${matchedAvoidTags.join(", ")}] (-${
+      matchedAvoidTags.length * 10
+    })`
+  );
+}
+
       console.log(`Total score: ${score}`);
 
       return { ...ingredient, score };
@@ -437,6 +476,7 @@ const getRecommendedIngredients = async (req, res) => {
       userSkinType: skinTypeFromScan || "Unknown",
       mainConcern,
       recommended: ingredientScores.slice(0, 5), // top 5
+      avoidIngredients: avoidTags,
     };
 
     console.log("🎯 Final Recommendation Result:");
