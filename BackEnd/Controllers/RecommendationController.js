@@ -195,13 +195,13 @@ const getRecommendedIngredients = async (req, res) => {
     );
 
     let normalizedConcern = normalize(mainConcern);
-    if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne";
+    if (normalizedConcern.includes("Acne Scars")) normalizedConcern = "acne_scars";
     else if (normalizedConcern.includes("Dull Skin"))
       normalizedConcern = "dullness";
     else if (normalizedConcern.includes("Wrinkles"))
       normalizedConcern = "aging";
-    else if (normalizedConcern.includes("acne_scars"))
-      normalizedConcern = "acne_scars";
+    else if (normalizedConcern.includes("acne"))
+      normalizedConcern = "acne";
     else if (normalizedConcern.includes("Hyperpigmentation"))
       normalizedConcern = "pigmentation";
     else normalizedConcern = "general";
