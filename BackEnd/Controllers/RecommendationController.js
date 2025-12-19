@@ -256,7 +256,7 @@ const getRecommendedIngredients = async (req, res) => {
 
     const concernAvoidTags = {
       acne: ["comedogenic", "heavy", "beeswax"],
-      sensitive: ["fragrance", "alcoho", "essential-oil"],
+      sensitive: ["fragrance", "alcohol", "essential-oil"],
       dryness: ["fragrance", "alcohol"],
       oily: ["heavy", "comedogenic"],
       pregnancy: ["benzoyl peroxide", "retinol"],
