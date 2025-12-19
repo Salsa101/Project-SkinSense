@@ -166,18 +166,23 @@ const getRecommendedIngredients = async (req, res) => {
     });
 
     const isSensitive =
-      answersMap[normalize("Do you have sensitive skin?")]?.includes("yes") ||
+      answersMap[normalize("do you have sensitive skin?")]?.includes("Yes") ||
       false;
     const usesSunscreen =
-      answersMap[normalize("Do you use sunscreen daily?")]?.includes("yes") ||
+      answersMap[normalize("do you use sunscreen daily?")]?.includes("Yes") ||
       false;
     const isPregnancy =
-      answersMap[normalize("Are you pregnant or breastfeeding?")]?.includes(
-        "yes"
-      ) || false;
-    const ageRange = answersMap[normalize("What’s your age range?")] || "";
+      answersMap[
+        normalize("are you currently pregnant and breastfeeding?")
+      ]?.includes("Yes") || false;
+    const normalizedSkinType = skinTypeFromScan
+      ? skinTypeFromScan.charAt(0).toUpperCase() +
+        skinTypeFromScan.slice(1).toLowerCase()
+      : null;
+
+    const ageRange = answersMap[normalize("what’s your age range?")] || "";
     let mainConcern =
-      answersMap[normalize("What is your main skin concern?")] || "General";
+      answersMap[normalize("what is your main skin concern?")] || "General";
 
     console.log("answersMap:", answersMap);
     console.log(
@@ -252,22 +257,42 @@ const getRecommendedIngredients = async (req, res) => {
       sensitive: ["soothing", "fragrance-free"],
       pigmentation: ["brightening", "cell-turnover", "anti-darkspot"],
       "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
+      sunscreen: ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
     };
 
     const concernAvoidTags = {
       acne: ["comedogenic", "heavy", "beeswax"],
-      sensitive: ["fragrance", "alcohol", "essential-oil"],
       dryness: ["fragrance", "alcohol"],
       oily: ["heavy", "comedogenic"],
+      sensitive: ["fragrance", "alcohol", "essential-oil"],
+      acne_scars: ["comedogenic", "essential-oil"],
       pregnancy: ["benzoyl peroxide", "retinol"],
+    };
+
+    const skinTypeAvoidTags = {
+      Dry: ["fragrance", "alcohol"],
+      Oily: ["heavy", "comedogenic"],
+      Normal: [],
+    };
+
+    const extraAvoidTags = {
+      usesSunscreen: ["spf-heavy"],
+      ageOver40: ["harsh-chemical", "retinol"],
     };
 
     const concernTags = concernToTags[normalizedConcern] || [];
     const avoidTags = [
       ...(concernAvoidTags[normalizedConcern] || []),
+      ...(normalizedSkinType
+        ? skinTypeAvoidTags[normalizedSkinType] || []
+        : []),
       ...(isPregnancy ? concernAvoidTags.pregnancy : []),
       ...(isSensitive ? concernAvoidTags.sensitive : []),
+      ...(usesSunscreen ? extraAvoidTags.usesSunscreen : []),
+      ...(ageRange.includes("40") ? extraAvoidTags.ageOver40 : []),
     ];
+
+    const uniqueAvoidTags = [...new Set(avoidTags)];
 
     // --- STEP 5: Build base ingredient query ---
     const ingredients = await Ingredient.findAll({
@@ -341,7 +366,6 @@ const getRecommendedIngredients = async (req, res) => {
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
 
-    // const recommendedIngredients = ingredientScores.slice(0, 5);
     const recommendedIds = recommendedIngredients.map((i) => i.id);
 
     await ResultScanIngredient.bulkCreate(
@@ -383,11 +407,25 @@ const getRecommendedIngredients = async (req, res) => {
       nest: true,
     });
 
+    const filteredProducts = bestProducts.filter((prod) => {
+      const ingredientsInProduct = prod.Ingredients || [];
+
+      const ingredientTags = ingredientsInProduct.flatMap(
+        (ing) => ing.tags || []
+      );
+
+      const hasAvoidTag = ingredientTags.some((tag) =>
+        matchedAvoidTags.includes(tag)
+      );
+
+      return !hasAvoidTag;
+    });
+
     // --- STEP 8: Filter 1 produk per productType ---
     const selectedTypes = new Set();
     const finalRecommendations = [];
 
-    for (const prod of bestProducts) {
+    for (const prod of filteredProducts) {
       const type = prod.productType
         ? prod.productType.toLowerCase().trim()
         : `type-${prod.id}`;
@@ -411,6 +449,7 @@ const getRecommendedIngredients = async (req, res) => {
       finalScore,
       recommendedIngredients,
       recommendedProducts: finalRecommendations,
+      uniqueAvoidTags,
     });
   } catch (err) {
     console.error(err);
