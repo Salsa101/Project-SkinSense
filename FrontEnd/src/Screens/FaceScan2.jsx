@@ -484,7 +484,10 @@ const FaceScan2 = ({ navigation }) => {
                           borderRadius: 6,
                         }}
                       >
-                        ✖ {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                        ✖{' '}
+                        {tag
+                          .replace(/-/g, ' ')
+                          .replace(/\b\w/g, c => c.toUpperCase())}
                       </Text>
                     ))
                   ) : (

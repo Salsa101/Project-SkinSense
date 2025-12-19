@@ -1,4 +1,9 @@
-const { ResultScan, Product, Ingredient } = require("../models");
+const {
+  ResultScan,
+  Product,
+  Ingredient,
+  ResultScanAvoid,
+} = require("../models");
 
 const getScanDetail = async (req, res) => {
   try {
@@ -25,6 +30,11 @@ const getScanDetail = async (req, res) => {
           ],
           through: { attributes: [] },
         },
+        {
+          model: ResultScanAvoid,
+          as: "avoidTags",
+          attributes: ["name"],
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -49,7 +59,9 @@ const getScanDetail = async (req, res) => {
 
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
-        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil"],
+        avoidIngredients: scan.avoidTags.map((a) =>
+          a.name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+        ),
 
         products: scan.products.map((p) => ({
           id: p.id,

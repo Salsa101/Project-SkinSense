@@ -6,6 +6,7 @@ const {
   ResultScanQuizUserAnswer,
   ResultScanIngredient,
   ResultScanProduct,
+  ResultScanAvoid,
   Ingredient,
   Product,
 } = require("../models");
@@ -66,6 +67,12 @@ const getScanQuizDetail = async (req, res) => {
           ],
           through: { attributes: [] },
         },
+        // === AVOID TAGS ===
+        {
+          model: ResultScanAvoid,
+          as: "avoidTags",
+          attributes: ["name"],
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -101,8 +108,10 @@ const getScanQuizDetail = async (req, res) => {
         // === INGREDIENTS FOR YOU ===
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
-        // === AVOID INGREDIENTS (dummy dulu) ===
-        avoidIngredients: ["Alcohol", "Fragrance", "Coconut Oil"],
+        // === AVOID INGREDIENTS ===
+        avoidIngredients: scan.avoidTags.map((a) =>
+          a.name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+        ),
 
         // === PRODUCTS ===
         products: scan.products.map((p) => ({

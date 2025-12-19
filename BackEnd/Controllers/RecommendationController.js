@@ -8,6 +8,7 @@ const {
   ResultScanIngredient,
   Product,
   ResultScanProduct,
+  ResultScanAvoid,
   sequelize,
 } = require("../models");
 const { Op } = require("sequelize");
@@ -441,6 +442,15 @@ const getRecommendedIngredients = async (req, res) => {
         product_id: p.id,
       }))
     );
+
+    if (uniqueAvoidTags.length > 0) {
+      await ResultScanAvoid.bulkCreate(
+        uniqueAvoidTags.map((tag) => ({
+          resultScan_id: resultScanId,
+          name: tag,
+        }))
+      );
+    }
 
     res.json({
       success: true,

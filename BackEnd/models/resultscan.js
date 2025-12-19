@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ResultScanProduct,
         foreignKey: "resultScan_id",
         otherKey: "product_id",
-        as: "products", 
+        as: "products",
       });
 
       ResultScan.belongsToMany(models.QuizUserAnswer, {
@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "resultScanId",
         otherKey: "quizUserAnswerId",
         as: "quizAnswers",
+      });
+
+      ResultScan.hasMany(models.ResultScanAvoid, {
+        foreignKey: "resultScan_id",
+        as: "avoidTags",
       });
     }
   }
