@@ -16,9 +16,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS
-const whitelist = process.env.CORS_WHITELIST
-  ? process.env.CORS_WHITELIST.split(",")
-  : [];
+const whitelist = [
+  "http://localhost:5173",
+  "http://10.0.2.2:3000",
+  "http://YOU_API_ADRESS:3000",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {

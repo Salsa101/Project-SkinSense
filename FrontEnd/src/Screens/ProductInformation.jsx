@@ -80,7 +80,7 @@ const ProductInformation = ({ navigation, route }) => {
             source={
               product.productimage
                 ? {
-                    uri: `${api.defaults.baseURL}${product.productimage}`,
+                    uri: product.productimage,
                   } // pakai productimage
                 : require('../../assets/product-placeholder.jpg') // fallback
             }
