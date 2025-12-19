@@ -420,19 +420,26 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  {recommendationData.recommendedIngredients?.map(item => (
-                    <Text
-                      key={item.id}
-                      style={{
-                        backgroundColor: '#FFF0F2',
-                        color: '#E07C8E',
-                        padding: 6,
-                        borderRadius: 6,
-                      }}
-                    >
-                      ✔ {item.name}
+                  {recommendationData.recommendedIngredients &&
+                  recommendationData.recommendedIngredients.length > 0 ? (
+                    recommendationData.recommendedIngredients.map(item => (
+                      <Text
+                        key={item.id}
+                        style={{
+                          backgroundColor: '#FFF0F2',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        ✔ {item.name}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                      No recommended ingredients
                     </Text>
-                  ))}
+                  )}
                 </View>
               </View>
             </View>
@@ -465,19 +472,26 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  {recommendationData.uniqueAvoidTags?.map((tag, index) => (
-                    <Text
-                      key={`avoid-${index}`}
-                      style={{
-                        backgroundColor: '#FFEAEA',
-                        color: '#E07C8E',
-                        padding: 6,
-                        borderRadius: 6,
-                      }}
-                    >
-                      ✖ {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                  {recommendationData.uniqueAvoidTags &&
+                  recommendationData.uniqueAvoidTags.length > 0 ? (
+                    recommendationData.uniqueAvoidTags.map((tag, index) => (
+                      <Text
+                        key={`avoid-${index}`}
+                        style={{
+                          backgroundColor: '#FFEAEA',
+                          color: '#E07C8E',
+                          padding: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        ✖ {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                      Nothing to avoid
                     </Text>
-                  ))}
+                  )}
                 </View>
               </View>
             </View>
@@ -507,67 +521,74 @@ const FaceScan2 = ({ navigation }) => {
                     paddingRight: 12,
                   }}
                 >
-                  {recommendationData.recommendedProducts?.map(
-                    (product, index) => (
-                      <View
-                        key={product.id}
-                        style={{
-                          alignItems: 'center',
-                          width: 120,
-                          backgroundColor: '#FFEAEA',
-                          padding: 10,
-                          borderRadius: 8,
-                          marginRight:
-                            index ===
-                            recommendationData.recommendedProducts.length - 1
-                              ? 0
-                              : 12, // jarak antar card
-                        }}
-                      >
-                        <Image
-                          source={
-                            product.productimage
-                              ? {
-                                  uri: `${api.defaults.baseURL}${product.productImage}`,
-                                } // pakai productimage
-                              : require('../../assets/product-placeholder.jpg') // fallback
-                          }
+                  {recommendationData.recommendedProducts &&
+                  recommendationData.recommendedProducts.length > 0 ? (
+                    recommendationData.recommendedProducts.map(
+                      (product, index) => (
+                        <View
+                          key={product.id}
                           style={{
-                            width: 95,
-                            height: 95,
+                            alignItems: 'center',
+                            width: 120,
+                            backgroundColor: '#FFEAEA',
+                            padding: 10,
                             borderRadius: 8,
-                            marginBottom: 4,
+                            marginRight:
+                              index ===
+                              recommendationData.recommendedProducts.length - 1
+                                ? 0
+                                : 12,
                           }}
-                        />
+                        >
+                          <Image
+                            source={
+                              product.productImage
+                                ? {
+                                    uri: `${api.defaults.baseURL}${product.productImage}`,
+                                  }
+                                : require('../../assets/product-placeholder.jpg')
+                            }
+                            style={{
+                              width: 95,
+                              height: 95,
+                              borderRadius: 8,
+                              marginBottom: 4,
+                            }}
+                          />
 
-                        <Text
-                          style={{
-                            marginTop: 4,
-                            fontSize: 12,
-                            textAlign: 'flex-start',
-                            fontWeight: 'bold',
-                            color: '#E07C8E',
-                          }}
-                        >
-                          {product.productName}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            marginTop: 8,
-                            alignSelf: 'flex-end',
-                            color: '#A77B7B',
-                          }}
-                          onPress={() =>
-                            navigation.navigate('ProductInformation', {
-                              productId: product.id,
-                            })
-                          }
-                        >
-                          See details →
-                        </Text>
-                      </View>
-                    ),
+                          <Text
+                            style={{
+                              marginTop: 4,
+                              fontSize: 12,
+                              textAlign: 'flex-start',
+                              fontWeight: 'bold',
+                              color: '#E07C8E',
+                            }}
+                          >
+                            {product.productName}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              marginTop: 8,
+                              alignSelf: 'flex-end',
+                              color: '#A77B7B',
+                            }}
+                            onPress={() =>
+                              navigation.navigate('ProductInformation', {
+                                productId: product.id,
+                              })
+                            }
+                          >
+                            See details →
+                          </Text>
+                        </View>
+                      ),
+                    )
+                  ) : (
+                    <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                      No recommended products
+                    </Text>
                   )}
                 </ScrollView>
               </View>
