@@ -246,6 +246,13 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+        quizQuestionId: 9,
+        title: "No Concern",
+        weight: 2.5,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         quizQuestionId: 10,
         title: "Yes",
         weight: 1,
