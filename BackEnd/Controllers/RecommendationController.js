@@ -233,12 +233,20 @@ const getRecommendedIngredients = async (req, res) => {
       acne: [
         "bha",
         "aha",
-        "moisturizing",
+        "niacinamide",
+        "zinc",
         "anti-bacterial",
         "acne-treatment",
-        "benzoyl peroxide",
+        "anti-acne",
+        "benzoyl-peroxide",
       ],
-      dryness: ["hydration", "humectant", "dry", "moisturizing"],
+      dryness: [
+        "hydration",
+        "humectant",
+        "barrier-repair",
+        "dry",
+        "moisturizing",
+      ],
       oily: [
         "oil-control",
         "sebum-regulation",
@@ -246,24 +254,40 @@ const getRecommendedIngredients = async (req, res) => {
         "aha",
         "bha",
       ],
-      dullness: ["brightening", "aha", "exfoliation", "anti-oxidant"],
+      dullness: ["brightening", "aha", "pha", "exfoliation", "anti-oxidant"],
       acne_scars: [
         "retinol",
         "collagen",
         "scar-healing",
+        "niacinamide",
         "hydration",
         "cell-turnover",
       ],
       aging: ["anti-aging", "cell-turnover", "peptides", "collagen"],
-      sensitive: ["soothing", "fragrance-free"],
-      pigmentation: ["brightening", "cell-turnover", "anti-darkspot"],
-      "sun damage": ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
-      sunscreen: ["spf", "sun-protection", "vitamin-e", "zinc-oxide"],
+      sensitive: [
+        "soothing",
+        "fragrance-free",
+        "alcohol-free",
+        "barrier-repair",
+      ],
+      pigmentation: [
+        "brightening",
+        "cell-turnover",
+        "vitamin-c",
+        "anti-darkspot",
+      ],
+      sunscreen: [
+        "spf",
+        "sun-protection",
+        "vitamin-e",
+        "zinc-oxide",
+        "sun-damage",
+      ],
     };
 
     const concernAvoidTags = {
-      acne: ["comedogenic", "heavy", "beeswax"],
-      dryness: ["fragrance", "alcohol"],
+      acne: ["comedogenic", "heavy", "beeswax", "fragrance"],
+      dryness: ["fragrance", "alcohol", "benzoyl-peroxide"],
       oily: ["heavy", "comedogenic"],
       sensitive: ["fragrance", "alcohol", "essential-oil"],
       acne_scars: ["comedogenic", "essential-oil"],
@@ -273,12 +297,13 @@ const getRecommendedIngredients = async (req, res) => {
     const skinTypeAvoidTags = {
       Dry: ["fragrance", "alcohol"],
       Oily: ["heavy", "comedogenic"],
+      Combination: ["heavy"],
       Normal: [],
     };
 
     const extraAvoidTags = {
       usesSunscreen: ["spf-heavy"],
-      ageOver40: ["harsh-chemical", "retinol"],
+      ageOver40: ["harsh-chemical"],
     };
 
     const concernTags = concernToTags[normalizedConcern] || [];
@@ -401,7 +426,7 @@ const getRecommendedIngredients = async (req, res) => {
       ],
       group: ["Product.id"],
       having: sequelize.literal(
-        `COUNT("Ingredients->ProductIngredient"."ingredients_id") >= 3`
+        `COUNT("Ingredients->ProductIngredient"."ingredients_id") >= 2`
       ),
       order: [[sequelize.fn("COUNT", sequelize.col("Ingredients.id")), "DESC"]],
       raw: true,
