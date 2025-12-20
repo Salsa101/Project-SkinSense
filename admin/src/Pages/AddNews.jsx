@@ -89,7 +89,6 @@ function AddNews() {
             value={form.content}
             onChange={(value) => setForm({ ...form, content: value })}
             style={{ height: "200px", marginBottom: "50px" }}
-            required
           />
         </div>
 
@@ -114,7 +113,6 @@ function AddNews() {
                         : [...form.categoryIds, id],
                     });
                   }}
-                  required
                 />
                 <label className="form-check-label">{c.name}</label>
               </div>
