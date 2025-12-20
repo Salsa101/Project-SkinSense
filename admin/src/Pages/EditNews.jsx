@@ -110,7 +110,6 @@ function EditNews() {
             value={form.content}
             onChange={(value) => setForm({ ...form, content: value })}
             style={{ height: "200px", marginBottom: "50px" }}
-            required
           />
         </div>
 
@@ -126,7 +125,6 @@ function EditNews() {
                   value={c.id}
                   checked={form.categoryIds.includes(c.id)}
                   onChange={(e) => handleCheckboxChange(c.id, e.target.checked)}
-                  required
                 />
                 <label className="form-check-label" htmlFor={`cat-${c.id}`}>
                   {c.name}
