@@ -77,7 +77,7 @@ const notifToggle = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { username, age, date_of_birth } = req.body;
+    const { username, email, age, date_of_birth } = req.body;
 
     const oldUser = await User.findByPk(userId);
     if (!oldUser) return res.status(404).json({ message: "User not found" });
@@ -103,9 +103,17 @@ const updateProfile = async (req, res) => {
           .secure_url
       : oldUser.bannerImage;
 
+    if (email && email !== oldUser.email) {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email sudah digunakan" });
+      }
+    }
+
     // siapkan data update
     const updateData = {
       username,
+      email,
       profileImage: profileImageUrl,
       bannerImage: bannerImageUrl,
     };
