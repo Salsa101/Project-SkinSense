@@ -96,6 +96,7 @@ const EditProfile = ({ navigation }) => {
       formData.append('username', name);
       formData.append('age', age);
       formData.append('date_of_birth', dob);
+      formData.append('email', email);
       if (profileImage) {
         formData.append('profileImage', {
           uri: profileImage.uri,
