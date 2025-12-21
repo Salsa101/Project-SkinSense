@@ -60,20 +60,36 @@ export const fetchAndScheduleNotifications = async () => {
     const expRes = await api.get('/expiry-product/notif');
     console.log('Expired product response:', expRes.data);
 
-    if (expRes.data) {
-      expRes.data.forEach(p => {
-        const expDate = new Date(p.expirationDate);
-        const pesan = `${
-          p.Product.productName
-        } will expire on ${expDate.toDateString()}`;
-        console.log('Sending notification for expired:', pesan);
+    if (expRes.data && expRes.data.length > 0) {
+      const productNames = expRes.data.map(p => p.Product.productName);
 
-        notification.kirimNotifikasi(
-          `${p.id}`,
-          'Product is almost expired ⚠️',
-          pesan,
-        );
+      // get the nearest expiration date
+      const earliestExp = expRes.data.reduce((earliest, p) => {
+        const d = new Date(p.expirationDate);
+        return !earliest || d < earliest ? d : earliest;
+      }, null);
+
+      const formattedDate = earliestExp.toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
       });
+
+      const message = `${productNames.join(
+        ', ',
+      )} will expire on ${formattedDate}`;
+
+      const time = new Date();
+      time.setHours(9, 0, 0, 0);
+
+      if (time <= new Date()) time.setDate(time.getDate() + 1);
+
+      notification.buatChannel('expired-product');
+
+      notification.kirimNotifikasiExpiredHarian(
+        '⚠️ Products Almost Expired',
+        message,
+        time,
+      );
     }
 
     notification.cekSemuaNotifikasi();
