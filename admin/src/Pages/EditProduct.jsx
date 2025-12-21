@@ -18,6 +18,7 @@ function EditProduct() {
   const [ingredientSearch, setIngredientSearch] = useState("");
   const [ingredientResults, setIngredientResults] = useState([]);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // GET PRODUCT DATA + ITS INGREDIENTS
   useEffect(() => {
@@ -37,6 +38,8 @@ function EditProduct() {
       } catch (err) {
         console.error(err);
         alert("Failed to load product data.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -112,6 +115,20 @@ function EditProduct() {
       alert("Failed to update product. Please try again.");
     }
   };
+
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading...
+      </div>
+    );
 
   return (
     <div className="container my-4">
