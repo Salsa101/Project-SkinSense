@@ -16,6 +16,7 @@ function EditNews() {
   });
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -39,6 +40,7 @@ function EditNews() {
           content: res.data.content,
           categoryIds: res.data.Categories?.map((c) => c.id) || [],
         });
+        setLoading(false);
       } catch (err) {
         console.error(err);
         alert("Failed to load news data.");
@@ -86,6 +88,20 @@ function EditNews() {
       alert("Failed to update news. Please try again.");
     }
   };
+
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        Loading...
+      </div>
+    );
 
   return (
     <div className="container my-4">
