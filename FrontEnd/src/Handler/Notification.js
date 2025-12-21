@@ -94,6 +94,18 @@ class Notification {
     });
   };
 
+  kirimNotifikasiExpiredHarian = (judul, pesan, waktu) => {
+    PushNotification.localNotificationSchedule({
+      channelId: 'expired-product',
+      title: judul,
+      message: pesan,
+      date: waktu,
+      allowWhileIdle: true,
+      repeatType: 'day',
+      repeatTime: '1',
+    });
+  };
+
   cancelAllNotifications = () => {
     // Cancel ALL scheduled notifications
     PushNotification.getScheduledLocalNotifications(list => {
