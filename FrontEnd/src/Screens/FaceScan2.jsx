@@ -470,9 +470,9 @@ const FaceScan2 = ({ navigation }) => {
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
-                  {recommendationData.uniqueAvoidTags &&
-                  recommendationData.uniqueAvoidTags.length > 0 ? (
-                    recommendationData.uniqueAvoidTags.map((tag, index) => (
+                  {recommendationData.avoidIngredients &&
+                  recommendationData.avoidIngredients.length > 0 ? (
+                    recommendationData.avoidIngredients.map((item, index) => (
                       <Text
                         key={`avoid-${index}`}
                         style={{
@@ -482,15 +482,12 @@ const FaceScan2 = ({ navigation }) => {
                           borderRadius: 6,
                         }}
                       >
-                        ✖{' '}
-                        {tag
-                          .replace(/-/g, ' ')
-                          .replace(/\b\w/g, c => c.toUpperCase())}
+                        ✖ {item.name} ({item.reasons.join(', ')})
                       </Text>
                     ))
                   ) : (
                     <Text style={{ color: '#999', fontStyle: 'italic' }}>
-                      Nothing to avoid
+                      No ingredients to avoid
                     </Text>
                   )}
                 </View>
@@ -594,6 +591,18 @@ const FaceScan2 = ({ navigation }) => {
                 </ScrollView>
               </View>
             </View>
+            <Text
+              style={{
+                fontSize: 11,
+                color: '#8A6A6A',
+                marginBottom: 8,
+                fontStyle: 'italic',
+              }}
+            >
+              *This skin scan is intended as a supporting tool only and does not
+              replace professional consultation. For accurate treatment, please
+              consult a skincare professional.
+            </Text>
           </View>
 
           {/* Home Button */}
