@@ -73,7 +73,7 @@ const getScanQuizDetail = async (req, res) => {
         {
           model: ResultScanAvoid,
           as: "avoidTags",
-          attributes: ["name"],
+          attributes: ["name", "reasons"],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -111,9 +111,14 @@ const getScanQuizDetail = async (req, res) => {
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
         // === AVOID INGREDIENTS ===
-        avoidIngredients: scan.avoidTags.map((a) =>
-          a.name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-        ),
+        avoidIngredients: scan.avoidTags.map((a) => ({
+          name: a.name
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase()),
+          reasons: Array.isArray(a.reasons)
+            ? a.reasons
+            : JSON.parse(a.reasons || "[]"),
+        })),
 
         // === PRODUCTS ===
         products: scan.products.map((p) => ({
