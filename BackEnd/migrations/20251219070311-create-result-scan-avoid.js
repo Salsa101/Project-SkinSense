@@ -20,6 +20,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      reasons: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
