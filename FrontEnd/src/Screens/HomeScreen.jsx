@@ -143,8 +143,11 @@ const HomeScreen = ({ navigation }) => {
           setWeeklyNews(null);
         }
       } catch (err) {
-        console.error('Error fetching weekly news:', err);
-        setWeeklyNews(null);
+        if (err.response?.status === 404) {
+          setWeeklyNews(null);
+        } else {
+          console.error('Error fetching weekly news:', err);
+        }
       } finally {
         setLoading(false);
       }
