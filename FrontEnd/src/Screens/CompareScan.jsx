@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  ScrollView,
   Alert,
 } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon1 from 'react-native-vector-icons/Ionicons';
@@ -461,19 +461,34 @@ const CompareScan = ({ navigation }) => {
                           gap: 8,
                         }}
                       >
-                        {currentItem.ingredientsForYou.map((item, idx) => (
-                          <Text
-                            key={idx}
+                        {currentItem.ingredientsForYou &&
+                        currentItem.ingredientsForYou.length > 0 ? (
+                          <View
                             style={{
-                              backgroundColor: '#FFF0F2',
-                              color: '#E07C8E',
-                              padding: 6,
-                              borderRadius: 6,
+                              flexDirection: 'row',
+                              flexWrap: 'wrap',
+                              gap: 8,
                             }}
                           >
-                            ✔ {item}
+                            {currentItem.ingredientsForYou.map((item, idx) => (
+                              <Text
+                                key={idx}
+                                style={{
+                                  backgroundColor: '#FFF0F2',
+                                  color: '#E07C8E',
+                                  padding: 6,
+                                  borderRadius: 6,
+                                }}
+                              >
+                                ✔ {item}
+                              </Text>
+                            ))}
+                          </View>
+                        ) : (
+                          <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                            No recommended ingredients
                           </Text>
-                        ))}
+                        )}
                       </View>
                     </View>
                   </View>
@@ -512,19 +527,34 @@ const CompareScan = ({ navigation }) => {
                           gap: 8,
                         }}
                       >
-                        {currentItem.avoidIngredients.map((item, idx) => (
-                          <Text
-                            key={idx}
+                        {currentItem.avoidIngredients &&
+                        currentItem.avoidIngredients.length > 0 ? (
+                          <View
                             style={{
-                              backgroundColor: '#FFEAEA',
-                              color: '#E07C8E',
-                              padding: 6,
-                              borderRadius: 6,
+                              flexDirection: 'row',
+                              flexWrap: 'wrap',
+                              gap: 8,
                             }}
                           >
-                            ✖ {item}
+                            {currentItem.avoidIngredients.map((item, idx) => (
+                              <Text
+                                key={idx}
+                                style={{
+                                  backgroundColor: '#FFEAEA',
+                                  color: '#E07C8E',
+                                  padding: 6,
+                                  borderRadius: 6,
+                                }}
+                              >
+                                ✖ {item.name} ({item.reasons.join(', ')})
+                              </Text>
+                            ))}
+                          </View>
+                        ) : (
+                          <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                            No ingredients to avoid
                           </Text>
-                        ))}
+                        )}
                       </View>
                     </View>
                   </View>
@@ -546,76 +576,95 @@ const CompareScan = ({ navigation }) => {
                       <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
                         Products For You
                       </Text>
-                      <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{
-                          flexDirection: 'row',
-                          paddingRight: 12,
-                        }}
-                      >
-                        {currentItem.products?.map((product, index) => (
-                          <View
-                            key={index}
-                            style={{
-                              alignItems: 'center',
-                              width: 120,
-                              backgroundColor: '#FFEAEA',
-                              padding: 10,
-                              borderRadius: 8,
-                              marginRight:
-                                index === currentItem.products.length - 1
-                                  ? 0
-                                  : 12, // jarak antar card
-                            }}
-                          >
-                            <Image
-                              source={
-                                product.image
-                                  ? {
-                                      uri: `${api.defaults.baseURL}${product.image}`,
-                                    }
-                                  : require('../../assets/product-placeholder.jpg')
-                              }
+                      {currentItem.products &&
+                      currentItem.products.length > 0 ? (
+                        <ScrollView
+                          horizontal
+                          showsHorizontalScrollIndicator={false}
+                          contentContainerStyle={{
+                            flexDirection: 'row',
+                            paddingRight: 12,
+                          }}
+                        >
+                          {currentItem.products.map((product, index) => (
+                            <View
+                              key={index}
                               style={{
-                                width: 95,
-                                height: 95,
+                                alignItems: 'center',
+                                width: 120,
+                                backgroundColor: '#FFEAEA',
+                                padding: 10,
                                 borderRadius: 8,
-                                marginBottom: 4,
+                                marginRight:
+                                  index === currentItem.products.length - 1
+                                    ? 0
+                                    : 12,
                               }}
-                            />
+                            >
+                              <Image
+                                source={
+                                  product.image
+                                    ? {
+                                        uri: `${api.defaults.baseURL}${product.image}`,
+                                      }
+                                    : require('../../assets/product-placeholder.jpg')
+                                }
+                                style={{
+                                  width: 95,
+                                  height: 95,
+                                  borderRadius: 8,
+                                  marginBottom: 4,
+                                }}
+                              />
 
-                            <Text
-                              style={{
-                                marginTop: 4,
-                                fontSize: 12,
-                                textAlign: 'flex-start',
-                                fontWeight: 'bold',
-                                color: '#E07C8E',
-                              }}
-                            >
-                              {product.name}
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                marginTop: 8,
-                                alignSelf: 'flex-end',
-                                color: '#A77B7B',
-                              }}
-                              onPress={() =>
-                                navigation.navigate('ProductInformation', {
-                                  productId: product.id,
-                                })
-                              }
-                            >
-                              See details →
-                            </Text>
-                          </View>
-                        ))}
-                      </ScrollView>
+                              <Text
+                                style={{
+                                  marginTop: 4,
+                                  fontSize: 12,
+                                  textAlign: 'flex-start',
+                                  fontWeight: 'bold',
+                                  color: '#E07C8E',
+                                }}
+                              >
+                                {product.name}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  marginTop: 8,
+                                  alignSelf: 'flex-end',
+                                  color: '#A77B7B',
+                                }}
+                                onPress={() =>
+                                  navigation.navigate('ProductInformation', {
+                                    productId: product.id,
+                                  })
+                                }
+                              >
+                                See details →
+                              </Text>
+                            </View>
+                          ))}
+                        </ScrollView>
+                      ) : (
+                        <Text style={{ color: '#999', fontStyle: 'italic' }}>
+                          No recommended products
+                        </Text>
+                      )}
                     </View>
                   </View>
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: '#8A6A6A',
+                      marginBottom: 8,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    *This skin scan is intended as a supporting tool only and
+                    does not replace professional consultation. For accurate
+                    treatment, please consult a skincare professional.
+                  </Text>
                 </View>
 
                 {/* Compare Button */}
