@@ -33,7 +33,7 @@ const getScanDetail = async (req, res) => {
         {
           model: ResultScanAvoid,
           as: "avoidTags",
-          attributes: ["name"],
+          attributes: ["name", "reasons"],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -59,9 +59,14 @@ const getScanDetail = async (req, res) => {
 
         ingredientsForYou: scan.ingredients.map((i) => i.name),
 
-        avoidIngredients: scan.avoidTags.map((a) =>
-          a.name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-        ),
+        avoidIngredients: scan.avoidTags.map((a) => ({
+          name: a.name
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase()),
+          reasons: Array.isArray(a.reasons)
+            ? a.reasons
+            : JSON.parse(a.reasons || "[]"),
+        })),
 
         products: scan.products.map((p) => ({
           id: p.id,
