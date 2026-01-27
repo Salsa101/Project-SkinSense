@@ -232,78 +232,136 @@ const getRecommendedIngredients = async (req, res) => {
     const concernToTags = {
       acne: [
         "bha",
-        "aha",
+        "salicylic-acid",
         "niacinamide",
         "zinc",
         "anti-bacterial",
-        "acne-treatment",
         "anti-acne",
-        "benzoyl-peroxide",
+        "acne-treatment",
+        "oil-control",
+        "anti-inflammatory",
       ],
+
       dryness: [
         "hydration",
+        "hydrating",
         "humectant",
+        "hyaluronic-acid",
+        "urea",
         "barrier-repair",
-        "dry",
         "moisturizing",
+        "soothing",
+        "ceramides",
       ],
-      oily: [
-        "oil-control",
-        "sebum-regulation",
-        "anti-inflammatory",
+
+      oily: ["oil-control", "sebum-regulation", "anti-inflammatory", "bha"],
+
+      dullness: [
+        "brightening",
         "aha",
-        "bha",
+        "pha",
+        "exfoliation",
+        "anti-oxidant",
+        "vitamin-c",
       ],
-      dullness: ["brightening", "aha", "pha", "exfoliation", "anti-oxidant"],
+
       acne_scars: [
-        "retinol",
-        "collagen",
-        "scar-healing",
-        "niacinamide",
-        "hydration",
         "cell-turnover",
+        "collagen",
+        "niacinamide",
+        "vitamin-c",
+        "peptides",
+        "scar-healing",
+        "hydration",
       ],
-      aging: ["anti-aging", "cell-turnover", "peptides", "collagen"],
+
+      aging: [
+        "anti-aging",
+        "cell-turnover",
+        "peptides",
+        "collagen",
+        "retinol",
+        "vitamin-a",
+        "vitamin-c",
+        "vitamin-e",
+        "anti-oxidant",
+      ],
+
       sensitive: [
         "soothing",
-        "fragrance-free",
-        "alcohol-free",
+        "reduce-irritation",
+        "reduces-irritation",
+        "reduce-redness",
         "barrier-repair",
+        "centella-asiatica",
       ],
+
       pigmentation: [
         "brightening",
-        "cell-turnover",
-        "vitamin-c",
         "anti-darkspot",
+        "vitamin-c",
+        "tranexamic-acid",
+        "arbutin",
+        "cell-turnover",
+        "anti-oxidant",
       ],
+
       sunscreen: [
         "spf",
         "sun-protection",
-        "vitamin-e",
         "zinc-oxide",
-        "sun-damage",
+        "vitamin-e",
+        "anti-oxidant",
       ],
     };
 
     const concernAvoidTags = {
-      acne: ["comedogenic", "heavy", "beeswax", "fragrance"],
-      dryness: ["fragrance", "alcohol", "benzoyl-peroxide"],
-      oily: ["heavy", "comedogenic"],
-      sensitive: ["fragrance", "alcohol", "essential-oil"],
-      acne_scars: ["comedogenic", "essential-oil"],
-      pregnancy: ["benzoyl peroxide", "retinol"],
+      acne: ["comedogenic", "heavy", "cause-acne", "cause-fungal-acne"],
+
+      dryness: [
+        "alcohol",
+        "worsen-dryskin",
+        "exfoliant",
+        "salicylic-acid",
+        "surfactant",
+      ],
+
+      oily: ["heavy", "comedogenic", "worsen-oilyskin"],
+
+      sensitive: [
+        "fragrance",
+        "alcohol",
+        "cause-irritation",
+        "essential-oil",
+        "worsen-eczema",
+        "cause-eczema",
+      ],
+
+      acne_scars: ["comedogenic", "cause-irritation"],
+
+      pregnancy: ["retinol", "retinoid"],
     };
 
     const skinTypeAvoidTags = {
-      Dry: ["fragrance", "alcohol"],
-      Oily: ["heavy", "comedogenic"],
+      Dry: [
+        "alcohol",
+        "worsen-dryskin",
+        "exfoliant",
+        "salicylic-acid",
+        "surfactant",
+      ],
+
+      Oily: ["heavy", "comedogenic", "cause-fungal-acne", "worsen-oilyskin"],
+
       Combination: ["heavy"],
+
       Normal: [],
     };
 
     const extraAvoidTags = {
-      usesSunscreen: ["spf-heavy"],
-      ageOver40: ["harsh-chemical"],
+      usesSunscreen: ["heavy"],
+
+      ageOver40: ["exfoliant", "fragrance", "alcohol"],
     };
 
     const concernTags = concernToTags[normalizedConcern] || [];
@@ -345,44 +403,139 @@ const getRecommendedIngredients = async (req, res) => {
       raw: true,
     });
 
+    const avoidIngredients = [];
+
     // --- STEP 6: Score ingredients ---
     const ingredientScores = ingredients.map((ingredient) => {
       let score = 0;
 
-      const ingredientTags = (ingredient.tags || []).map((t) =>
-        t.toLowerCase().trim()
-      );
+      console.log(`\n========================================`);
+      console.log(`🧪 Evaluating: ${ingredient.name}`);
+      console.log(`========================================`);
 
+      const ingredientTags = (ingredient.tags || [])
+        .map((t) => t.toLowerCase().trim())
+        .filter(Boolean);
+
+      console.log(`📋 Ingredient tags:`, ingredientTags);
+
+      // Skin type match
       if (
         skinTypeFromScan &&
         (ingredient.skinTypes?.includes(skinTypeFromScan) ||
           ingredient.skinTypes?.includes("all"))
-      )
+      ) {
         score += 3;
+        console.log(`✅ Skin type match (${skinTypeFromScan}): +3`);
+      } else {
+        console.log(`❌ No skin type match`);
+      }
 
+      console.log(`📊 Current score: ${score}`);
+
+      // Concern tags match
       const matchedTags = concernTags.filter((t) => ingredientTags.includes(t));
-      score += matchedTags.length * 5;
+      // score += matchedTags.length * 5;
+      if (matchedTags.length > 0) {
+        const points = matchedTags.length * 5;
+        score += points;
+        console.log(
+          `✅ Concern tags matched [${matchedTags.join(", ")}]: +${points}`
+        );
+      } else {
+        console.log(`❌ No concern tags matched`);
+      }
 
-      if (isSensitive && ingredient.isSensitive) score += 2;
-      if (ageRange.includes("40") && ingredientTags.includes("anti-aging"))
+      console.log(`📊 Current score: ${score}`);
+
+      // Sensitive bonus
+      // if (isSensitive && ingredient.isSensitive) score += 2;
+      if (isSensitive && ingredient.isSensitive) {
+        score += 2;
+        console.log(`✅ Sensitive safe: +2`);
+        console.log(`📊 Current score: ${score}`);
+      }
+
+      // Age bonus
+      // if (ageRange.includes("40") && ingredientTags.includes("anti-aging"))
+      //   score += 3;
+      if (ageRange.includes("40") && ingredientTags.includes("anti-aging")) {
         score += 3;
-      if (usesSunscreen && ingredientTags.includes("spf")) score += 2;
+        console.log(`✅ Age 40+ anti-aging: +3`);
+        console.log(`📊 Current score: ${score}`);
+      }
+
+      // Sunscreen bonus
+      // if (usesSunscreen && ingredientTags.includes("spf")) score += 2;
+      if (usesSunscreen && ingredientTags.includes("spf")) {
+        score += 2;
+        console.log(`✅ Sunscreen with SPF: +2`);
+        console.log(`📊 Current score: ${score}`);
+      }
+
+      // Avoid tags penalty
+      // const matchedAvoidTags = avoidTags.filter((t) =>
+      //   ingredientTags.includes(t)
+      // );
+
+      // if (matchedAvoidTags.length > 0) {
+      //   avoidIngredients.push({
+      //     id: ingredient.id,
+      //     name: ingredient.name,
+      //     reasons: matchedAvoidTags,
+      //   });
+      // }
+
+      // if (matchedAvoidTags.length > 0) {
+      //   const penaltyMultiplier = acneCount <= 5 ? 0.5 : 1;
+      //   score -= matchedAvoidTags.length * 10 * penaltyMultiplier;
+      //   console.log(
+      //     `Avoid tags matched [${matchedAvoidTags.join(", ")}] (-${
+      //       matchedAvoidTags.length * 10
+      //     })`
+      //   );
+      // }
+
+      // return { ...ingredient, score, matchedAvoidTags };
 
       const matchedAvoidTags = avoidTags.filter((t) =>
         ingredientTags.includes(t)
       );
+
       if (matchedAvoidTags.length > 0) {
+        avoidIngredients.push({
+          id: ingredient.id,
+          name: ingredient.name,
+          reasons: matchedAvoidTags,
+        });
+
         const penaltyMultiplier = acneCount <= 5 ? 0.5 : 1;
-        score -= matchedAvoidTags.length * 10 * penaltyMultiplier;
+        const penalty = matchedAvoidTags.length * 10 * penaltyMultiplier;
+        score -= penalty;
+
         console.log(
-          `Avoid tags matched [${matchedAvoidTags.join(", ")}] (-${
-            matchedAvoidTags.length * 10
-          })`
+          `⚠️ Avoid tags matched [${matchedAvoidTags.join(", ")}]: -${penalty}`
         );
+        console.log(
+          `   (Penalty multiplier: ${penaltyMultiplier}x for acne count: ${acneCount})`
+        );
+      } else {
+        console.log(`✅ No avoid tags found`);
       }
+
+      console.log(`\n🎯 FINAL SCORE: ${score}`);
+      console.log(`========================================\n`);
 
       return { ...ingredient, score, matchedAvoidTags };
     });
+
+    console.log(`\n\n🏆 ========== RANKING RESULTS ==========`);
+    ingredientScores
+      .sort((a, b) => b.score - a.score)
+      .forEach((ing, index) => {
+        console.log(`${index + 1}. ${ing.name} - Score: ${ing.score}`);
+      });
+    console.log(`========================================\n`);
 
     const filteredIngredients = ingredientScores.filter(
       (ing) => ing.matchedAvoidTags.length === 0
@@ -393,6 +546,38 @@ const getRecommendedIngredients = async (req, res) => {
       .slice(0, 5);
 
     const recommendedIds = recommendedIngredients.map((i) => i.id);
+
+    const allIngredients = await Ingredient.findAll({
+      attributes: ["id", "name", "tags"],
+      raw: true,
+    });
+
+    const globalAvoidIngredients = allIngredients
+      .map((ingredient) => {
+        const ingredientTags = (ingredient.tags || [])
+          .map((t) => t.toLowerCase().trim())
+          .filter(Boolean);
+
+        const matchedAvoidTags = uniqueAvoidTags.filter((tag) =>
+          ingredientTags.includes(tag)
+        );
+
+        if (matchedAvoidTags.length > 0) {
+          return {
+            id: ingredient.id,
+            name: ingredient.name,
+            reasons: matchedAvoidTags,
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+
+    const finalAvoidIngredients = globalAvoidIngredients
+      .filter((ing) => !recommendedIds.includes(ing.id))
+      .sort((a, b) => b.reasons.length - a.reasons.length)
+      .slice(0, 5);
 
     await ResultScanIngredient.bulkCreate(
       recommendedIngredients.map((ing) => ({
@@ -468,11 +653,12 @@ const getRecommendedIngredients = async (req, res) => {
       }))
     );
 
-    if (uniqueAvoidTags.length > 0) {
+    if (finalAvoidIngredients.length > 0) {
       await ResultScanAvoid.bulkCreate(
-        uniqueAvoidTags.map((tag) => ({
+        finalAvoidIngredients.map((ing) => ({
           resultScan_id: resultScanId,
-          name: tag,
+          name: ing.name,
+          reasons: ing.reasons || [],
         }))
       );
     }
@@ -484,7 +670,7 @@ const getRecommendedIngredients = async (req, res) => {
       finalScore,
       recommendedIngredients,
       recommendedProducts: finalRecommendations,
-      uniqueAvoidTags,
+      avoidIngredients: finalAvoidIngredients,
     });
   } catch (err) {
     console.error(err);
