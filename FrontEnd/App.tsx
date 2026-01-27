@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, LogBox } from 'react-native';
 import AppNavigator from './src/Navigation/AppNavigator';
 import { notification } from './src/Handler/Notification';
 import { fetchAndScheduleNotifications } from './src/Handler/FetchNotification';
@@ -19,6 +19,8 @@ const App = () => {
     requestPermission();
     fetchAndScheduleNotifications();
   }, []);
+
+  LogBox.ignoreAllLogs();
 
   return <AppNavigator />;
 };
