@@ -56,6 +56,22 @@ export const fetchAndScheduleNotifications = async () => {
       });
     }
 
+    // === Reminder siang (sunscreen) ===
+    const now = new Date();
+    const sunscreenTime = new Date();
+    sunscreenTime.setHours(12, 0, 0, 0); // jam 12 siang
+
+    if (sunscreenTime <= now)
+      sunscreenTime.setDate(sunscreenTime.getDate() + 1);
+
+    notification.buatChannel('sunscreen-reminder');
+
+    notification.kirimNotifikasiJadwal(
+      '☀️ Sunscreen Reminder',
+      "Don't forget to use your sunscreen again.!",
+      sunscreenTime,
+    );
+
     // === Produk hampir expired ===
     const expRes = await api.get('/expiry-product/notif');
     console.log('Expired product response:', expRes.data);
