@@ -1,0 +1,82 @@
+"use strict";
+const { Model } = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  class RoutineProduct extends Model {
+    static associate(models) {
+      RoutineProduct.belongsTo(models.Product, {
+        foreignKey: "productId",
+        onDelete: "CASCADE",
+      });
+      RoutineProduct.belongsTo(models.User, { foreignKey: "userId" });
+      RoutineProduct.belongsTo(models.ReminderTime, {
+        foreignKey: "timeOfDay",
+        targetKey: "timeOfDay",
+        as: "reminder",
+      });
+    }
+  }
+
+  RoutineProduct.init(
+    {
+      routineType: {
+        type: DataTypes.ENUM("daily", "weekly", "custom"),
+        allowNull: false,
+      },
+      timeOfDay: {
+        type: DataTypes.ENUM("morning", "night"),
+        allowNull: false,
+      },
+      notificationFrequency: {
+        type: DataTypes.STRING,
+      },
+      dayOfWeek: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
+      customDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      productStep: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      dateOpened: {
+        type: DataTypes.DATEONLY,
+      },
+      expirationDate: {
+        type: DataTypes.DATEONLY,
+      },
+      doneDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      doneStatus: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      isOpened: DataTypes.BOOLEAN,
+      hasPao: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      paoMonths: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+    },
+    {
+      sequelize,
+      modelName: "RoutineProduct",
+    }
+  );
+
+  return RoutineProduct;
+};
